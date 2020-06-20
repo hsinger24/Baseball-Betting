@@ -445,11 +445,11 @@ print(z)
 #     away_table = starting_rotations_tables[sp_away_team]
     
 #     rotation_WAR_home = home_table.WAR.sum()
-#     pitcher_WAR_home = home_table[home_table['Name'] == sp_home].WAR * 5
+#     pitcher_WAR_home = home_table[home_table['Name'] == sp_home]['WAR'].iloc[0] * 5
 #     WAR_diff_home = pitcher_WAR_home - rotation_WAR_home
     
 #     rotation_WAR_away = away_table.WAR.sum()
-#     pitcher_WAR_away = away_table[away_table['Name'] == sp_away].WAR * 5
+#     pitcher_WAR_away = away_table[away_table['Name'] == sp_away]['WAR'].iloc[0] * 5
 #     WAR_diff_away = pitcher_WAR_away - rotation_WAR_away
    
     
