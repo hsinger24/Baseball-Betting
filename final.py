@@ -7,64 +7,38 @@ import re
 import pprint
 
 # projected war functions
-from get_active_roster import get_all_active_rosters
-from get_pecota_tables import get_combined_pecota_table
-from get_previous_year_war import get_combined_previous_year_war_table
-from get_overall_war_predictions import get_overall_war_predictions
-from get_final_war_table import get_final_war_table
+from war_functions.get_active_roster import get_all_active_rosters
+from war_functions.get_pecota_tables import get_combined_pecota_table
+from war_functions.get_previous_year_war import get_combined_previous_year_war_table
+from war_functions.get_overall_war_predictions import get_overall_war_predictions
+from war_functions.get_final_war_table import get_final_war_table
 
 # cluster luck functions
-from get_cluster_luck_hitting import get_cluster_luck_hitting_table
-from get_cluster_luck_pitching import get_cluster_luck_pitching_table
+from cluster_luck_functions.get_cluster_luck_hitting import get_cluster_luck_hitting_table
+from cluster_luck_functions.get_cluster_luck_pitching import get_cluster_luck_pitching_table
+from cluster_luck_functions.get_combined_cluster_luck_table import merge_cluster_luck_tables
+
+from get_final_win_percentage_table import get_win_percentage_predictions
 
 # projected war based off of last year and pecota
-# active_rosters = get_all_active_rosters()
-# pecota_table = get_combined_pecota_table()
-# previous_year_war_table = get_combined_previous_year_war_table()
-# projected_war_table = get_overall_war_predictions(active_rosters, pecota_table)
-# final_war_table = get_final_war_table(
-#     projected_war_table, previous_year_war_table)
+active_rosters = get_all_active_rosters()
+pecota_table = get_combined_pecota_table()
+previous_year_war_table = get_combined_previous_year_war_table()
+projected_war_table = get_overall_war_predictions(active_rosters, pecota_table)
+final_war_table = get_final_war_table(
+    projected_war_table, previous_year_war_table)
 
 # cluster luck tables
-# cluster_luck_hitting_table = get_cluster_luck_hitting_table()
+cluster_luck_hitting_table = get_cluster_luck_hitting_table()
 cluster_luck_pitching_table = get_cluster_luck_pitching_table()
-print(cluster_luck_pitching_table)
+cluster_luck_combined_table = merge_cluster_luck_tables(
+    cluster_luck_hitting_table, cluster_luck_pitching_table)
 
-# # Historical Pitching Table (2017-2019)
+# merge cluster luck and war tables
+win_percentage_predictions_table = get_win_percentage_predictions(
+    cluster_luck_combined_table, final_war_table)
 
-
-# # Merging 2019 Hitting and Pitching with CL Adjustments
-# cluster_final = pd.merge(hitting_2019, table_2019, on='Team')
-# drop_list = ['RK', 'GP', 'AB', 'H', '2B', '3B', 'HR', 'RBI', 'TB',
-#              'BB', 'SO', 'SB', 'AVG', 'OBP_x', 'SLG_x', 'OPS', 'ISO_x', 'HPR_x',
-#              'predict_x', 'SLG_y', 'OBP_y', 'ISO_y', 'RPG', 'HPG',
-#              'HPR_y', 'predict_y', ]
-# cluster_final.drop(drop_list, axis=1, inplace=True)
-# cluster_final.columns = [
-#     'Team', 'Runs', 'Offensive_Adjustment', 'Runs_Allowed', 'Defensive_Adjustment']
-# #cluster_final['Adjusted_Differential'] = cluster_final.Runs + cluster_final.Offensive_Adjustment + cluster_final.Defensive_Adjustment - cluster_final.Runs_Allowed
-# cluster_final['Defensive_Adjustment'] = -cluster_final['Defensive_Adjustment']
-# cluster_final['Adjusted_Runs_Scored'] = cluster_final.Runs + \
-#     cluster_final.Offensive_Adjustment
-# cluster_final['Adjusted_Runs_Allowed'] = cluster_final.Runs_Allowed + \
-#     cluster_final.Defensive_Adjustment
-
-
-# # In[7]:
-
-
-# # Final Merge to create base Win % Adjustments
-# final = pd.merge(cluster_final, final_WAR_table, on='Team')
-# display(final.columns)
-# drop_list_final = ['Runs', 'Offensive_Adjustment', 'Runs_Allowed',
-#                    'Defensive_Adjustment',
-#                    '2020', '2019', ]
-# final.drop(drop_list_final, axis=1, inplace=True)
-# # Using Pythagorean Linear Regression to Predict Win %
-# final['Win_Percentage'] = .5 + 0.000683 * \
-#     (final.Adjusted_Runs_Scored + final.Run_Change - final.Adjusted_Runs_Allowed)
-# display(final)
-
+print(win_percentage_predictions_table)
 
 # # In[8]:
 

@@ -40,32 +40,37 @@ def get_prev_three_years_stats():
 
 def get_pitching_linear_regression(pitching_data):
     # Linear Regression for Pitching
-    X_pitching = pitching_data.loc[:, ['SLG', 'OBP', 'ISO']]
-    Y_pitching = pitching_data.HPR
-    lr_pitching = LinearRegression()
-    lr_pitching.fit(X_pitching, Y_pitching)
+    x = pitching_data.loc[:, ['SLG', 'OBP', 'ISO']]
+    y = pitching_data.HPR
+    linear_regression = LinearRegression()
+    linear_regression.fit(x, y)
 
-    return lr_pitching
+    return linear_regression
 
 
-def get_previous_year_pitching_table(lr_pitching, table_2019):
-    # Creating 2019 Pitching Table With CL Adjustments
-    pitching_2019_x = table_2019.loc[:, ['SLG', 'OBP', 'ISO']]
-    table_2019['predict'] = lr_pitching.predict(pitching_2019_x)
-    table_2019['R'] = table_2019.RPG*162
-    table_2019['run_adjust'] = (
-        (table_2019['predict'] - table_2019['HPR'])/table_2019['HPR'])*table_2019['R']
+def get_previous_year_pitching_table(linear_regression, prev_year_table):
+    # use linear regression for prediction
+    x_vars = prev_year_table.loc[:, ['SLG', 'OBP', 'ISO']]
+    prev_year_table['predict'] = linear_regression.predict(x_vars)
+
+    # calculate runs and adjust columns
+    prev_year_table['R'] = prev_year_table.RPG*162
+    prev_year_table['run_adjust'] = (
+        (prev_year_table['predict'] - prev_year_table['HPR']) / prev_year_table['HPR'])*prev_year_table['R']
+
+    # add the team names as a column
     team_list = ['Dodgers', 'Rays', 'Cardinals', 'Astros', 'Athletics', 'Reds', 'Nationals', 'Cubs', 'Mets', 'Indians', 'Braves', 'Twins', 'Brewers', 'Giants', 'Padres',
                  'Red Sox', 'Diamondbacks', 'Yankees', 'Marlins', 'Blue Jays', 'White Sox', 'Phillies', 'Royals', 'Angels', 'Rangers', 'Mariners', 'Pirates', 'Tigers', 'Rockies', 'Orioles']
-    table_2019['Team'] = team_list
+    prev_year_table['Team'] = team_list
 
-    return table_2019
+    return prev_year_table
 
 
 def get_cluster_luck_pitching_table():
-    pitching_data, table_2019 = get_prev_three_years_stats()
-    lr_pitching = get_pitching_linear_regression(pitching_data)
+    prev_three_years_table, prev_year_table = get_prev_three_years_stats()
+    pitching_linear_regression = get_pitching_linear_regression(
+        prev_three_years_table)
     cluster_luck_pitching_table = get_previous_year_pitching_table(
-        lr_pitching, table_2019)
+        pitching_linear_regression, prev_year_table)
 
     return cluster_luck_pitching_table
