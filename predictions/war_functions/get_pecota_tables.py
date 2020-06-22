@@ -10,7 +10,7 @@ def get_pecota_hitting_table():
         - A pandas dataframe holding all the hitting data
     '''
     # create the table from the file
-    hitting_table = pd.read_csv('./pecota_data/pecota_hitting.csv')
+    hitting_table = pd.read_csv('./predictions/pecota_data/pecota_hitting.csv')
 
     # adjust columns
     hitting_table.drop('pos', axis=1, inplace=True)
@@ -36,7 +36,8 @@ def get_pecota_pitching_table():
         - A pandas dataframe holding all the pitching data
     '''
     # create the table from the file
-    pitching_table = pd.read_csv('./pecota_data/pecota_pitching.csv')
+    pitching_table = pd.read_csv(
+        './predictions/pecota_data/pecota_pitching.csv')
 
     # adjust columns
     pitching_table['g'] = 0
