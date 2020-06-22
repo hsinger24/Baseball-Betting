@@ -1,10 +1,7 @@
-import pandas as pd
-from sklearn.linear_model import LinearRegression
-from bs4 import BeautifulSoup
-from lxml import html
-import requests
-import re
-import pprint
+'''
+Project: MLB Baseball Betting Model
+Authors: Henry Singer, Ryan Loutos
+'''
 
 # projected war functions
 from predictions.war_functions.get_active_roster import get_all_active_rosters
