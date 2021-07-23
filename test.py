@@ -25,3 +25,4 @@ cl = get_combined_cluster_luck_table(ht, pt)
 # starting_rotations, f = get_starting_rotations(pt)
 # print(sp_adjustment(games, starting_rotations, 0.500))
 # hey this is a comment I did stuff
+# hey i added another comment
