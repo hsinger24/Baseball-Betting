@@ -18,6 +18,8 @@ ht = get_cluster_luck_hitting_table()
 pt = get_cluster_luck_hitting_table()
 cl = get_combined_cluster_luck_table(ht, pt)
 
+
+
 # games = get_todays_games_info()
 # pt = get_combined_pecota_table()
 # starting_rotations, f = get_starting_rotations(pt)
