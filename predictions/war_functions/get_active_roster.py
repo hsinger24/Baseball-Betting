@@ -1,5 +1,4 @@
 import requests
-import re
 
 # List of dictionaries with team_id and team_name as they appear in MLB API
 teams = [

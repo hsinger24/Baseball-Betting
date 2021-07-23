@@ -1,5 +1,4 @@
 from bs4 import BeautifulSoup
-from lxml import html
 import requests
 import re
 
