@@ -114,7 +114,7 @@ def get_team_active_roster(team_id):
     players_active = []
     for player in players_all:
         if (player['status_code'] == 'A'):
-            players_active.append(player['name_display_first_last'])
+            players_active.append((player['name_display_first_last'], player['player_id']))
     return players_active
 
 
@@ -133,3 +133,5 @@ def get_all_active_rosters():
             'team_roster': get_team_active_roster(team['team_id'])
         })
     return active_rosters
+
+

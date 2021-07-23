@@ -1,6 +1,6 @@
 '''
 Project: MLB Baseball Betting Model
-Authors: Henry Singer, Ryan Loutos
+Authors: Henry Singer, Ryan Loutos, Ben Schulman
 '''
 
 # projected war functions

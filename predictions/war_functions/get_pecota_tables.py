@@ -50,4 +50,7 @@ def get_pecota_pitching_table():
 
 
 def get_combined_pecota_table():
-    return pd.DataFrame.append(get_pecota_hitting_table(), get_pecota_pitching_table())
+    table = pd.DataFrame.append(get_pecota_hitting_table(), get_pecota_pitching_table())
+    table['name_wo_a'] = table.first_name + ' ' + table.last_name
+    return table
+

@@ -1,0 +1,8 @@
+1. Create function for cluster luck of active roster
+2. Create function get current projected winning %
+3. Figure out how to adjust for active roster
+    1. We have preseason projections of active roster, need to get current year WAR stats
+    2. What we should do is look at difference in current roster projected from beginning of season. Adjust with actual as season goes on
+4. Separate things we need to do once (and save results) vs. things that need to occur on a daily basis
+5. Get git setup
+6. Figure out final configuration
