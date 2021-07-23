@@ -14,13 +14,6 @@ from predictions.cluster_luck_functions.get_combined_cluster_luck_table import *
 
 from predictions.get_final_win_percentage_table import *
 
-ht = get_cluster_luck_hitting_table()
-pt = get_cluster_luck_hitting_table()
-cl = get_combined_cluster_luck_table(ht, pt)
 
 
 
-# games = get_todays_games_info()
-# pt = get_combined_pecota_table()
-# starting_rotations, f = get_starting_rotations(pt)
-# print(sp_adjustment(games, starting_rotations, 0.500))
