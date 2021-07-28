@@ -14,13 +14,9 @@ from predictions.cluster_luck_functions.get_combined_cluster_luck_table import *
 
 from predictions.get_final_win_percentage_table import *
 
-pt = get_combined_pecota_table()
-r = get_all_active_rosters()
-op = get_overall_war_predictions(r, pt)
+from external_work.odds_and_other_projections import *
 
-table,fucked = active_roster_adjustment(r, op)
-
-print(fucked)
+print(merge_all())
 
 
 

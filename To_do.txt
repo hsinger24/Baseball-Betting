@@ -6,5 +6,4 @@
 4. Separate things we need to do once (and save results) vs. things that need to occur on a daily basis
     1. Want a final file for beginning scripts and daily scripts
 5. Figure out final configuration
-6. Put scraping of other sites and odds into VS code
-7. Fix pitchers adjustment (don't use fangraphs)
+6. Fix pitchers adjustment (don't use fangraphs)
