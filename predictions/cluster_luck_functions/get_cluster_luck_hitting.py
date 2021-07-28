@@ -134,4 +134,23 @@ def get_cluster_luck_hitting_table():
 
     return cluster_luck_hitting_table
 
+def get_cluster_luck_hitting_current_year():
+    current_year = dt.date.today().year
+    url_this_year = 'https://www.espn.com/mlb/stats/team/_/stat/batting/season/%s/seasontype/2' % current_year
+    current_year_html = pd.read_html(url_this_year)
+    current_year_hitting = pd.concat(
+        [current_year_html[0], current_year_html[1]], axis=1)
+    current_year_hitting['ISO'] = (current_year_hitting['2B']+2*current_year_hitting['3B'] +
+                                3*current_year_hitting['HR']) / current_year_hitting['AB']
+    current_year_hitting['HPR'] = current_year_hitting['H'] / current_year_hitting['R']
+    regression = get_hitting_linear_regression(get_prev_three_years_hitting_table())
+    regression_x_vars = current_year_hitting.loc[:, ['OBP', 'ISO', 'SLG']]
+    current_year_hitting['predict'] = regression.predict(regression_x_vars)
+    current_year_hitting['run_adjust'] = (
+        (current_year_hitting['HPR'] - current_year_hitting['predict']) / current_year_hitting['HPR'])*current_year_hitting['R']
+    current_year_hitting.Team = current_year_hitting.Team.apply(lambda x: _team_map[x])
+    return current_year_hitting
+    
+
+
 

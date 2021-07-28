@@ -16,7 +16,7 @@ from predictions.get_final_win_percentage_table import *
 
 from external_work.odds_and_other_projections import *
 
-print(merge_all())
+print(get_current_year_pitching_table())
 
 
 

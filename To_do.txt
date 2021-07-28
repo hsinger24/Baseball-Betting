@@ -1,4 +1,4 @@
-1. Create function for cluster luck of active roster
+1. Create function for cluster luck of current team
 2. Create function get current projected winning %
 3. Figure out how to adjust for active roster (probably need to figure out selenium on baseball prospectus)
     1. We have preseason projections of active roster, need to get current year WAR stats
@@ -6,4 +6,7 @@
 4. Separate things we need to do once (and save results) vs. things that need to occur on a daily basis
     1. Want a final file for beginning scripts and daily scripts
 5. Figure out final configuration
+    1. Change folders and shit
 6. Fix pitchers adjustment (don't use fangraphs)
+
+######### LEFT OFF IN GET_CLUSTER_LUCK_PITCHING NEED TO ADJUST GP TO NOT BE 162

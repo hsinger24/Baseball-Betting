@@ -138,5 +138,21 @@ def get_cluster_luck_pitching_table():
 
     return cluster_luck_pitching_table
 
+def get_current_year_pitching_table():
+    year = dt.date.today().year
+    one_year_list = [f'https://www.teamrankings.com/mlb/stat/opponent-slugging-pct', f'https://www.teamrankings.com/mlb/stat/opponent-on-base-pct',
+                      f'https://www.teamrankings.com/mlb/stat/opponent-isolated-power', f'https://www.teamrankings.com/mlb/stat/opponent-runs-per-game', f'https://www.teamrankings.com/mlb/stat/opponent-hits-per-game']
+    current_year = table_maker(one_year_list, str(year))
+    x_vars = current_year.loc[:, ['SLG', 'OBP', 'ISO']]
+    current_year['predict'] = get_pitching_linear_regression(None).predict(x_vars)
+    current_year['R'] = current_year.RPG*gp
+    current_year['run_adjust'] = (
+        (current_year['predict'] - current_year['HPR']) / current_year['HPR'])*current_year['R']
+
+    current_year.Team = current_year.Team.apply(lambda x: _team_map[x])
+    return current_year
+
+
+
 
 
