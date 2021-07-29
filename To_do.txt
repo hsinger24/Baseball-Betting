@@ -7,6 +7,9 @@
     1. Want a final file for beginning scripts and daily scripts
 5. Figure out final configuration
     1. Change folders and shit
-6. Fix pitchers adjustment (don't use fangraphs)
+6. Fix pitchers adjustment (don't use FanGraphs)
 
 ######### LEFT OFF IN GET_CLUSTER_LUCK_PITCHING NEED TO ADJUST GP TO NOT BE 162
+
+
+# Note: When retrieving previous year team WARs in `predictions/war_table.py` we use FanGraphs, change that

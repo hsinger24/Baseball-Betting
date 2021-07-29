@@ -6,7 +6,7 @@ from predictions.war_functions.active_rosters import *
 from predictions.war_functions.get_final_war_table import *
 from predictions.war_functions.get_overall_war_predictions import *
 from predictions.war_functions.pecota_tables import *
-from predictions.war_functions.get_previous_year_war import *
+from predictions.war_functions.war_table import *
 
 from predictions.cluster_luck_functions.get_cluster_luck_hitting import *
 from predictions.cluster_luck_functions.get_cluster_luck_pitching import *
@@ -16,7 +16,10 @@ from predictions.get_final_win_percentage_table import *
 
 from external_work.odds_and_other_projections import *
 
-print(load_active_rosters())
+retrieve_historical_combined_war_table(2020)
+
+print(load_combined_war_table())
+
 
 
 
