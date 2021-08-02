@@ -1,4 +1,5 @@
 import requests
+import json
 
 # List of dictionaries with team_id and team_name as they appear in MLB API
 teams = [
@@ -96,9 +97,9 @@ teams = [
 ]
 
 
-def get_team_active_roster(team_id):
+def _retrieve_team_active_roster(team_id):
     '''
-    Gets the ~25 man active roster for a specific MLB team
+    Gets the ~25 man active roster for a specific MLB team. Should not be used outside this file
     Params:
         - team_id {Integer}: the id of the team in the list above
     Returns:
@@ -117,11 +118,11 @@ def get_team_active_roster(team_id):
     return players_active
 
 
-def get_all_active_rosters():
+def retrieve_all_active_rosters(file_name="data/rosters.json"):
     '''
-    Gets the active rosters for every MLB team
+    Downloads the active rosters for every MLB team and saves to given file_name (rosters.json)
     Params:
-        - None
+        - file_name=data/rosters.json
     Returns: 
         - A array of dictionaries where each element holds the team name and roster
     '''
@@ -129,8 +130,28 @@ def get_all_active_rosters():
     for team in teams:
         active_rosters.append({
             'team_name': team['team_name'],
-            'team_roster': get_team_active_roster(team['team_id'])
+            'team_roster': _retrieve_team_active_roster(team['team_id'])
         })
+
+    if file_name is not None:
+        with open(file_name, "w") as f:
+            f.write(json.dumps(active_rosters, indent=2))
+
     return active_rosters
+
+
+def load_active_rosters(file_name= "data/rosters.json"):
+    """Loads the active rosters from a saved file
+
+    Args:
+        file_name (str, optional): The json file to read the rosters. Defaults to "data/rosters.json".
+
+    Returns:
+        (list of dicts): a list of dicts, one dict for each team + roster
+    """
+
+    with open(file_name, "r") as f:
+        active_rosters = json.load(f)
+        return active_rosters
 
 
