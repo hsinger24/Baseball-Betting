@@ -6,8 +6,8 @@ Authors: Henry Singer, Ryan Loutos, Ben Schulman
 # projected war functions
 from predictions.war_functions.active_rosters import load_active_rosters, retrieve_all_active_rosters
 from predictions.war_functions.pecota_tables import load_combined_pecota_table
-from predictions.war_functions.war_table import retrieve_historical_combined_war_table, load_combined_war_table
-from predictions.war_functions.war_projections import calculate_team_war_projections_table
+from predictions.war_functions.historical_war_table import retrieve_historical_combined_war_table, load_combined_war_table
+from predictions.war_functions.war_projections_pecota import calculate_team_war_projections_table
 from predictions.war_functions.final_war_table import calculate_final_war_table
 
 # cluster luck functions
@@ -30,7 +30,7 @@ last_year = curr_year - 1
 retrieve = True
 if retrieve:
     retrieve_all_active_rosters()
-    retrieve_historical_combined_war_table(last_year, file_path=f"data/war_table_{last_year}csv")
+    retrieve_historical_combined_war_table(last_year, file_path=f"data/war_table_{last_year}.csv")
 
 # Load Data
 # projected war based off of last year and pecota
@@ -39,8 +39,8 @@ pecota_table = load_combined_pecota_table()
 previous_year_war_table = load_combined_war_table(file_path=f"data/war_table_{last_year}.csv")
 
 # Calculate Results
-projected_war_table = calculate_team_war_projections_table(active_rosters, pecota_table)
-final_war_table = calculate_final_war_table(projected_war_table, previous_year_war_table)
+projected_war_table_pecota = calculate_team_war_projections_table(active_rosters, pecota_table)
+final_war_table = calculate_final_war_table(projected_war_table_pecota, previous_year_war_table, curr_year)
 
 
 # ------------- Cluster Luck -------------
