@@ -1,12 +1,12 @@
-1. Create function for cluster luck of current team
-2. Create function get current projected winning %
-3. Figure out how to adjust for active roster (probably need to figure out selenium on baseball prospectus)
-    1. We have preseason projections of active roster, need to get current year WAR stats
-    2. What we should do is look at difference in current roster projected from beginning of season. Adjust with actual as season goes on
-4. Separate things we need to do once (and save results) vs. things that need to occur on a daily basis
-    1. Want a final file for beginning scripts and daily scripts
-5. Figure out final configuration
-    1. Change folders and shit
-6. Fix pitchers adjustment (don't use fangraphs)
+1. Get team's current WAR by active roster 
+    1. We currently use FanGraphs, need to use Baseball prospectus
+2. Fix pitcher adjustments to use baseball prospectus instead of FanGraphs
+3. Create function for team's winning percentage
+    1. As season goes on, need to adjust for current run differential, current cluster luck 
+4. Fix what folders every team is in
+5. Create final configuration
+    1. Things we need to do once vs. daily
+    2. What our daily output will look like
+    3. Need to save results in some way where we have data on performance
+    4. How to incorporate the other models we've scraped?
 
-######### LEFT OFF IN GET_CLUSTER_LUCK_PITCHING NEED TO ADJUST GP TO NOT BE 162

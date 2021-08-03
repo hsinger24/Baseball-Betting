@@ -75,7 +75,7 @@ def get_starting_rotations_failed(pecota_table):
 
     # return starting_rotations_tables, failed_to_find_war_list
 
-def get_starting_rotations(pecota_table):
+def get_starting_rotations(pecota_table, curr_year_WAR_BP):
     team_list = ['Diamondbacks', 'Braves', 'Orioles', 'Red Sox', 'Cubs', 'White Sox', 'Reds', 'Indians', 'Rockies',
                  'Tigers', 'Astros', 'Royals', 'Angels', 'Dodgers', 'Marlins', 'Brewers', 'Twins', 'Mets', 'Yankees',
                  'Athletics', 'Phillies', 'Pirates', 'Padres', 'Giants', 'Mariners', 'Cardinals', 'Rays', 'Rangers',
@@ -87,9 +87,10 @@ def get_starting_rotations(pecota_table):
         dfs = pd.read_html(link)
         starting_pitchers = dfs[-3]
 
-        starting_pitchers = starting_pitchers[['Name', 'WAR']]
+        starting_pitchers = starting_pitchers[['Name']]
         starting_pitchers = starting_pitchers.loc[starting_pitchers['Name'] != 'Total']
         starting_pitchers['WAR_proj'] = 0
+        starting_pitchers['WAR'] = 0
         sp_list = starting_pitchers[['Name']].values
         for index, pitcher in enumerate(sp_list):
             pitcher = pitcher[0]
@@ -104,5 +105,9 @@ def get_starting_rotations(pecota_table):
                     except:
                         starting_pitchers.loc[index, 'WAR_proj'] = 0
                         failed_to_find_war_list.append(pitcher)
+            try:
+                starting_pitchers.loc[index, 'WAR'] = curr_year_WAR_BP.loc[pitcher]
+            except:
+                failed_to_find_war_list.append(pitcher)
         starting_rotations[team] = starting_pitchers
     return starting_rotations, failed_to_find_war_list
