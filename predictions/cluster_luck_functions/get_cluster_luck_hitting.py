@@ -37,45 +37,85 @@ _team_map = {
     'Cincinnati Reds': 'Reds'
 }
 
-def get_prev_three_years_hitting_table():
-    # last three years links
+def _retrieve_single_year_hitting_table(year: int) -> pd.DataFrame:
+    """Retrieves a table from espn for a team's single year cluster luck table with
+    cluster luck regressors. This function should not be used outside this file
 
-    current_year = dt.date.today().year
-    years = [str(current_year-2), str(current_year-3), str(current_year-4)]
-    
+    Args:
+        year (int): the year to retrieve
 
-    # list of links to espn
-    links = ['https://www.espn.com/mlb/stats/team/_/stat/batting/season/%s/seasontype/2' % (year) for year in years]
+    Returns:
+        pd.DataFrame: DataFrame containing a teams single year stats to be used for cluster lucks
+    """
+    # Link to espn
+    link = 'https://www.espn.com/mlb/stats/team/_/stat/batting/season/%s/seasontype/2' % year
 
-    #links = ['https://www.espn.com/mlb/stats/team/_/stat/batting', 'https://www.espn.com/mlb/stats/team/_/stat/batting/season/2018/seasontype/2',
-    #         'https://www.espn.com/mlb/stats/team/_/stat/batting/season/2017/seasontype/2']
-
-    # will hold combination of all stats for teams from
-    #   previous three years
+    # will hold combination of all stats for teams for given year
     hitting_table = pd.DataFrame()
 
-    # loop through each year
-    for year in links:
-        stats_table_html = pd.read_html(year)
-        combined_stats_table = pd.concat(
-            [stats_table_html[0], stats_table_html[1]], axis=1)
-        hitting_table = hitting_table.append(combined_stats_table)
-
-    # sort and adjust and/or add columns
-    hitting_table.sort_values(by=['HR'], inplace=True, ascending=False)
-    hitting_table['ISO'] = (hitting_table['2B']+2*hitting_table['3B'] +
-                            3*hitting_table['HR']) / hitting_table['AB']
-    hitting_table['HPR'] = hitting_table['H'] / hitting_table['R']
+    # Collect hitting table for given year
+    stats_table_html = pd.read_html(year)
+    # Combine two required tables
+    combined_stats_table = pd.concat([stats_table_html[0], stats_table_html[1]], axis=1)
+    hitting_table = hitting_table.append(combined_stats_table)
 
     return hitting_table
 
+def retrieve_historical_hitting_tables(years: list[int], file_name="data/historical_team_hitting.csv") -> pd.DataFrame:
+    """Retrieve multi-year hitting table for a given list of years.
 
-def get_hitting_linear_regression(previous_three_years_table, load=True):
-    if load:
-        with open("./beginning_scripts/hitting_regression.pickle", 'rb') as f:
-            return pickle.load(f)
+    Args:
+        years (list[int]): the list of years to retrieve information from
+        file_name(str, optional): The file_path to save the resulting DataFrame to. If None, will not save.
+        Defaults to 'data/historical_team_hitting.csv'
+
+    Returns:
+        pd.DataFrame: a DataFrame containing the data to be used in a regression for clusterluck
+    """
+    # will hold combination of all stats for teams
+    multi_year_hitting_table = pd.DataFrame()
+
+    # loop through each year and append the single year table
+    for year in years:
+        multi_year_hitting_table.append(_retrieve_single_year_hitting_table(year))
+
+    # sort and adjust and/or add columns
+    multi_year_hitting_table.sort_values(by=['HR'], inplace=True, ascending=False)
+
+    # Calculate ISO or isolated slugging to be used as a regressor
+    multi_year_hitting_table['ISO'] = (multi_year_hitting_table['2B']+2*multi_year_hitting_table['3B'] +
+                            3*multi_year_hitting_table['HR']) / multi_year_hitting_table['AB']
+    # Calculate HPR or Hits per Run to be used as the predicted variable in regression
+    multi_year_hitting_table['HPR'] = multi_year_hitting_table['H'] / multi_year_hitting_table['R']
+
+    # If the file_name is not None then save the historical data to the given file
+    if file_name is not None:
+        with open(file_name, 'w') as f:
+            multi_year_hitting_table.to_csv(f)
+
+    return multi_year_hitting_table
+
+def load_historical_hitting_tables(file_name="data/historical_team_hitting.csv") -> pd.DataFrame:
+    pass
+
+def calculate_and_save_hitting_linear_regression(previous_three_years_table: pd.DataFrame, file_name='./data/hitting_regression.pickle')->LinearRegression:
+    """Runs a linear regression on Hits per Run based on team's previous years OBP, ISO and SLG.
+    Stores results to a pickle file if file_name is not None. By defualt, saves results to data
+    directory.
+
+    Args:
+        previous_three_years_table (pd.DataFrame): The DataFrame containing previous (three) years team data
+        file_name (str, optional): File to save regression results to. If None, does not save results.
+        Defaults to './data/hitting_regression.pickle'.
+
+    Returns:
+        LinearRegression: The Linear Regression object
+    """
+    # if load:
+    #     with open("./beginning_scripts/hitting_regression.pickle", 'rb') as f:
+    #         return pickle.load(f)
     
-    # setup x and y variables for regression
+    # Setup x and y variables for regression
     x = previous_three_years_table.loc[:, ['OBP', 'ISO', 'SLG']]
     y = previous_three_years_table.HPR
 
@@ -83,12 +123,12 @@ def get_hitting_linear_regression(previous_three_years_table, load=True):
     linear_regression = LinearRegression()
     linear_regression.fit(x, y)
     
-    
-    with open('./beginning_scripts/hitting_regression.pickle', 'wb') as f:
-        pickle.dump(linear_regression, f)
+    # If file_name is none then do not save the regression
+    if file_name is not None:
+        with open(file_name, 'wb') as f:
+            pickle.dump(linear_regression, f)
 
     return linear_regression
-
 
 def get_prev_year_hitting_table(linear_regression):
     # TODO get prev_year automatically

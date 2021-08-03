@@ -7,9 +7,9 @@ from player_adjustments.get_todays_games_info import *
 from player_adjustments.get_adjusted_war_table_for_today import *
 from predictions.war_functions.active_rosters import *
 from predictions.war_functions.final_war_table import *
-from predictions.war_functions.war_projections import *
+from predictions.war_functions.war_projections_pecota import *
 from predictions.war_functions.pecota_tables import *
-from predictions.war_functions.war_table import *
+from predictions.war_functions.historical_war_table import *
 from predictions.cluster_luck_functions.get_cluster_luck_hitting import *
 from predictions.cluster_luck_functions.get_cluster_luck_pitching import *
 from predictions.cluster_luck_functions.get_combined_cluster_luck_table import *
@@ -74,6 +74,11 @@ class TestFinalWarTable(unittest.TestCase):
 
         self.assertEqual(final_war.shape, (30, 4))
         self.assertListEqual(final_war.columns.tolist(), ["Team", "2021", "2020", "Run_Change"])
+    
+class TestClusterLuckHitting(unittest.TestCase):
+    def test_retrieve_historical_hitting_tables(self):
+        pass
+    
         
 
 def _clean_data():
