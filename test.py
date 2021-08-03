@@ -18,7 +18,16 @@ from external_work.odds_and_other_projections import *
 
 from player_adjustments.getting_WAR_BP import *
 
-result = retrieve_current_year_WAR()
+curr_year_war_BP = retrieve_current_year_WAR()
+
+pt = load_combined_pecota_table()
+
+st_rot, failed  = get_starting_rotations(pt, curr_year_war_BP)
+
+print(st_rot)
+
+print(failed)
+
 
 
 

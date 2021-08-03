@@ -152,4 +152,8 @@ def retrieve_current_year_WAR():
     all_players['WAR'] = all_players['WAR'].apply(conv)
     grouped = all_players.groupby(by = 'Name')['WAR'].sum()
     grouped = pd.DataFrame(grouped)
+
+    with open("data/curr_war_table.csv", 'w') as f:
+        grouped.to_csv(f)
+
     return grouped
