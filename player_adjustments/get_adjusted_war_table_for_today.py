@@ -37,9 +37,6 @@ def sp_adjustment(games, starting_rotations, frac_season=0.0):
     return sp_adjust_list
 
 def active_roster_war_table(active_rosters, overall_war_predictions_preseason, curr_year_WAR_BP, frac_season = 0.0):
-    # Active rosters comes from the get_all_active_roster function from get_active_roster in war_functions
-    # overall_war_predictions_preseason comes from get_overall_war_predictions in war_functions
-    # Instead of Fangraphs: https://www.baseballprospectus.com/leaderboards/pitching/
 
     active_roster_war_table = pd.DataFrame(columns = ['Team', 'WAR', 'WAR_proj'])
     fucked_name_list = []
@@ -49,7 +46,7 @@ def active_roster_war_table(active_rosters, overall_war_predictions_preseason, c
         roster = team_dict['team_roster']
         for player, _ in roster:
             try:
-                team_table = team_table.append(curr_year_WAR_BP.loc[player])
+                team_table = team_table.append(curr_year_WAR_BP[curr_year_WAR_BP.Name == player].iloc[0,1])
             except:
                 fucked_name_list.append(player)
         active_roster_total_war = team_table.WAR.sum()

@@ -18,7 +18,7 @@ from external_work.odds_and_other_projections import *
 
 from player_adjustments.getting_WAR_BP import *
 
-curr_year_war_BP = retrieve_current_year_WAR()
+curr_year_war_BP = pd.read_csv("data/curr_war_table.csv")
 
 pt = load_combined_pecota_table()
 
