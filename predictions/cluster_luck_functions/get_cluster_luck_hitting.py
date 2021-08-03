@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 import pickle
+from typing import Union
 
 
 _team_map = {
@@ -53,7 +54,8 @@ def _retrieve_single_year_hitting_table(year: int) -> pd.DataFrame:
     hitting_table = pd.DataFrame()
 
     # Collect hitting table for given year
-    stats_table_html = pd.read_html(year)
+    stats_table_html = pd.read_html(link)
+
     # Combine two required tables
     combined_stats_table = pd.concat([stats_table_html[0], stats_table_html[1]], axis=1)
     hitting_table = hitting_table.append(combined_stats_table)
@@ -63,11 +65,11 @@ def _retrieve_single_year_hitting_table(year: int) -> pd.DataFrame:
 
     return hitting_table
 
-def retrieve_historical_hitting_tables(years: list[int], file_name="data/historical_team_hitting.csv") -> pd.DataFrame:
+def retrieve_historical_hitting_tables(years: Union[list[int], int], file_name="data/historical_team_hitting.csv") -> pd.DataFrame:
     """Retrieve multi-year hitting table for a given list of years.
 
     Args:
-        years (list[int]): the list of years to retrieve information from
+        years (list[int] or int): the list of years (or single year) to retrieve information from
         file_name(str, optional): The file_path to save the resulting DataFrame to. If None, will not save.
         Defaults to 'data/historical_team_hitting.csv'
 
@@ -78,10 +80,20 @@ def retrieve_historical_hitting_tables(years: list[int], file_name="data/histori
     multi_year_hitting_table = pd.DataFrame()
 
     # loop through each year and append the single year table
-    for year in years:
-        multi_year_hitting_table.append(_retrieve_single_year_hitting_table(year))
+    if type(years) is int:
+        one_year_table = _retrieve_single_year_hitting_table(years)
+        multi_year_hitting_table.columns = one_year_table.columns
+        multi_year_hitting_table.append(one_year_table)
+        multi_year_hitting_table.append(one_year_table)
+    else:
+        for year in years:
+            one_year_table = _retrieve_single_year_hitting_table(year)
+            multi_year_hitting_table.columns = one_year_table.columns
+            multi_year_hitting_table.append(one_year_table)
+            print(multi_year_hitting_table)
 
     # sort and adjust and/or add columns
+    print(multi_year_hitting_table)
     multi_year_hitting_table.sort_values(by=['HR'], inplace=True, ascending=False)
 
     # Calculate ISO or isolated slugging to be used as a regressor
