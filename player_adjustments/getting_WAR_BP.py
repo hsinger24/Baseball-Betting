@@ -9,13 +9,13 @@ import time
 import pandas as pd
 import re
 
-### NEED TO PUT IN FUNCTION###
+############ FIX SO IT LOADS ALL THE PLAYERS ##############
 
 
 # Get all current year WAR data by player
 
-def _retrieve_current_year_WAR():
-    driver = webdriver.Chrome('../Desktop/chromedriver')
+def retrieve_current_year_WAR():
+    driver = webdriver.Chrome('../chromedriver')
     driver.get('https://www.baseballprospectus.com/leaderboards/hitting/')
     regex_name = r'(\D+\s\D+)+'
     table_dict = {}
@@ -49,10 +49,11 @@ def _retrieve_current_year_WAR():
             team_name = hitting_table.iloc[0,1]
             table_dict[team_name] = pd.DataFrame(columns = hitting_table.columns)
             table_dict[team_name] = table_dict[team_name].append(hitting_table)
+            print(team_name)
         else:
-            time.sleep(1)
+            time.sleep(2)
             team_filter.click()
-            time.sleep(1)
+            time.sleep(2)
             team_options = driver.find_elements_by_class_name('multi-select__box')
             team_options[i].click()
             team_options[(i+1)].click()
@@ -75,6 +76,7 @@ def _retrieve_current_year_WAR():
             team_name = hitting_table.iloc[0,1]
             table_dict[team_name] = pd.DataFrame(columns = hitting_table.columns)
             table_dict[team_name] = table_dict[team_name].append(hitting_table)
+            print(team_name)
     # Getting pitchers
     driver.get('https://www.baseballprospectus.com/leaderboards/pitching/')
     for i in range(30):
@@ -112,10 +114,11 @@ def _retrieve_current_year_WAR():
             pitching_table['Name'] = pitching_table.Name.apply(lambda x: x.strip(' '))
             team_name = pitching_table.iloc[0,1]
             table_dict[team_name] = table_dict[team_name].append(pitching_table)
+            print(team_name)
         else:
-            time.sleep(1)
+            time.sleep(2)
             team_filter.click()
-            time.sleep(1)
+            time.sleep(2)
             team_options = driver.find_elements_by_class_name('multi-select__box')
             team_options[i].click()
             team_options[(i+1)].click()
@@ -137,4 +140,16 @@ def _retrieve_current_year_WAR():
             pitching_table['Name'] = pitching_table.Name.apply(lambda x: x.strip(' '))
             team_name = pitching_table.iloc[0,1]
             table_dict[team_name] = table_dict[team_name].append(pitching_table)
-    return table_dict
+            print(team_name)
+    all_players = pd.DataFrame()
+    for key, value in table_dict.items():
+        all_players = all_players.append(value)
+    def conv(x):
+        try:
+            return float(x)
+        except:
+            return 0
+    all_players['WAR'] = all_players['WAR'].apply(conv)
+    grouped = all_players.groupby(by = 'Name')['WAR'].sum()
+    grouped = pd.DataFrame(grouped)
+    return grouped
