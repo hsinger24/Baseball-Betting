@@ -81,19 +81,13 @@ def retrieve_historical_hitting_tables(years: Union[list[int], int], file_name="
 
     # loop through each year and append the single year table
     if type(years) is int:
-        one_year_table = _retrieve_single_year_hitting_table(years)
-        multi_year_hitting_table.columns = one_year_table.columns
-        multi_year_hitting_table.append(one_year_table)
-        multi_year_hitting_table.append(one_year_table)
+        multi_year_hitting_table = multi_year_hitting_table.append(_retrieve_single_year_hitting_table(years))
     else:
         for year in years:
-            one_year_table = _retrieve_single_year_hitting_table(year)
-            multi_year_hitting_table.columns = one_year_table.columns
-            multi_year_hitting_table.append(one_year_table)
-            print(multi_year_hitting_table)
+            multi_year_hitting_table = multi_year_hitting_table.append(_retrieve_single_year_hitting_table(year))
+
 
     # sort and adjust and/or add columns
-    print(multi_year_hitting_table)
     multi_year_hitting_table.sort_values(by=['HR'], inplace=True, ascending=False)
 
     # Calculate ISO or isolated slugging to be used as a regressor
