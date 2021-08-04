@@ -3,7 +3,7 @@ import requests
 import re
 
 
-def get_todays_games_info():
+def retrieve_todays_games_info():
     # Get the html for the games and their info for the day
     page = requests.get('https://www.mlb.com/starting-lineups')
     soup = BeautifulSoup(page.content, 'lxml')

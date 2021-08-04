@@ -18,7 +18,7 @@ from predictions.cluster_luck_functions.get_combined_cluster_luck_table import m
 from predictions.get_final_win_percentage_table import get_win_percentage_predictions
 
 from player_adjustments.get_starting_rotations import get_starting_rotations
-from player_adjustments.get_todays_games_info import get_todays_games_info
+from player_adjustments.get_todays_games_info import retrieve_todays_games_info
 
 import datetime as dt
 
@@ -62,4 +62,4 @@ starting_rotations, failed_to_find_war_list = get_starting_rotations(
     pecota_table)
 
 # get the starting pitchers, home team, away team, and lineup for today's games
-todays_games_info = get_todays_games_info()
+todays_games_info = retrieve_todays_games_info()
