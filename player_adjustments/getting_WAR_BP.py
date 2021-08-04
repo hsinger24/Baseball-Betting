@@ -14,7 +14,16 @@ import re
 
 # Get all current year WAR data by player
 
-def retrieve_current_year_WAR():
+def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
+    """Retrieves the current year WAR of all players who have played in the MLB this season from 
+    baseball prospectus
+
+    Args:
+        file_path (str, optional): path to save file. Defaults to "data/curr_war_table.csv".
+
+    Returns:
+        pandas.DataFrame: The current year war table
+    """
     driver = webdriver.Chrome('../chromedriver')
     driver.get('https://www.baseballprospectus.com/leaderboards/hitting/')
     regex_name = r'(\D+\s\D+)+'
@@ -153,7 +162,20 @@ def retrieve_current_year_WAR():
     grouped = all_players.groupby(by = 'Name')['WAR'].sum()
     grouped = pd.DataFrame(grouped)
 
-    with open("data/curr_war_table.csv", 'w') as f:
-        grouped.to_csv(f)
+    if file_path is not None:
+        with open("data/curr_war_table.csv", 'w') as f:
+            grouped.to_csv(f)
 
     return grouped
+
+def load_current_year_WAR(file_path = "data/curr_war_table.csv"):
+    """Loads the current year war Table from a given file
+
+    Args:
+        file_path (str, optional): War file. Defaults to "data/curr_war_table.csv".
+
+    Returns:
+        pandas.DataFrame: Current year War Table
+    """
+
+    return pd.read_csv(file_path)
