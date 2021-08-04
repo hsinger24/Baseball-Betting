@@ -1,5 +1,5 @@
 1. Get team's current WAR by active roster (did this, need to see if it works)
-    1. We currently use FanGraphs, need to use Baseball prospectus
+    1. Need to fix to make sure we're loading all players
 2. Fix pitcher adjustments to use baseball prospectus instead of Fangraphs
     1. Ran this: Issue is accents and players just called up
         1. Put possible solution in comment on get_starting_rotations
