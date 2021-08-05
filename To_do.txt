@@ -1,14 +1,15 @@
 1. Get team's current WAR by active roster
     1. Need to fix to make sure we're loading all players (think I fixed this)
-    2. Now, need to make sure it works downstream (left off at get_starting_rotations)
+    2. Now, need to make sure it works downstream (left off at adjusting active roster)
         i. Mainly, adjusted WAR table for today's games
-            i. Issue is with people in starting rotations who haven't played yet b/c they're not in BP table
+            i. Issue is with people in starting rotations who haven't played yet b/c 
+                they're not in BP table (coded a solution to this)
 2. Create function for team's winning percentage
     1. As season goes on, need to adjust for current run differential, current cluster luck 
-3. Change historical WAR to get from BP instead of Fangraphs
-    1. Just need to check to see if this still works downstream
-4. Fix what folders every team is in
-5. Create final configuration
+3. Check if everything in predictions.war_functions still works downstream with change from fangraphs to BP
+4. Finish refactoring
+5. Fix what folders every team is in
+6. Create final configuration
     1. Things we need to do once vs. daily
     2. What our daily output will look like
     3. Need to save results in some way where we have data on performance
