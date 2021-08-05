@@ -6,6 +6,7 @@
 3. Create function for team's winning percentage
     1. As season goes on, need to adjust for current run differential, current cluster luck 
 4. Change historical WAR to get from BP instead of Fangraphs
+    1. Just need to check to see if this still works downstream
 5. Fix what folders every team is in
 6. Create final configuration
     1. Things we need to do once vs. daily

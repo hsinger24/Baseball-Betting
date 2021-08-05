@@ -46,8 +46,28 @@ def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
             plate_appearance_input.send_keys('0')
             save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[5]/div/div/div/div[2]/button[2]")
             save_button.click()
-            WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn'))).click()
-            WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, 'load-more__btn')))
+            time.sleep(2)
+            try:
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
+                time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
+            except:
+                pass
+            try:
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
+                time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
+            except:
+                pass
+            try:
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
+                time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
+            except:
+                pass
             html = driver.page_source
             hitting_table = pd.read_html(html)
             hitting_table = hitting_table[0]
@@ -68,11 +88,26 @@ def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
             team_options[(i+1)].click()
             save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[4]/div/div/div/div[2]/button[2]")
             save_button.click()
-            time.sleep(1)
-            WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn'))).click()
+            time.sleep(2)
             try:
                 WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
                 time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
+            except:
+                pass
+            try:
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
+                time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
+            except:
+                pass
+            try:
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
+                time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
             except:
                 pass
             html = driver.page_source
@@ -107,13 +142,28 @@ def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
             innings_input.send_keys('0')
             save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[5]/div/div/div/div[2]/button[2]")
             save_button.click()
-            WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn'))).click()
+            time.sleep(2)
             try:
                 WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
                 time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
             except:
                 pass
-            html = driver.page_source
+            try:
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
+                time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
+            except:
+                pass
+            try:
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
+                time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
+            except:
+                pass
             html = driver.page_source
             pitching_table = pd.read_html(html)
             pitching_table = pitching_table[0]
@@ -133,11 +183,26 @@ def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
             team_options[(i+1)].click()
             save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[4]/div/div/div/div[2]/button[2]")
             save_button.click()
-            time.sleep(1)
-            WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn'))).click()
+            time.sleep(2)
             try:
                 WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
                 time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
+            except:
+                pass
+            try:
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
+                time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
+            except:
+                pass
+            try:
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
+                time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
             except:
                 pass
             html = driver.page_source
