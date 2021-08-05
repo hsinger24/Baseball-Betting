@@ -34,6 +34,4 @@ from player_adjustments.getting_WAR_BP import *
 # projected_war_table = calculate_team_war_projections_table(active_rosters,pt)
 # final = calculate_final_war_table(projected_war_table, load_previous_year_war_table(), 2021)
 
-retrieve_current_year_WAR()
-print(load_current_year_WAR())
 
