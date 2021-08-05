@@ -20,11 +20,11 @@ from player_adjustments.getting_WAR_BP import *
 
 
 # Testing Player Adjustments Folder
-    # curr_year_war_BP = pd.read_csv("data/curr_war_table.csv")
-    # pt = load_combined_pecota_table()
-    # st_rot, failed  = get_starting_rotations(pt, curr_year_war_BP)
-    # print(st_rot)
-    # print(failed)
+curr_year_war_BP = load_current_year_WAR()
+pt = load_combined_pecota_table()
+st_rot, failed  = get_starting_rotations(pt, curr_year_war_BP)
+print(st_rot)
+print(failed)
 
 # Testing War_Functions Folder
 

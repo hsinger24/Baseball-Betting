@@ -8,6 +8,7 @@ from selenium.webdriver.support.ui import Select
 import time
 import pandas as pd
 import re
+import unidecode
 
 ############ FIX SO IT LOADS ALL THE PLAYERS ##############
 
@@ -226,6 +227,9 @@ def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
     all_players['WAR'] = all_players['WAR'].apply(conv)
     grouped = all_players.groupby(by = 'Name')['WAR'].sum()
     grouped = pd.DataFrame(grouped)
+    grouped.reset_index(inplace = True)
+    grouped.columns = ['Name', 'WAR']
+    grouped['Name'] = grouped.Name.apply(unidecode.unidecode)
 
     if file_path is not None:
         with open("data/curr_war_table.csv", 'w') as f:
@@ -243,4 +247,4 @@ def load_current_year_WAR(file_path = "data/curr_war_table.csv"):
         pandas.DataFrame: Current year War Table
     """
 
-    return pd.read_csv(file_path)
+    return pd.read_csv(file_path, index_col = 0)
