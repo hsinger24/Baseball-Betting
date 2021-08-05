@@ -1,6 +1,6 @@
-1. Get team's current WAR by active roster (did this, need to see if it works)
+1. Get team's current WAR by active roster
     1. Need to fix to make sure we're loading all players (think I fixed this)
-    2. Now, need to make sure it works downstream  
+    2. Now, need to make sure it works downstream (left off at get_starting_rotations)
         i. Mainly, adjusted WAR table for today's games
             i. Issue is with people in starting rotations who haven't played yet b/c they're not in BP table
 2. Create function for team's winning percentage
