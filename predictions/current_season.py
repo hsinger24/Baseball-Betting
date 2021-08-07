@@ -54,16 +54,37 @@ def _retrieve_current_runs_allowed():
     runs_allowed_table['Team'] = runs_allowed_table.Team.apply(lambda x: team_map[x])
     return runs_allowed_table
 
-def _retrieve_current_run_differential():
+def _calculate_current_run_differential():
     merged = pd.merge(_retrieve_current_runs_scored(), _retrieve_current_runs_allowed(), on = 'Team')
     merged = merged[['Team', 'Games', 'Runs_162', 'Runs_Allowed_162']]
     return merged
 
-def _retrieve_current_cluster_luck():
+def _retrieve_current_cluster_luck_hitting():
     cluster_luck_hitting = get_cluster_luck_hitting_current_year()
     #cluster_luck_hitting.set_index('RK', inplace = True)
-    cluster_luck_hitting = cluster_luck_hitting[:31]
+    cluster_luck_hitting = cluster_luck_hitting[['Team', 'GP', 'run_adjust']]
+    cluster_luck_hitting.columns = ['Team', 'Games', 'Offensive_Adjustment']
     return cluster_luck_hitting
 
+def _retrieve_current_cluster_luck_pitching():
+    return get_current_year_pitching_table()
 
+def _calculate_cluster_luck_tables():
+    hitting = _retrieve_current_cluster_luck_hitting()
+    pitching = _retrieve_current_cluster_luck_pitching()
+    merged = pd.merge(hitting, pitching, on = 'Team')
+    merged['Runs_Allowed'] = merged.RPG*merged.Games
+    merged['Defensive_Adjustment'] = (
+        (merged['predict'] - merged['HPR']) / merged['HPR'])*merged['Runs_Allowed']
+    merged = merged[['Team', 'Offensive_Adjustment', 'Defensive_Adjustment']]
+    merged['Team'] = merged.Team.apply(lambda x: team_map[x])
+    return merged
+
+def _calculate_cl_run_differential():
+    cl  = _calculate_cluster_luck_tables()
+    run_diff = _calculate_current_run_differential()
+    merged = pd.merge(run_diff, cl, on = 'Team')
+    return merged
+
+print(_calculate_cl_run_differential())
 
