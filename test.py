@@ -13,6 +13,7 @@ from predictions.cluster_luck_functions.get_cluster_luck_pitching import *
 from predictions.cluster_luck_functions.get_combined_cluster_luck_table import *
 
 from predictions.get_final_win_percentage_table import *
+from predictions.current_season import *
 
 from external_work.odds_and_other_projections import *
 
@@ -35,3 +36,4 @@ from player_adjustments.getting_WAR_BP import *
 # projected_war_table = calculate_team_war_projections_table(active_rosters,pt)
 # final = calculate_final_war_table(projected_war_table, load_previous_year_war_table(), 2021)
 
+print(retrieve_current_runs_allowed())
