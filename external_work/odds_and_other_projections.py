@@ -8,13 +8,13 @@ from selenium.webdriver.common.keys import Keys
 import time
 from selenium.webdriver.chrome.options import Options
 
-def convert_odds(odds):
+def _calculate_odds(odds):
     if odds<0:
         return (abs(odds)/(abs(odds)+100))*100
     if odds>0:
         return (100/(odds+100))*100
 
-def scrape_odds():
+def _retrieve_odds():
     odds_team_mapping = {
     'Cleveland Indians' : 'Indians',
     'St. Louis Cardinals' : 'Cardinals',
@@ -68,13 +68,13 @@ def scrape_odds():
         odds_df = odds_df.append(append, ignore_index = True)
     odds_df['Home_Odds'] = odds_df.Home_Odds.apply(float)
     odds_df['Away_Odds'] = odds_df.Away_Odds.apply(float)
-    odds_df['Home_Prob'] = odds_df.Home_Odds.apply(convert_odds)
-    odds_df['Away_Prob'] = odds_df.Away_Odds.apply(convert_odds)
+    odds_df['Home_Prob'] = odds_df.Home_Odds.apply(_calculate_odds)
+    odds_df['Away_Prob'] = odds_df.Away_Odds.apply(_calculate_odds)
     odds_df['Home_Team'] = odds_df.Home_Team.apply(lambda x: odds_team_mapping[x])
     odds_df['Away_Team'] = odds_df.Away_Team.apply(lambda x: odds_team_mapping[x])
     return odds_df
 
-def scrape_538():
+def _retrieve_538():
     fivethirtyeight_team_mapping = {
     'MIAMarlins' : 'Marlins',
     'WSHNationals' : 'Nationals',
@@ -126,7 +126,7 @@ def scrape_538():
     final_538['Date'] = '0' + final_538.Date
     return final_538
 
-def scrape_athletic():
+def _retrieve_athletic():
     athletic_team_mapping = {
     'MIL' : 'Brewers',
     'PIT' : 'Pirates',
@@ -191,14 +191,34 @@ def scrape_athletic():
     browser.quit()
     return final_athletic
 
-def merge_all():
-    merged = pd.merge(scrape_athletic(), scrape_538(), on = ['Home_Team', 'Away_Team', 'Date'], how = 'inner')
+def retrieve_external_data(file_path = 'data/external_data.csv'):
+    """Retrieves and merges the models from 538, The Athletic, and today's odds
+    Args:
+        file_path (str, optional): path to save file. Defaults to "data/external_data.csv".
+    Returns:
+        pandas.DataFrame: The merged external data table
+    """
+
+    merged = pd.merge(_retrieve_athletic(), _retrieve_538(), on = ['Home_Team', 'Away_Team', 'Date'], how = 'inner')
     merged.columns = ['Date', 'Away_Team', 'Home_Team','Away_Prob_Athletic', 'Home_Prob_Athletic', 'Away_Prob_538', 
                     'Home_Prob_538']
-    final = pd.merge(scrape_odds(), merged, on = ['Home_Team', 'Away_Team'], how = 'inner')
+    final = pd.merge(_retrieve_odds(), merged, on = ['Home_Team', 'Away_Team'], how = 'inner')
     final.drop(['Home_Odds', 'Away_Odds'], axis = 1, inplace = True)
     final = final[['Date', 'Away_Team', 'Home_Team','Away_Prob_Athletic', 'Home_Prob_Athletic',
                 'Away_Prob_538', 'Home_Prob_538', 'Away_Prob', 'Home_Prob']]
     final.columns = ['Date', 'Away_Team', 'Home_Team','Away_Prob_Athletic', 'Home_Prob_Athletic', 'Away_Prob_538', 
                     'Home_Prob_538', 'Away_Prob_Implied', 'Home_Prob_Implied']
+    if file_path is not None:
+        with open(file_path, "w") as f:
+            final.to_csv(f)
+
     return final
+
+def load_external_data(file_path = 'data/external_data.csv'):
+    """Loads external data table from a given file
+    Args:
+        file_path (str, optional): War file. Defaults to "data/external_data.csv".
+    Returns:
+        pandas.DataFrame: External Data Table
+    """
+    return pd.read_csv(file_path, index_col=0)

@@ -18,14 +18,24 @@ def sp_adjustment(games, starting_rotations, frac_season=0.0):
         home_table = starting_rotations[home_team]
         away_table = starting_rotations[away_team]
 
-        home_pitch_war = (home_table.loc[home_table.Name==sp_home, 'WAR_proj'].values[0]*(1.0-frac_season)+home_table.loc[home_table.Name==sp_home, 'WAR'].values[0])*5.0
-        home_team_war = home_table.WAR_proj.sum()*(1.0-frac_season)+home_table.WAR.sum()
-        WAR_diff_home = home_pitch_war - home_team_war
+        if home_table.loc[home_table.Name==sp_home, 'WAR'].values[0] == 0.0001:
+            home_pitch_war = home_table.loc[home_table.Name==sp_home, 'WAR_proj'].values[0]
+            home_team_war = home_table.WAR_proj.sum()*(1.0-frac_season)+home_table.WAR.sum()
+            WAR_diff_home = home_pitch_war - home_team_war
+        else:
+            home_pitch_war = (home_table.loc[home_table.Name==sp_home, 'WAR_proj'].values[0]*(1.0-frac_season)+home_table.loc[home_table.Name==sp_home, 'WAR'].values[0])*5.0
+            home_team_war = home_table.WAR_proj.sum()*(1.0-frac_season)+home_table.WAR.sum()
+            WAR_diff_home = home_pitch_war - home_team_war
 
 
-        away_pitch_war = (away_table.loc[away_table.Name==sp_away, 'WAR_proj'].values[0]*(1.0-frac_season)+away_table.loc[away_table.Name==sp_away, 'WAR'].values[0])*5.0
-        away_team_war = away_table.WAR_proj.sum()*(1.0-frac_season)+away_table.WAR.sum()
-        WAR_diff_away = away_pitch_war - away_team_war
+        if away_table.loc[away_table.Name==sp_away, 'WAR'].values[0] == 0.0001:
+            away_pitch_war = away_table.loc[away_table.Name==sp_away, 'WAR_proj'].values[0]
+            away_team_war = away_table.WAR_proj.sum()*(1.0-frac_season)+away_table.WAR.sum()
+            WAR_diff_away = away_pitch_war - away_team_war
+        else:
+            away_pitch_war = (away_table.loc[away_table.Name==sp_away, 'WAR_proj'].values[0]*(1.0-frac_season)+away_table.loc[away_table.Name==sp_away, 'WAR'].values[0])*5.0
+            away_team_war = away_table.WAR_proj.sum()*(1.0-frac_season)+away_table.WAR.sum()
+            WAR_diff_away = away_pitch_war - away_team_war
 
     
 
@@ -37,9 +47,6 @@ def sp_adjustment(games, starting_rotations, frac_season=0.0):
     return sp_adjust_list
 
 def active_roster_war_table(active_rosters, overall_war_predictions_preseason, curr_year_WAR_BP, frac_season = 0.0):
-    # Active rosters comes from the get_all_active_roster function from get_active_roster in war_functions
-    # overall_war_predictions_preseason comes from get_overall_war_predictions in war_functions
-    # Instead of Fangraphs: https://www.baseballprospectus.com/leaderboards/pitching/
 
     active_roster_war_table = pd.DataFrame(columns = ['Team', 'WAR', 'WAR_proj'])
     fucked_name_list = []
@@ -49,7 +56,7 @@ def active_roster_war_table(active_rosters, overall_war_predictions_preseason, c
         roster = team_dict['team_roster']
         for player, _ in roster:
             try:
-                team_table = team_table.append(curr_year_WAR_BP.loc[player])
+                team_table = team_table.append(curr_year_WAR_BP[curr_year_WAR_BP.Name == player].iloc[0,1])
             except:
                 fucked_name_list.append(player)
         active_roster_total_war = team_table.WAR.sum()

@@ -8,13 +8,23 @@ from selenium.webdriver.support.ui import Select
 import time
 import pandas as pd
 import re
+import unidecode
 
 ############ FIX SO IT LOADS ALL THE PLAYERS ##############
 
 
 # Get all current year WAR data by player
 
-def retrieve_current_year_WAR():
+def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
+    """Retrieves the current year WAR of all players who have played in the MLB this season from 
+    baseball prospectus
+
+    Args:
+        file_path (str, optional): path to save file. Defaults to "data/curr_war_table.csv".
+
+    Returns:
+        pandas.DataFrame: The current year war table
+    """
     driver = webdriver.Chrome('../chromedriver')
     driver.get('https://www.baseballprospectus.com/leaderboards/hitting/')
     regex_name = r'(\D+\s\D+)+'
@@ -37,8 +47,28 @@ def retrieve_current_year_WAR():
             plate_appearance_input.send_keys('0')
             save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[5]/div/div/div/div[2]/button[2]")
             save_button.click()
-            WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn'))).click()
-            WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, 'load-more__btn')))
+            time.sleep(2)
+            try:
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
+                time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
+            except:
+                pass
+            try:
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
+                time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
+            except:
+                pass
+            try:
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
+                time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
+            except:
+                pass
             html = driver.page_source
             hitting_table = pd.read_html(html)
             hitting_table = hitting_table[0]
@@ -59,11 +89,26 @@ def retrieve_current_year_WAR():
             team_options[(i+1)].click()
             save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[4]/div/div/div/div[2]/button[2]")
             save_button.click()
-            time.sleep(1)
-            WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn'))).click()
+            time.sleep(2)
             try:
                 WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
                 time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
+            except:
+                pass
+            try:
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
+                time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
+            except:
+                pass
+            try:
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
+                time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
             except:
                 pass
             html = driver.page_source
@@ -98,13 +143,28 @@ def retrieve_current_year_WAR():
             innings_input.send_keys('0')
             save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[5]/div/div/div/div[2]/button[2]")
             save_button.click()
-            WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn'))).click()
+            time.sleep(2)
             try:
                 WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
                 time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
             except:
                 pass
-            html = driver.page_source
+            try:
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
+                time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
+            except:
+                pass
+            try:
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
+                time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
+            except:
+                pass
             html = driver.page_source
             pitching_table = pd.read_html(html)
             pitching_table = pitching_table[0]
@@ -124,11 +184,26 @@ def retrieve_current_year_WAR():
             team_options[(i+1)].click()
             save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[4]/div/div/div/div[2]/button[2]")
             save_button.click()
-            time.sleep(1)
-            WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn'))).click()
+            time.sleep(2)
             try:
                 WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
                 time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
+            except:
+                pass
+            try:
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
+                time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
+            except:
+                pass
+            try:
+                WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
+                time.sleep(0.5)
+                load_button = driver.find_element_by_class_name('load-more__btn')
+                load_button.click()
             except:
                 pass
             html = driver.page_source
@@ -152,8 +227,24 @@ def retrieve_current_year_WAR():
     all_players['WAR'] = all_players['WAR'].apply(conv)
     grouped = all_players.groupby(by = 'Name')['WAR'].sum()
     grouped = pd.DataFrame(grouped)
+    grouped.reset_index(inplace = True)
+    grouped.columns = ['Name', 'WAR']
+    grouped['Name'] = grouped.Name.apply(unidecode.unidecode)
 
-    with open("data/curr_war_table.csv", 'w') as f:
-        grouped.to_csv(f)
+    if file_path is not None:
+        with open("data/curr_war_table.csv", 'w') as f:
+            grouped.to_csv(f)
 
     return grouped
+
+def load_current_year_WAR(file_path = "data/curr_war_table.csv"):
+    """Loads the current year war Table from a given file
+
+    Args:
+        file_path (str, optional): War file. Defaults to "data/curr_war_table.csv".
+
+    Returns:
+        pandas.DataFrame: Current year War Table
+    """
+
+    return pd.read_csv(file_path, index_col = 0)

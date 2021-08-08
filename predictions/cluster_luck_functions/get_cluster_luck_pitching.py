@@ -145,9 +145,9 @@ def get_current_year_pitching_table():
     current_year = table_maker(one_year_list, str(year))
     x_vars = current_year.loc[:, ['SLG', 'OBP', 'ISO']]
     current_year['predict'] = get_pitching_linear_regression(None).predict(x_vars)
-    current_year['R'] = current_year.RPG*gp
-    current_year['run_adjust'] = (
-        (current_year['predict'] - current_year['HPR']) / current_year['HPR'])*current_year['R']
+    #current_year['R'] = current_year.RPG*gp
+    # current_year['run_adjust'] = (
+    #     (current_year['predict'] - current_year['HPR']) / current_year['HPR'])*current_year['R']
 
     current_year.Team = current_year.Team.apply(lambda x: _team_map[x])
     return current_year
