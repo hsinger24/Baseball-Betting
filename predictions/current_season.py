@@ -80,11 +80,11 @@ def _calculate_cluster_luck_tables():
     merged['Team'] = merged.Team.apply(lambda x: team_map[x])
     return merged
 
-def _calculate_cl_run_differential():
+def _calculate_cl_with_differential():
     cl  = _calculate_cluster_luck_tables()
     run_diff = _calculate_current_run_differential()
     merged = pd.merge(run_diff, cl, on = 'Team')
     return merged
 
-print(_calculate_cl_run_differential())
+print(_calculate_cl_with_differential())
 
