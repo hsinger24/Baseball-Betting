@@ -1,8 +1,8 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
-from cluster_luck_functions.get_cluster_luck_hitting import *
-from cluster_luck_functions.get_cluster_luck_pitching import *
+from predictions.cluster_luck_functions.get_cluster_luck_hitting import *
+from predictions.cluster_luck_functions.get_cluster_luck_pitching import *
 
 team_map = {
     'Giants' : 'San Francisco Giants',
@@ -87,4 +87,3 @@ def _calculate_cl_with_differential():
     return merged
 
 print(_calculate_cl_with_differential())
-
