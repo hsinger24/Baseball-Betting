@@ -65,7 +65,7 @@ def _retrieve_single_year_hitting_table(year: int) -> pd.DataFrame:
 
     return hitting_table
 
-def retrieve_historical_hitting_tables(years: Union[list[int], int], file_name="data/historical_team_hitting.csv") -> pd.DataFrame:
+def retrieve_historical_hitting_tables(years, file_name="data/historical_clusterluck_team_hitting.csv") -> pd.DataFrame:
     """Retrieve multi-year hitting table for a given list of years.
 
     Args:
@@ -103,7 +103,7 @@ def retrieve_historical_hitting_tables(years: Union[list[int], int], file_name="
 
     return multi_year_hitting_table
 
-def load_historical_hitting_tables(file_name="data/historical_team_hitting.csv") -> pd.DataFrame:
+def load_historical_hitting_tables(file_name="data/historical_clusterluck_team_hitting.csv") -> pd.DataFrame:
     """Loads a hitting table from a saved file.
 
     Args:
@@ -146,7 +146,7 @@ def calculate_and_save_hitting_linear_regression(previous_three_years_table: pd.
 
     return linear_regression
 
-def calculate_predicted_cluster_luck_run_adjustment_hitting(linear_regression:LinearRegression, hitting_data:pd.DataFrame)->pd.DataFrame:
+def calculate_predicted_cluster_luck_run_adjustment_hitting(linear_regression:LinearRegression, hitting_data:pd.DataFrame, file_name=None)->pd.DataFrame:
     """Constructs a DataFrame with the predicted HPR and the run adjustment based on a linear regression
     and hitting data.
 
@@ -167,6 +167,10 @@ def calculate_predicted_cluster_luck_run_adjustment_hitting(linear_regression:Li
 
     # Calculate the run adjustment column based on prediction
     prev_year_hitting['run_adjust'] = ( (prev_year_hitting['HPR'] - prev_year_hitting['predict']) / prev_year_hitting['HPR']) * prev_year_hitting['R']
+
+    if file_name is not None:
+        with open(file_name, 'w') as f:
+            prev_year_hitting.to_csv(f)
 
     return prev_year_hitting
 
