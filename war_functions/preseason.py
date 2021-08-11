@@ -3,10 +3,10 @@ import datetime as dt
 import pickle
 
 
-def get_win_percentage_predictions(cluster_luck_table, war_table, save=False):
+def get_win_percentage_predictions(cluster_luck_table, final_preseason_war_projections, save=False):
     current_year = dt.date.today().year
     # merge tables
-    table = pd.merge(cluster_luck_table, war_table, on='Team')
+    table = pd.merge(cluster_luck_table, final_preseason_war_projections, on='Team')
 
     # drop unnecessary columns
     drop_list_final = ['Runs', 'Offensive_Adjustment', 'Runs_Allowed',

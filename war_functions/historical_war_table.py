@@ -42,84 +42,6 @@ team_map = {
     'TEX': 'Rangers'
 }
 
-def _retrieve_offense_war_table_failed(year):
-    # year = str(year)
-    # offense_war_html = pd.read_html(
-    #     f'https://www.fangraphs.com/leaders.aspx?pos=all&stats=bat&lg=all&qual=0&type=8&season={year}&month=0&season1={year}&ind=0&team=0,ts&rost=0&age=0&filter=&players=0&startdate=&enddate=')
-
-    # TEAM_WAR_TABLE_INDEX = 16
-
-    # # Find the correct table
-    # offense_war_table = offense_war_html[TEAM_WAR_TABLE_INDEX]
-
-    # # Set up dataframe by adjusting columns
-    # offense_war_table_columns = []
-    # for _, j in offense_war_table.columns:
-    #     offense_war_table_columns.append(j)
-    # offense_war_table.columns = offense_war_table_columns
-    # offense_war_table_final = offense_war_table.loc[:, ['Team', 'WAR']]
-
-    # return offense_war_table_final
-    return None
-
-def _retrieve_defense_war_table_failed(year):
-    # """Retrieves the Defensive WAR table. Should not be used outside this file
-
-    # Args:
-    #     year (int): the year to retrieve the war table for
-
-    # Returns:
-    #     pandas.DataFrame: The War table
-    # """
-    # year = str(year)
-    # TEAM_WAR_TABLE_INDEX = 16
-    # defense_war_html = pd.read_html(
-    #     f'https://www.fangraphs.com/leaders.aspx?pos=all&stats=pit&lg=all&qual=0&type=8&season={year}&month=0&season1={year}&ind=0&team=0,ts&rost=0&age=0&filter=&players=0&startdate=&enddate=')
-
-    # # get the correct table
-    # defense_war_table = defense_war_html[TEAM_WAR_TABLE_INDEX]
-
-    # # set up dataframe by adjusting columns
-    # defense_war_table_columns = []
-    # for _, j in defense_war_table.columns:
-    #     defense_war_table_columns.append(j)
-    # defense_war_table.columns = defense_war_table_columns
-    # defense_war_table_final = defense_war_table.loc[:, ['Team', 'WAR']]
-
-    return None
-
-def retrieve_historical_combined_war_table_failed(year, file_path="data/war_table.csv"):
-    # """Retrieves the Offensive and Defensive War tables for a given year (past) and saves it to a file,
-    # if the given file_path is not None
-
-    # Args:
-    #     year (int): Year to get
-    #     file_path (str, optional): path to save file. Defaults to "data/war_table.csv".
-
-    # Returns:
-    #     pandas.DataFrame: The War table
-    # """
-    # # get both offense and defense tables
-    # offense_table = _retrieve_offense_war_table(year)
-    # defense_table = _retrieve_defense_war_table(year)
-
-    # # merge tables
-    # war = pd.merge(offense_table, defense_table, on='Team')
-
-    # # adjust columns and create a total war column
-    # war.columns = ['Team', 'Offense', 'Defense']
-    # war.drop(30, inplace=True)
-    # war.Offense = pd.to_numeric(war['Offense'])
-    # war.Defense = pd.to_numeric(war.Defense)
-    # war['Total'] = war.Offense + war.Defense
-    # war.sort_values(by='Total', ascending=False, inplace=True)
-    # war.Team = war.Team.apply(lambda x: team_map[x])
-
-    # if file_path is not None:
-    #     with open(file_path, "w") as f:
-    #         war.to_csv(f)
-
-    return None
 
 def retrieve_previous_year_war_table(previous_year, file_path="data/historical_war_table.csv"):
     """Retrieves previous year war table and saves it to a file,
@@ -356,7 +278,7 @@ def retrieve_previous_year_war_table(previous_year, file_path="data/historical_w
     grouped.reset_index(inplace = True)
     grouped.columns = ['Team', 'WAR']
     grouped['Team'] = grouped.Team.apply(lambda x: team_map[x])
-    grouped.drop('Unnamed: 0', axis = 1, inplace = True)
+    #grouped.drop('Unnamed: 0', axis = 1, inplace = True)
 
     if file_path is not None:
         with open(file_path, "w") as f:

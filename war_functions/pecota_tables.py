@@ -25,7 +25,6 @@ def _load_pecota_hitting_table(file_name='pecota_data/pecota_hitting.csv'):
 
     return hitting_table
 
-
 def _load_pecota_pitching_table(file_name='pecota_data/pecota_pitching.csv'):
     '''
     Gets the table for WAR predictions from Pecota
@@ -45,7 +44,6 @@ def _load_pecota_pitching_table(file_name='pecota_data/pecota_pitching.csv'):
     pitching_table.drop('g', axis=1)
 
     return pitching_table
-
 
 def load_combined_pecota_table(data_path=None):
     """Loads both PECOTA hitting and pitching and returns a combined dataframe

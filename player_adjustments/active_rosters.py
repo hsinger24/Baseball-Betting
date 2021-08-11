@@ -117,7 +117,6 @@ def _retrieve_team_active_roster(team_id):
             players_active.append((player['name_display_first_last'], player['player_id']))
     return players_active
 
-
 def retrieve_all_active_rosters(file_name="data/active_rosters.json"):
     '''
     Downloads the active rosters for every MLB team and saves to given file_name (rosters.json)
@@ -138,7 +137,6 @@ def retrieve_all_active_rosters(file_name="data/active_rosters.json"):
             f.write(json.dumps(active_rosters, indent=2))
 
     return active_rosters
-
 
 def load_active_rosters(file_name= "data/active_rosters.json"):
     """Loads the active rosters from a saved file
