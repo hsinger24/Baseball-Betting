@@ -10,11 +10,6 @@ import pandas as pd
 import re
 import unidecode
 
-############ FIX SO IT LOADS ALL THE PLAYERS ##############
-
-
-# Get all current year WAR data by player
-
 def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
     """Retrieves the current year WAR of all players who have played in the MLB this season from 
     baseball prospectus

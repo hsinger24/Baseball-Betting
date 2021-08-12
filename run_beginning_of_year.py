@@ -1,6 +1,6 @@
 import datetime as dt
 
-from player_adjustments.active_rosters import *
+from daily_adjustments.active_rosters import *
 
 from cluster_luck_functions.cluster_luck_hitting import *
 from cluster_luck_functions.cluster_luck_pitching import *
