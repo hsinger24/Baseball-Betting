@@ -1,9 +1,17 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
+
+from war_functions.pecota_tables import *
+
 from cluster_luck_functions.cluster_luck_hitting import *
 from cluster_luck_functions.cluster_luck_pitching import *
 from cluster_luck_functions.cluster_luck_combined import *
+
+from daily_adjustments.active_rosters import *
+from daily_adjustments.current_year_WAR import *
+from daily_adjustments.todays_game_info import *
+from daily_adjustments.starting_rotations_WAR import *
 
 team_map = {
     'Giants' : 'San Francisco Giants',
@@ -37,6 +45,17 @@ team_map = {
     'Orioles': 'Baltimore Orioles',
     'Diamondbacks': 'Arizona Diamondbacks'
 }
+
+########## RETRIEVING NECESSARY DATA ##########
+
+active_rosters = retrieve_all_active_rosters(file_name = None)
+todays_games = retrieve_todays_games_info()
+#retrieve_current_year_WAR()
+current_year_WAR = load_current_year_WAR()
+pt = load_combined_pecota_table()
+starting_rotations_WAR = retrieve_starting_rotations_WAR(pt, current_year_WAR)
+
+########## GETTING CURRENT RUN DIFFERENTIAL WITH CURRENT CLUSTER LUCK ##########
 
 def _retrieve_current_runs_scored():
     tables = pd.read_html('https://www.espn.com/mlb/stats/team')
@@ -91,4 +110,8 @@ def _calculate_cl_with_differential():
     merged = pd.merge(run_diff, cl, on = 'Team')
     return merged
 
-print(_calculate_cl_with_differential())
+current_run_differential = _calculate_cl_with_differential()
+
+########## MAKING WAR ADJUSTMENTS FOR ACTIVE ROSTER AND STARTING ROTATION ##########
+
+starting_rotations_WAR = retrieve_starting_rotations_WAR(pt, current_year_WAR)
