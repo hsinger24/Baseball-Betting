@@ -50,7 +50,7 @@ def _get_driver_location():
     
     return dct
 
-def _retrieve_historical_player_war_tables(driver, year=None):
+def _retrieve_historical_player_war_tables(driver, year=None, get_gs = False):
     # create dict to store team's player tables
     table_dict = {}
     regex_name = r'(\D+\s\D+)+'
@@ -133,12 +133,16 @@ def _retrieve_historical_player_war_tables(driver, year=None):
                 load_more_button.click()
 
             # download team....
+            
             html = driver.page_source
             player_table = pd.read_html(html)
             player_table = player_table[0]
-            player_table = player_table.iloc[0:(player_table.shape[0]), [0,2,3]]
-            player_table.columns = ['Name', 'Team', 'WAR']
-
+            if not get_gs:
+                player_table = player_table.iloc[:, [0,2,3]]
+                player_table.columns = ['Name', 'Team', 'WAR']
+            else:
+                player_table = player_table.iloc[:, [0,2,3, 8]]
+                player_table.columns = ['Name', 'Team', 'WAR', 'GS']
             player_table['Name'] = player_table.Name.apply(lambda x: re.findall(regex_name, x)[0])
             player_table['Name'] = player_table.Name.apply(lambda x: x.strip(' '))
 
@@ -161,7 +165,7 @@ def _retrieve_historical_player_war_tables(driver, year=None):
         
     return table_dict
 
-def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
+def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv", get_gs = False):
     """Retrieves the current year WAR of all players who have played in the MLB this season from 
     baseball prospectus
 

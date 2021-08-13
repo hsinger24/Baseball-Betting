@@ -1,4 +1,5 @@
 import pandas as pd
+ 
 
 team_list = ['Diamondbacks', 'Braves', 'Orioles', 'Red Sox', 'Cubs', 'White Sox', 'Reds', 'Indians', 'Rockies',
                  'Tigers', 'Astros', 'Royals', 'Angels', 'Dodgers', 'Marlins', 'Brewers', 'Twins', 'Mets', 'Yankees',
@@ -80,7 +81,7 @@ def get_starting_rotations_failed(pecota_table):
 
     # return starting_rotations_tables, failed_to_find_war_list
 
-def retrieve_starting_rotations_WAR(pecota_table, curr_year_WAR_BP):
+def retrieve_starting_rotations_WAR_also_failed(pecota_table, curr_year_WAR_BP):
     
     ##### Issue: Players just called up: for these players, use only Projected ##### 
     
@@ -161,3 +162,12 @@ def retrieve_starting_rotations_WAR(pecota_table, curr_year_WAR_BP):
         starting_rotations[team] = starting_pitchers
     return starting_rotations, failed_to_find_war_list
 
+def retrieve_starting_rotations_WAR(pecota_tablem):
+    team_list = ['Diamondbacks', 'Braves', 'Orioles', 'Red Sox', 'Cubs', 'White Sox', 'Reds', 'Indians', 'Rockies',
+                 'Tigers', 'Astros', 'Royals', 'Angels', 'Dodgers', 'Marlins', 'Brewers', 'Twins', 'Mets', 'Yankees',
+                 'Athletics', 'Phillies', 'Pirates', 'Padres', 'Giants', 'Mariners', 'Cardinals', 'Rays', 'Rangers',
+                 'Blue Jays', 'Nationals']
+    names = pd.read_csv("pecota_data/names.csv", index_col=0)
+    starting_rotations = {}
+    failed_to_find_war_list = []
+    return 
