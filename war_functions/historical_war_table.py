@@ -8,27 +8,67 @@ from selenium.webdriver.support.ui import Select
 import time
 import pandas as pd
 import re
-import unidecode
 
-############ FIX SO IT LOADS ALL THE PLAYERS ##############
+team_map = {
+    'LAD': 'Dodgers',
+    'SD': 'Padres',
+    'CWS': 'White Sox',
+    'MIN': 'Twins',
+    'CLE': 'Indians',
+    'OAK': 'Athletics',
+    'TB': 'Rays',
+    'NYY': 'Yankees',
+    'ATL': 'Braves',
+    'NYM': 'Mets',
+    'CHC': 'Cubs',
+    'CIN': 'Reds',
+    'LAA': 'Angels',
+    'MIL': 'Brewers',
+    'SF': 'Giants',
+    'PHI': 'Phillies',
+    'HOU': 'Astros',
+    'STL': 'Cardinals',
+    'KC': 'Royals',
+    'BAL': 'Orioles',
+    'SEA': 'Mariners',
+    'TOR': 'Blue Jays',
+    'DET': 'Tigers',
+    'BOS': 'Red Sox',
+    'ARI': 'Diamondbacks',
+    'WSH': 'Nationals',
+    'COL': 'Rockies',
+    'MIA': 'Marlins',
+    'PIT': 'Pirates',
+    'TEX': 'Rangers'
+}
 
 
-# Get all current year WAR data by player
-
-def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
-    """Retrieves the current year WAR of all players who have played in the MLB this season from 
-    baseball prospectus
+def retrieve_previous_year_war_table(previous_year, file_path="data/historical_war_table.csv"):
+    """Retrieves previous year war table and saves it to a file,
+    if the given file_path is not None
 
     Args:
-        file_path (str, optional): path to save file. Defaults to "data/curr_war_table.csv".
+        previous year
+        file_path (str, optional): path to save file. Defaults to "data/war_table.csv".
 
     Returns:
-        pandas.DataFrame: The current year war table
+        pandas.DataFrame: The previous year's WAR table by team
     """
+    
     driver = webdriver.Chrome('../chromedriver')
     driver.get('https://www.baseballprospectus.com/leaderboards/hitting/')
     regex_name = r'(\D+\s\D+)+'
     table_dict = {}
+    filters = driver.find_elements_by_class_name('filter-btn')
+    year_filter = filters[0]
+    year_filter.click()
+    time.sleep(1)
+    year_input = driver.find_element_by_name('currentSliderValue')
+    year_input.clear()
+    year_input.send_keys(str(previous_year))
+    save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[1]/div/div/div/div[2]/button[2]")
+    save_button.click()
+    time.sleep(3)
     for i in range(30):
         if i==0:
             filters = driver.find_elements_by_class_name('filter-btn')
@@ -41,13 +81,12 @@ def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
             save_button.click() # clicks save button
             plate_appearance_filter = filters[4]
             plate_appearance_filter.click() # Clicking plate appearance filter
-            time.sleep(2)
+            time.sleep(5)
             plate_appearance_input = driver.find_element_by_name('currentSliderValue')
             plate_appearance_input.clear()
             plate_appearance_input.send_keys('0')
             save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[5]/div/div/div/div[2]/button[2]")
             save_button.click()
-            time.sleep(2)
             try:
                 WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
                 time.sleep(0.5)
@@ -81,15 +120,15 @@ def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
             table_dict[team_name] = table_dict[team_name].append(hitting_table)
             print(team_name)
         else:
-            time.sleep(2)
+            time.sleep(5)
             team_filter.click()
-            time.sleep(2)
+            time.sleep(5)
             team_options = driver.find_elements_by_class_name('multi-select__box')
             team_options[i].click()
             team_options[(i+1)].click()
             save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[4]/div/div/div/div[2]/button[2]")
             save_button.click()
-            time.sleep(2)
+            time.sleep(5)
             try:
                 WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
                 time.sleep(0.5)
@@ -124,6 +163,16 @@ def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
             print(team_name)
     # Getting pitchers
     driver.get('https://www.baseballprospectus.com/leaderboards/pitching/')
+    filters = driver.find_elements_by_class_name('filter-btn')
+    year_filter = filters[0]
+    year_filter.click()
+    time.sleep(1)
+    year_input = driver.find_element_by_name('currentSliderValue')
+    year_input.clear()
+    year_input.send_keys(str(previous_year))
+    save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[1]/div/div/div/div[2]/button[2]")
+    save_button.click()
+    time.sleep(3)
     for i in range(30):
         if i==0:
             time.sleep(5)
@@ -137,13 +186,12 @@ def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
             save_button.click()
             innings_filter = filters[4]
             innings_filter.click()
-            time.sleep(2)
+            time.sleep(5)
             innings_input = driver.find_element_by_name('currentSliderValue')
             innings_input.clear()
             innings_input.send_keys('0')
             save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[5]/div/div/div/div[2]/button[2]")
             save_button.click()
-            time.sleep(2)
             try:
                 WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
                 time.sleep(0.5)
@@ -176,15 +224,15 @@ def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
             table_dict[team_name] = table_dict[team_name].append(pitching_table)
             print(team_name)
         else:
-            time.sleep(2)
+            time.sleep(5)
             team_filter.click()
-            time.sleep(2)
+            time.sleep(5)
             team_options = driver.find_elements_by_class_name('multi-select__box')
             team_options[i].click()
             team_options[(i+1)].click()
             save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[4]/div/div/div/div[2]/button[2]")
             save_button.click()
-            time.sleep(2)
+            time.sleep(5)
             try:
                 WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
                 time.sleep(0.5)
@@ -216,35 +264,39 @@ def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
             team_name = pitching_table.iloc[0,1]
             table_dict[team_name] = table_dict[team_name].append(pitching_table)
             print(team_name)
-    all_players = pd.DataFrame()
+    big_boi_df = pd.DataFrame()
     for key, value in table_dict.items():
-        all_players = all_players.append(value)
+        big_boi_df = big_boi_df.append(value)
     def conv(x):
         try:
             return float(x)
         except:
             return 0
-    all_players['WAR'] = all_players['WAR'].apply(conv)
-    grouped = all_players.groupby(by = 'Name')['WAR'].sum()
+    big_boi_df['WAR'] = big_boi_df['WAR'].apply(conv)
+    grouped = big_boi_df.groupby(by = 'Team')['WAR'].sum()
     grouped = pd.DataFrame(grouped)
     grouped.reset_index(inplace = True)
-    grouped.columns = ['Name', 'WAR']
-    grouped['Name'] = grouped.Name.apply(unidecode.unidecode)
+    grouped.columns = ['Team', 'WAR']
+    grouped['Team'] = grouped.Team.apply(lambda x: team_map[x])
+    #grouped.drop('Unnamed: 0', axis = 1, inplace = True)
 
     if file_path is not None:
-        with open("data/curr_war_table.csv", 'w') as f:
+        with open(file_path, "w") as f:
             grouped.to_csv(f)
 
     return grouped
 
-def load_current_year_WAR(file_path = "data/curr_war_table.csv"):
-    """Loads the current year war Table from a given file
+def load_previous_year_war_table(file_path="data/historical_war_table.csv"):
+    """Loads historical war table from a given file
 
     Args:
-        file_path (str, optional): War file. Defaults to "data/curr_war_table.csv".
+        file_path (str, optional): War file. Defaults to "data/historical_war_table.csv".
 
     Returns:
-        pandas.DataFrame: Current year War Table
+        pandas.DataFrame: War Table
     """
+    return pd.read_csv(file_path, index_col=0)
 
-    return pd.read_csv(file_path, index_col = 0)
+
+
+

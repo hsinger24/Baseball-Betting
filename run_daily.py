@@ -1,8 +1,17 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
-from predictions.cluster_luck_functions.get_cluster_luck_hitting import *
-from predictions.cluster_luck_functions.get_cluster_luck_pitching import *
+
+from war_functions.pecota_tables import *
+
+from cluster_luck_functions.cluster_luck_hitting import *
+from cluster_luck_functions.cluster_luck_pitching import *
+from cluster_luck_functions.cluster_luck_combined import *
+
+from daily_adjustments.active_rosters import *
+from daily_adjustments.current_year_WAR import *
+from daily_adjustments.todays_game_info import *
+from daily_adjustments.starting_rotations_WAR import *
 
 team_map = {
     'Giants' : 'San Francisco Giants',
@@ -37,6 +46,17 @@ team_map = {
     'Diamondbacks': 'Arizona Diamondbacks'
 }
 
+########## RETRIEVING NECESSARY DATA ##########
+
+active_rosters = retrieve_all_active_rosters(file_name = None)
+todays_games = retrieve_todays_games_info()
+#retrieve_current_year_WAR()
+current_year_WAR = load_current_year_WAR()
+pt = load_combined_pecota_table()
+starting_rotations_WAR = retrieve_starting_rotations_WAR(pt, current_year_WAR)
+
+########## GETTING CURRENT RUN DIFFERENTIAL WITH CURRENT CLUSTER LUCK ##########
+
 def _retrieve_current_runs_scored():
     tables = pd.read_html('https://www.espn.com/mlb/stats/team')
     runs_scored_table = pd.merge(tables[0], tables[1], left_on = tables[0].index, right_on = tables[1].index)
@@ -60,14 +80,18 @@ def _calculate_current_run_differential():
     return merged
 
 def _retrieve_current_cluster_luck_hitting():
-    cluster_luck_hitting = get_cluster_luck_hitting_current_year()
-    #cluster_luck_hitting.set_index('RK', inplace = True)
+    current_year_hitting = retrieve_historical_hitting_tables(2021, file_name = None)
+    hitting_reg = load_linear_regression("data/hitting_regression.pickle")
+    cluster_luck_hitting = calculate_predicted_cluster_luck_run_adjustment_hitting(hitting_reg, current_year_hitting)
     cluster_luck_hitting = cluster_luck_hitting[['Team', 'GP', 'run_adjust']]
     cluster_luck_hitting.columns = ['Team', 'Games', 'Offensive_Adjustment']
     return cluster_luck_hitting
 
 def _retrieve_current_cluster_luck_pitching():
-    return get_current_year_pitching_table()
+    current_year_pitching = retrieve_historical_pitching_tables(2021, file_name = None)
+    pitching_reg = load_linear_regression('./data/pitching_regression.pickle')
+    cluster_luck_pitching = calculate_predicted_cluster_luck_run_adjustment_pitching(pitching_reg, current_year_pitching)
+    return cluster_luck_pitching
 
 def _calculate_cluster_luck_tables():
     hitting = _retrieve_current_cluster_luck_hitting()
@@ -86,4 +110,8 @@ def _calculate_cl_with_differential():
     merged = pd.merge(run_diff, cl, on = 'Team')
     return merged
 
-print(_calculate_cl_with_differential())
+current_run_differential = _calculate_cl_with_differential()
+
+########## MAKING WAR ADJUSTMENTS FOR ACTIVE ROSTER AND STARTING ROTATION ##########
+
+starting_rotations_WAR = retrieve_starting_rotations_WAR(pt, current_year_WAR)

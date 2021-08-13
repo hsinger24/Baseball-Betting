@@ -3,10 +3,9 @@ import datetime as dt
 import pickle
 
 
-def get_win_percentage_predictions(cluster_luck_table, war_table, save=False):
-    current_year = dt.date.today().year
+def calculate_preseason_win_percentage(cluster_luck_table, final_preseason_war_projections, current_year, file_name = None):
     # merge tables
-    table = pd.merge(cluster_luck_table, war_table, on='Team')
+    table = pd.merge(cluster_luck_table, final_preseason_war_projections, on='Team')
 
     # drop unnecessary columns
     drop_list_final = ['Runs', 'Offensive_Adjustment', 'Runs_Allowed',
@@ -18,13 +17,9 @@ def get_win_percentage_predictions(cluster_luck_table, war_table, save=False):
     table['Win_Percentage'] = .5 + 0.000683 * \
         (table.Adjusted_Runs_Scored + table.Run_Change - table.Adjusted_Runs_Allowed)
     
-    if save:
-        with open("./beginning_scripts/baseline_win_perc.pickle", "wb") as f:
-            pickle.dump(table, f)
+    if file_name is not None:
+        table.to_csv(file_name)
 
     return table
 
 
-def access_baseline_win_percentage_predictions():
-    with open("./beginning_scripts/baseline_win_perc.pickle", "rb") as f:
-        return pickle.load(f)

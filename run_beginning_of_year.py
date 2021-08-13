@@ -1,28 +1,55 @@
-from player_adjustments.get_starting_rotations import *
-from player_adjustments.get_todays_games_info import *
-from player_adjustments.get_adjusted_war_table_for_today import *
+import datetime as dt
 
-from predictions.war_functions.active_rosters import *
-from predictions.war_functions.final_war_table import *
-from predictions.war_functions.war_projections_pecota import *
-from predictions.war_functions.pecota_tables import *
-from predictions.war_functions.historical_war_table import *
+from daily_adjustments.active_rosters import *
 
-from predictions.cluster_luck_functions.get_cluster_luck_hitting import *
-from predictions.cluster_luck_functions.get_cluster_luck_pitching import *
-from predictions.cluster_luck_functions.get_combined_cluster_luck_table import *
+from cluster_luck_functions.cluster_luck_hitting import *
+from cluster_luck_functions.cluster_luck_pitching import *
+from cluster_luck_functions.cluster_luck_combined import *
 
-from predictions.get_final_win_percentage_table import *
+from war_functions.pecota_tables import *
+from war_functions.historical_war_table import *
+from war_functions.preseason_war_projections import *
+from war_functions.preseason_win_percentage import *
 
-from external_work.odds_and_other_projections import *
+#current_year = dt.date.today()
+current_year = 2020
 
-from player_adjustments.getting_WAR_BP import *
-
-
-# Getting beginning of year projection
+# ########## ACTIVE ROSTER BEGINNING OF YEAR ##########
 
 retrieve_all_active_rosters()
-active_rosters = load_active_rosters()
+rosters = load_active_rosters()
+
+# ########## CLUSTER LUCK ##########
+
+# # Getting cluster luck hitting #
+
+# retrieve_historical_hitting_tables([2019, 2018, 2017])
+historical_hitting_table = load_historical_hitting_tables()
+# calculate_and_save_hitting_linear_regression(historical_hitting_table)
+hitting_reg = load_linear_regression("data/hitting_regression.pickle")
+prev_year_hitting_table = retrieve_historical_hitting_tables(2019)
+prev_year_hitting_adjustment = calculate_predicted_cluster_luck_run_adjustment_hitting(hitting_reg, prev_year_hitting_table)
+
+# # Getting cluster luck pitching #
+
+# retrieve_historical_pitching_tables([2019, 2018, 2017])
+historical_pitching_table = load_historical_pitching_tables()
+# calculate_and_save_pitching_linear_regression(historical_pitching_table)
+pitching_reg = load_linear_regression('./data/pitching_regression.pickle')
+prev_year_pitching_table = retrieve_historical_pitching_tables(2019)
+prev_year_pitching_adjustment = calculate_predicted_cluster_luck_run_adjustment_pitching(pitching_reg, prev_year_pitching_table)
+
+# # Merging #
+
+final_cluster_luck = merge_cluster_luck_tables(prev_year_hitting_adjustment, prev_year_pitching_adjustment)
+
+########## WAR FUNCTIONS ##########
+
 pt = load_combined_pecota_table()
-projected_war_table = calculate_team_war_projections_table(active_rosters,pt)
-war_difference = calculate_final_war_table(projected_war_table, load_previous_year_war_table(file_path = 'data/previous_year_war.csv'), 2021)
+#retrieve_previous_year_war_table(2019)
+prev_year_war = load_previous_year_war_table()
+preseason_projections = calculate_preaseason_war_projections(rosters, pt)
+final_war_preseason = calculate_final_preseason_war_change(preseason_projections, prev_year_war, current_year = current_year)
+final_preseason_win_percentage = calculate_preseason_win_percentage(final_cluster_luck, final_war_preseason, current_year, file_name = 'data/preseason_projections.csv')
+
+

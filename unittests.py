@@ -5,14 +5,17 @@ import pandas as pd
 from player_adjustments.get_starting_rotations import *
 from player_adjustments.get_todays_games_info import *
 from player_adjustments.get_adjusted_war_table_for_today import *
+
 from predictions.war_functions.active_rosters import *
 from predictions.war_functions.final_war_table import *
-from predictions.war_functions.war_projections import *
+from predictions.war_functions.war_projections_pecota import *
 from predictions.war_functions.pecota_tables import *
-from predictions.war_functions.war_table import *
+from predictions.war_functions.historical_war_table import *
+
 from predictions.cluster_luck_functions.get_cluster_luck_hitting import *
 from predictions.cluster_luck_functions.get_cluster_luck_pitching import *
 from predictions.cluster_luck_functions.get_combined_cluster_luck_table import *
+
 from predictions.get_final_win_percentage_table import *
 from external_work.odds_and_other_projections import *
 
@@ -74,6 +77,27 @@ class TestFinalWarTable(unittest.TestCase):
 
         self.assertEqual(final_war.shape, (30, 4))
         self.assertListEqual(final_war.columns.tolist(), ["Team", "2021", "2020", "Run_Change"])
+    
+class TestClusterLuckHitting(unittest.TestCase):
+    def test_retrieve_historical_hitting_tables(self):
+        ht = retrieve_historical_hitting_tables(2020, file_name=None)
+        self.assertEqual(ht[ht['Team'] == 'Mets']['AB'].values[0], 2023)
+        self.assertAlmostEqual(ht[ht['Team'] == "Giants"]['OPS'].values[0], 0.785)
+
+    def test_load_historical_hitting_tables(self):
+        ht1 = retrieve_historical_hitting_tables(2020, file_name="./test_data/2020_hitting.csv")
+        ht = load_historical_hitting_tables(file_name="./test_data/2020_hitting.csv")
+        self.assertEqual(ht.shape, ht1.shape)
+        self.assertEqual(ht[ht['Team'] == "Braves"]['3B'].values[0], 3)
+
+    def test_calculate_regression_saves(self):
+        pass
+
+    def test_calculate_regression(self):
+        pass
+    
+    def test_calculate_predicted_cluster_luck_adj(self):
+        pass
         
 
 def _clean_data():

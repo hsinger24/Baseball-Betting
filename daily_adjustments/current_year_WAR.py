@@ -8,145 +8,22 @@ from selenium.webdriver.support.ui import Select
 import time
 import pandas as pd
 import re
+import unidecode
 
-team_map = {
-    'LAD': 'Dodgers',
-    'SD': 'Padres',
-    'CWS': 'White Sox',
-    'MIN': 'Twins',
-    'CLE': 'Indians',
-    'OAK': 'Athletics',
-    'TB': 'Rays',
-    'NYY': 'Yankees',
-    'ATL': 'Braves',
-    'NYM': 'Mets',
-    'CHC': 'Cubs',
-    'CIN': 'Reds',
-    'LAA': 'Angels',
-    'MIL': 'Brewers',
-    'SF': 'Giants',
-    'PHI': 'Phillies',
-    'HOU': 'Astros',
-    'STL': 'Cardinals',
-    'KC': 'Royals',
-    'BAL': 'Orioles',
-    'SEA': 'Mariners',
-    'TOR': 'Blue Jays',
-    'DET': 'Tigers',
-    'BOS': 'Red Sox',
-    'ARI': 'Diamondbacks',
-    'WSH': 'Nationals',
-    'COL': 'Rockies',
-    'MIA': 'Marlins',
-    'PIT': 'Pirates',
-    'TEX': 'Rangers'
-}
-
-def _retrieve_offense_war_table_failed(year):
-    # year = str(year)
-    # offense_war_html = pd.read_html(
-    #     f'https://www.fangraphs.com/leaders.aspx?pos=all&stats=bat&lg=all&qual=0&type=8&season={year}&month=0&season1={year}&ind=0&team=0,ts&rost=0&age=0&filter=&players=0&startdate=&enddate=')
-
-    # TEAM_WAR_TABLE_INDEX = 16
-
-    # # Find the correct table
-    # offense_war_table = offense_war_html[TEAM_WAR_TABLE_INDEX]
-
-    # # Set up dataframe by adjusting columns
-    # offense_war_table_columns = []
-    # for _, j in offense_war_table.columns:
-    #     offense_war_table_columns.append(j)
-    # offense_war_table.columns = offense_war_table_columns
-    # offense_war_table_final = offense_war_table.loc[:, ['Team', 'WAR']]
-
-    # return offense_war_table_final
-    return None
-
-def _retrieve_defense_war_table_failed(year):
-    # """Retrieves the Defensive WAR table. Should not be used outside this file
-
-    # Args:
-    #     year (int): the year to retrieve the war table for
-
-    # Returns:
-    #     pandas.DataFrame: The War table
-    # """
-    # year = str(year)
-    # TEAM_WAR_TABLE_INDEX = 16
-    # defense_war_html = pd.read_html(
-    #     f'https://www.fangraphs.com/leaders.aspx?pos=all&stats=pit&lg=all&qual=0&type=8&season={year}&month=0&season1={year}&ind=0&team=0,ts&rost=0&age=0&filter=&players=0&startdate=&enddate=')
-
-    # # get the correct table
-    # defense_war_table = defense_war_html[TEAM_WAR_TABLE_INDEX]
-
-    # # set up dataframe by adjusting columns
-    # defense_war_table_columns = []
-    # for _, j in defense_war_table.columns:
-    #     defense_war_table_columns.append(j)
-    # defense_war_table.columns = defense_war_table_columns
-    # defense_war_table_final = defense_war_table.loc[:, ['Team', 'WAR']]
-
-    return None
-
-def retrieve_historical_combined_war_table_failed(year, file_path="data/war_table.csv"):
-    # """Retrieves the Offensive and Defensive War tables for a given year (past) and saves it to a file,
-    # if the given file_path is not None
-
-    # Args:
-    #     year (int): Year to get
-    #     file_path (str, optional): path to save file. Defaults to "data/war_table.csv".
-
-    # Returns:
-    #     pandas.DataFrame: The War table
-    # """
-    # # get both offense and defense tables
-    # offense_table = _retrieve_offense_war_table(year)
-    # defense_table = _retrieve_defense_war_table(year)
-
-    # # merge tables
-    # war = pd.merge(offense_table, defense_table, on='Team')
-
-    # # adjust columns and create a total war column
-    # war.columns = ['Team', 'Offense', 'Defense']
-    # war.drop(30, inplace=True)
-    # war.Offense = pd.to_numeric(war['Offense'])
-    # war.Defense = pd.to_numeric(war.Defense)
-    # war['Total'] = war.Offense + war.Defense
-    # war.sort_values(by='Total', ascending=False, inplace=True)
-    # war.Team = war.Team.apply(lambda x: team_map[x])
-
-    # if file_path is not None:
-    #     with open(file_path, "w") as f:
-    #         war.to_csv(f)
-
-    return None
-
-def retrieve_previous_year_war_table(previous_year, file_path="data/historical_war_table.csv"):
-    """Retrieves previous year war table and saves it to a file,
-    if the given file_path is not None
+def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
+    """Retrieves the current year WAR of all players who have played in the MLB this season from 
+    baseball prospectus
 
     Args:
-        previous year
-        file_path (str, optional): path to save file. Defaults to "data/war_table.csv".
+        file_path (str, optional): path to save file. Defaults to "data/curr_war_table.csv".
 
     Returns:
-        pandas.DataFrame: The previous year's WAR table by team
+        pandas.DataFrame: The current year war table
     """
-    
     driver = webdriver.Chrome('../chromedriver')
     driver.get('https://www.baseballprospectus.com/leaderboards/hitting/')
     regex_name = r'(\D+\s\D+)+'
     table_dict = {}
-    filters = driver.find_elements_by_class_name('filter-btn')
-    year_filter = filters[0]
-    year_filter.click()
-    time.sleep(1)
-    year_input = driver.find_element_by_name('currentSliderValue')
-    year_input.clear()
-    year_input.send_keys(str(previous_year))
-    save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[1]/div/div/div/div[2]/button[2]")
-    save_button.click()
-    time.sleep(3)
     for i in range(30):
         if i==0:
             filters = driver.find_elements_by_class_name('filter-btn')
@@ -159,12 +36,13 @@ def retrieve_previous_year_war_table(previous_year, file_path="data/historical_w
             save_button.click() # clicks save button
             plate_appearance_filter = filters[4]
             plate_appearance_filter.click() # Clicking plate appearance filter
-            time.sleep(5)
+            time.sleep(2)
             plate_appearance_input = driver.find_element_by_name('currentSliderValue')
             plate_appearance_input.clear()
             plate_appearance_input.send_keys('0')
             save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[5]/div/div/div/div[2]/button[2]")
             save_button.click()
+            time.sleep(2)
             try:
                 WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
                 time.sleep(0.5)
@@ -198,15 +76,15 @@ def retrieve_previous_year_war_table(previous_year, file_path="data/historical_w
             table_dict[team_name] = table_dict[team_name].append(hitting_table)
             print(team_name)
         else:
-            time.sleep(5)
+            time.sleep(2)
             team_filter.click()
-            time.sleep(5)
+            time.sleep(2)
             team_options = driver.find_elements_by_class_name('multi-select__box')
             team_options[i].click()
             team_options[(i+1)].click()
             save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[4]/div/div/div/div[2]/button[2]")
             save_button.click()
-            time.sleep(5)
+            time.sleep(2)
             try:
                 WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
                 time.sleep(0.5)
@@ -241,16 +119,6 @@ def retrieve_previous_year_war_table(previous_year, file_path="data/historical_w
             print(team_name)
     # Getting pitchers
     driver.get('https://www.baseballprospectus.com/leaderboards/pitching/')
-    filters = driver.find_elements_by_class_name('filter-btn')
-    year_filter = filters[0]
-    year_filter.click()
-    time.sleep(1)
-    year_input = driver.find_element_by_name('currentSliderValue')
-    year_input.clear()
-    year_input.send_keys(str(previous_year))
-    save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[1]/div/div/div/div[2]/button[2]")
-    save_button.click()
-    time.sleep(3)
     for i in range(30):
         if i==0:
             time.sleep(5)
@@ -264,12 +132,13 @@ def retrieve_previous_year_war_table(previous_year, file_path="data/historical_w
             save_button.click()
             innings_filter = filters[4]
             innings_filter.click()
-            time.sleep(5)
+            time.sleep(2)
             innings_input = driver.find_element_by_name('currentSliderValue')
             innings_input.clear()
             innings_input.send_keys('0')
             save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[5]/div/div/div/div[2]/button[2]")
             save_button.click()
+            time.sleep(2)
             try:
                 WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
                 time.sleep(0.5)
@@ -302,15 +171,15 @@ def retrieve_previous_year_war_table(previous_year, file_path="data/historical_w
             table_dict[team_name] = table_dict[team_name].append(pitching_table)
             print(team_name)
         else:
-            time.sleep(5)
+            time.sleep(2)
             team_filter.click()
-            time.sleep(5)
+            time.sleep(2)
             team_options = driver.find_elements_by_class_name('multi-select__box')
             team_options[i].click()
             team_options[(i+1)].click()
             save_button = driver.find_element_by_xpath("//*[@id='app']/div[2]/div/div[2]/div[2]/div[4]/div/div/div/div[2]/button[2]")
             save_button.click()
-            time.sleep(5)
+            time.sleep(2)
             try:
                 WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.CLASS_NAME, 'load-more__btn')))
                 time.sleep(0.5)
@@ -342,39 +211,35 @@ def retrieve_previous_year_war_table(previous_year, file_path="data/historical_w
             team_name = pitching_table.iloc[0,1]
             table_dict[team_name] = table_dict[team_name].append(pitching_table)
             print(team_name)
-    big_boi_df = pd.DataFrame()
+    all_players = pd.DataFrame()
     for key, value in table_dict.items():
-        big_boi_df = big_boi_df.append(value)
+        all_players = all_players.append(value)
     def conv(x):
         try:
             return float(x)
         except:
             return 0
-    big_boi_df['WAR'] = big_boi_df['WAR'].apply(conv)
-    grouped = big_boi_df.groupby(by = 'Team')['WAR'].sum()
+    all_players['WAR'] = all_players['WAR'].apply(conv)
+    grouped = all_players.groupby(by = 'Name')['WAR'].sum()
     grouped = pd.DataFrame(grouped)
     grouped.reset_index(inplace = True)
-    grouped.columns = ['Team', 'WAR']
-    grouped['Team'] = grouped.Team.apply(lambda x: team_map[x])
-    grouped.drop('Unnamed: 0', axis = 1, inplace = True)
+    grouped.columns = ['Name', 'WAR']
+    grouped['Name'] = grouped.Name.apply(unidecode.unidecode)
 
     if file_path is not None:
-        with open(file_path, "w") as f:
+        with open("data/curr_war_table.csv", 'w') as f:
             grouped.to_csv(f)
 
     return grouped
 
-def load_previous_year_war_table(file_path="data/historical_war_table.csv"):
-    """Loads historical war table from a given file
+def load_current_year_WAR(file_path = "data/curr_war_table.csv"):
+    """Loads the current year war Table from a given file
 
     Args:
-        file_path (str, optional): War file. Defaults to "data/historical_war_table.csv".
+        file_path (str, optional): War file. Defaults to "data/curr_war_table.csv".
 
     Returns:
-        pandas.DataFrame: War Table
+        pandas.DataFrame: Current year War Table
     """
-    return pd.read_csv(file_path, index_col=0)
 
-
-
-
+    return pd.read_csv(file_path, index_col = 0)
