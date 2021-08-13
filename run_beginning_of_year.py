@@ -1,13 +1,14 @@
 import datetime as dt
 
 from daily_adjustments.active_rosters import *
+from daily_adjustments.BP_WAR import *
 
 from cluster_luck_functions.cluster_luck_hitting import *
 from cluster_luck_functions.cluster_luck_pitching import *
 from cluster_luck_functions.cluster_luck_combined import *
 
 from war_functions.pecota_tables import *
-from war_functions.historical_war_table import *
+#from war_functions.historical_war_table import *
 from war_functions.preseason_war_projections import *
 from war_functions.preseason_win_percentage import *
 
@@ -46,7 +47,7 @@ final_cluster_luck = merge_cluster_luck_tables(prev_year_hitting_adjustment, pre
 ########## WAR FUNCTIONS ##########
 
 pt = load_combined_pecota_table()
-#retrieve_previous_year_war_table(2019)
+retrieve_previous_year_war_table(2019)
 prev_year_war = load_previous_year_war_table()
 preseason_projections = calculate_preaseason_war_projections(rosters, pt)
 final_war_preseason = calculate_final_preseason_war_change(preseason_projections, prev_year_war, current_year = current_year)
