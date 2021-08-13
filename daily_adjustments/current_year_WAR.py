@@ -243,3 +243,111 @@ def load_current_year_WAR(file_path = "data/curr_war_table.csv"):
     """
 
     return pd.read_csv(file_path, index_col = 0)
+
+def retrieve_historical_player_war_tables(driver, year):
+    for i in range(2):
+        if i == 1:
+            driver.get("https://www.baseballprospectus.com/leaderboards/hitting/")
+        else:
+            driver.get("https://www.baseballprospectus.com/leaderboards/pitching/")
+    
+        # list of filters
+        filters = driver.find_elements_by_class_name("filter-btn")
+
+        # get the current year
+        year_filter = filters[0]
+        year_current = year_filter.text[-4:]
+
+        # if the current year is the year given then do nothing
+        # otherwise change the year filter
+        if str(year) != year_current:
+
+            # set the year to the given year
+            year_filter.click()
+            year_slider = driver.find_element_by_name("currentSliderValue")
+            year_slider.clear()
+            year_slider.send_keys(year)
+
+            # get the save button, click it and wait for it to be stale
+            save_btn = driver.find_elements_by_class_name("modal__btn--save")[0]
+            save_btn.click()
+            WebDriverWait(driver, 10).until(EC.staleness_of(save_btn))
+
+        # Set PA/IP to 0    
+        plate_apearance_innings_pitched_filter = filters[4]
+        plate_apearance_innings_pitched_filter.click()
+        pa_slider = driver.find_element_by_name("currentSliderValue")
+        pa_slider.clear()
+        pa_slider.send_keys(0)
+
+        # save selection
+        save_btn = driver.find_elements_by_class_name("modal__btn--save")[0]
+        save_btn.click()
+        WebDriverWait(driver, 10).until(EC.staleness_of(save_btn))
+
+        # unclick the default all selection
+        team_filter = filters[3]
+        team_filter.click()
+        teams = driver.find_elements_by_class_name("multi-select__box")
+        all_btn = teams[0]
+        all_btn.click()
+
+        # create dict to store team's player tables
+        table_dict = {}
+        regex_name = r'(\D+\s\D+)+'
+
+        def to_num(x):
+            try: return float(x)
+            except: return 0.0
+
+        # For every team
+        for i in range(1, 31):
+            # click the correct team
+            team_btn = driver.find_elements_by_class_name("multi-select__box")[i]
+            team_btn.click()
+
+            # click save
+            save_btn = driver.find_elements_by_class_name("modal__btn--save")
+            save_btn = save_btn[0]
+            save_btn.click()
+
+            # wait for save button staleness
+            WebDriverWait(driver, 10).until(
+                EC.staleness_of(save_btn)
+            )
+
+            # click load till you can't click no mo
+
+            # get the load button
+            load_more_button = driver.find_elements_by_class_name("load-more__btn")[0]
+            # click load while it is not disabled, but if it's inactive then also don't click it
+            while len(driver.find_elements_by_class_name("load-more__btn--disabled")) == 0:
+                if len(driver.find_elements_by_class_name("load-more__btn--inactive")) > 0:
+                    continue
+                load_more_button.click()
+
+            # download team....
+            html = driver.page_source
+            hitting_table = pd.read_html(html)
+            hitting_table = hitting_table[0]
+            hitting_table = hitting_table.iloc[0:(hitting_table.shape[0]), [0,2,3]]
+            hitting_table.columns = ['Name', 'Team', 'WAR']
+
+            hitting_table['Name'] = hitting_table.Name.apply(lambda x: re.findall(regex_name, x)[0])
+            hitting_table['Name'] = hitting_table.Name.apply(lambda x: x.strip(' '))
+
+            hitting_table['WAR'] = hitting_table.WAR.apply(to_num)
+
+            team_name = hitting_table.iloc[0,1]
+            table_dict[team_name] = pd.DataFrame(columns = hitting_table.columns)
+            table_dict[team_name] = table_dict[team_name].append(hitting_table)
+
+            print(team_name)
+
+            # Unclick the team
+            team_filter.click()
+            team_btn = driver.find_elements_by_class_name("multi-select__box")[i]
+            team_btn.click()
+        
+        
+    return table_dict
