@@ -1,5 +1,10 @@
 import pandas as pd
 
+team_list = ['Diamondbacks', 'Braves', 'Orioles', 'Red Sox', 'Cubs', 'White Sox', 'Reds', 'Indians', 'Rockies',
+                 'Tigers', 'Astros', 'Royals', 'Angels', 'Dodgers', 'Marlins', 'Brewers', 'Twins', 'Mets', 'Yankees',
+                 'Athletics', 'Phillies', 'Pirates', 'Padres', 'Giants', 'Mariners', 'Cardinals', 'Rays', 'Rangers',
+                 'Blue Jays', 'Nationals']
+
 def get_starting_rotations_failed(pecota_table):
     pass
     # team_list_links = ['https://www.lineups.com/mlb/depth-charts/arizona-diamondbacks', 'https://www.lineups.com/mlb/depth-charts/atlanta-braves',
@@ -76,12 +81,14 @@ def get_starting_rotations_failed(pecota_table):
     # return starting_rotations_tables, failed_to_find_war_list
 
 def retrieve_starting_rotations_WAR(pecota_table, curr_year_WAR_BP):
+    
     ##### Issue: Players just called up: for these players, use only Projected ##### 
     
     team_list = ['Diamondbacks', 'Braves', 'Orioles', 'Red Sox', 'Cubs', 'White Sox', 'Reds', 'Indians', 'Rockies',
                  'Tigers', 'Astros', 'Royals', 'Angels', 'Dodgers', 'Marlins', 'Brewers', 'Twins', 'Mets', 'Yankees',
                  'Athletics', 'Phillies', 'Pirates', 'Padres', 'Giants', 'Mariners', 'Cardinals', 'Rays', 'Rangers',
                  'Blue Jays', 'Nationals']
+    names = pd.read_csv("pecota_data/names.csv", index_col=0)
     starting_rotations = {}
     failed_to_find_war_list = []
     for team in team_list:
@@ -89,44 +96,68 @@ def retrieve_starting_rotations_WAR(pecota_table, curr_year_WAR_BP):
         dfs = pd.read_html(link)
         starting_pitchers = dfs[-3]
 
-        starting_pitchers = starting_pitchers[['Name']]
+        starting_pitchers['Name'] = starting_pitchers[['Name']]
         starting_pitchers = starting_pitchers.loc[starting_pitchers['Name'] != 'Total']
         starting_pitchers['WAR_proj'] = 0
         starting_pitchers['WAR'] = 0
         sp_list = starting_pitchers[['Name']].values
         for index, pitcher in enumerate(sp_list):
-            pitcher = pitcher[0]
-            if pitcher == 'Michael Baumann':
-                pitcher = 'Mike Baumann'
-            if pitcher == 'Nicholas Lodolo':
-                pitcher = 'Nick Lodolo'
-            if pitcher == 'JC Mejia':
-                pitcher = 'J.C. Mejia'
-            if pitcher == 'Andrew Strotman':
-                pitcher = 'Drew Strotman'
-            if pitcher == 'Joseph Ryan':
-                pitcher = 'Joe Ryan'
-            if pitcher == 'Hyun-Jin Ryu':
-                pitcher = 'Hyun Jin Ryu'
-            if pitcher == 'Kwang-hyun Kim':
-                pitcher = 'Kwang Hyun Kim'
-            if pitcher == 'Sidney Thomas':
-                pitcher = 'Connor Thomas'
+            pitcher = pitcher[0] 
+
+
+            # if pitcher == 'Nicholas Lodolo':
+            #     pitcher = 'Nick Lodolo'
+            # if pitcher == 'JC Mejia':
+            #     pitcher = 'J.C. Mejia'
+            # if pitcher == 'Andrew Strotman':
+            #     pitcher = 'Drew Strotman'
+            # if pitcher == 'Joseph Ryan':
+            #     pitcher = 'Joe Ryan'
+            # if pitcher == 'Hyun-Jin Ryu':
+            #     pitcher = 'Hyun Jin Ryu'
+            # if pitcher == 'Kwang-hyun Kim':
+            #     pitcher = 'Kwang Hyun Kim'
+            # if pitcher == 'Sidney Thomas':
+            #     pitcher = 'Connor Thomas'
+            # if pitcher == 'Alex Wells':
+            #     pitcher = 'Alexander Wells'
+            # if pitcher == 'Sam Long':
+            #     pitcher = 'Sammy Long'
+
+            for col in names.columns:
+                if pitcher in names[col].values:
+                    pitcher = names[names[col]==pitcher]
+                    break
+            
+            if type(pitcher) == str:
+                failed_to_find_war_list.append(pitcher + ' Pecota')
+                continue
+
             try:
-                starting_pitchers.loc[index, 'WAR_proj'] = pecota_table[pecota_table['name'] == pitcher]['war_162'].iloc[0]
+                starting_pitchers.loc[index, 'WAR_proj'] = pecota_table[pecota_table['name'] == pitcher['name'].values[0]]['war_162'].iloc[0]
+            except:
+                failed_to_find_war_list.append(pitcher['names_wo_a'].values[0] + ' Pecota')
+            try:
+                starting_pitchers.loc[index, 'WAR'] = curr_year_WAR_BP[curr_year_WAR_BP.Name==pitcher['name'].values[0]].iloc[0,1]
             except:
                 try:
-                    starting_pitchers.loc[index, 'WAR_proj'] = pecota_table[pecota_table['name_wo_a'] == pitcher]['war_162'].iloc[0]
+                    starting_pitchers.loc[index, 'WAR'] = curr_year_WAR_BP[curr_year_WAR_BP.Name==pitcher['name_wo_a'].values[0]].iloc[0,1]
                 except:
                     try:
-                        starting_pitchers.loc[index, 'WAR_proj'] = pecota_table[pecota_table['name_alt'] == pitcher]['war_162'].iloc[0]
+                        starting_pitchers.loc[index, 'WAR'] = curr_year_WAR_BP[curr_year_WAR_BP.Name==pitcher['name_alt_1'].values[0]].iloc[0,1]
                     except:
-                        starting_pitchers.loc[index, 'WAR_proj'] = 0
-                        failed_to_find_war_list.append(pitcher + 'pecota')
-            try:
-                starting_pitchers.loc[index, 'WAR'] = curr_year_WAR_BP[curr_year_WAR_BP.Name==pitcher].iloc[0,1]
-            except:
-                failed_to_find_war_list.append(pitcher + 'BP')
-                starting_pitchers.loc[index, 'WAR'] = 0.0001
+                        try:
+                            starting_pitchers.loc[index, 'WAR'] = curr_year_WAR_BP[curr_year_WAR_BP.Name==pitcher['name_alt_2'].values[0]].iloc[0,1]
+                        except:
+                            try:
+                                starting_pitchers.loc[index, 'WAR'] = curr_year_WAR_BP[curr_year_WAR_BP.Name==pitcher['name_alt_3'].values[0]].iloc[0,1]
+                            except:
+                                try:
+                                    starting_pitchers.loc[index, 'WAR'] = curr_year_WAR_BP[curr_year_WAR_BP.Name==pitcher['name_alt_4'].values[0]].iloc[0,1]
+                                except:
+                                    failed_to_find_war_list.append(pitcher['name_wo_a'].values[0] + ' BP')
+                                    starting_pitchers.loc[index, 'WAR'] = 0.0001
+
         starting_rotations[team] = starting_pitchers
     return starting_rotations, failed_to_find_war_list
+
