@@ -122,11 +122,11 @@ def retrieve_starting_rotations_WAR(pecota_table, curr_year_WAR_BP):
                         starting_pitchers.loc[index, 'WAR_proj'] = pecota_table[pecota_table['name_alt'] == pitcher]['war_162'].iloc[0]
                     except:
                         starting_pitchers.loc[index, 'WAR_proj'] = 0
-                        failed_to_find_war_list.append(pitcher)
+                        failed_to_find_war_list.append(pitcher + 'pecota')
             try:
                 starting_pitchers.loc[index, 'WAR'] = curr_year_WAR_BP[curr_year_WAR_BP.Name==pitcher].iloc[0,1]
             except:
-                failed_to_find_war_list.append(pitcher)
+                failed_to_find_war_list.append(pitcher + 'BP')
                 starting_pitchers.loc[index, 'WAR'] = 0.0001
         starting_rotations[team] = starting_pitchers
     return starting_rotations, failed_to_find_war_list
