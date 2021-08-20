@@ -141,7 +141,7 @@ def _retrieve_historical_player_war_tables(driver, year=None, get_gs = False):
                 player_table = player_table.iloc[:, [0,2,3]]
                 player_table.columns = ['Name', 'Team', 'WAR']
             else:
-                player_table = player_table.iloc[:, [0,2,3, 8]]
+                player_table = player_table.iloc[:, [0,2,3,8]]
                 player_table.columns = ['Name', 'Team', 'WAR', 'GS']
             player_table['Name'] = player_table.Name.apply(lambda x: re.findall(regex_name, x)[0])
             player_table['Name'] = player_table.Name.apply(lambda x: x.strip(' '))

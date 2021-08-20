@@ -162,7 +162,7 @@ def retrieve_starting_rotations_WAR_also_failed(pecota_table, curr_year_WAR_BP):
         starting_rotations[team] = starting_pitchers
     return starting_rotations, failed_to_find_war_list
 
-def retrieve_starting_rotations_WAR(pecota_tablem):
+def retrieve_starting_rotations_WAR(pecota_table):
     team_list = ['Diamondbacks', 'Braves', 'Orioles', 'Red Sox', 'Cubs', 'White Sox', 'Reds', 'Indians', 'Rockies',
                  'Tigers', 'Astros', 'Royals', 'Angels', 'Dodgers', 'Marlins', 'Brewers', 'Twins', 'Mets', 'Yankees',
                  'Athletics', 'Phillies', 'Pirates', 'Padres', 'Giants', 'Mariners', 'Cardinals', 'Rays', 'Rangers',
