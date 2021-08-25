@@ -114,4 +114,4 @@ def _calculate_cl_with_differential():
 ########## MAKING WAR ADJUSTMENTS FOR ACTIVE ROSTER AND STARTING ROTATION ##########
 
 starting_rotations, failed_to_find_pitchers = retrieve_starting_rotations_WAR(pt, current_year_WAR)
-print(failed_to_find_pitchers)
+print(starting_rotations)

@@ -87,22 +87,21 @@ def retrieve_starting_rotations_WAR(pecota_table, curr_year_WAR_BP):
     ##### Issue: Players just called up: for these players, use only Projected ##### 
     
     team_list = ['Diamondbacks', 'Braves', 'Orioles', 'Red Sox', 'Cubs', 'White Sox', 'Reds', 'Indians', 'Rockies',
-                 'Tigers', 'Astros', 'Royals', 'Dodgers', 'Marlins', 'Brewers', 'Twins', 'Mets', 'Yankees',
+                 'Tigers', 'Astros', 'Royals', 'Marlins', 'Brewers', 'Twins', 'Mets', 'Yankees',
                  'Athletics', 'Phillies', 'Pirates', 'Padres', 'Giants', 'Mariners', 'Cardinals', 'Rays', 'Rangers',
-                 'Blue Jays', 'Nationals', 'Angels']
+                 'Blue Jays', 'Nationals', 'Angels', 'Dodgers',]
     names = pd.read_csv("pecota_data/names.csv", index_col=0)
     starting_rotations = {}
     failed_to_find_war_list = []
     for team in team_list:
-        print(team)
-        link = f'https://www.fangraphs.com/teams/{team.lower().replace(" ", "")}/depth-chart'
-        try:
+        if team != 'Dodgers':
+            link = f'https://www.fangraphs.com/teams/{team.lower().replace(" ", "")}/depth-chart'
             dfs = pd.read_html(link)
-        except:
-            time.sleep(60)
+            starting_pitchers = dfs[-3]
+        else:
+            link = 'https://www.fangraphs.com/depthcharts.aspx?position=ALL&teamid=22'
             dfs = pd.read_html(link)
-        starting_pitchers = dfs[-3]
-
+            starting_pitchers = dfs[-4]
         starting_pitchers['Name'] = starting_pitchers[['Name']]
         starting_pitchers = starting_pitchers.loc[starting_pitchers['Name'] != 'Total']
         starting_pitchers['WAR_proj'] = 0
@@ -126,6 +125,7 @@ def retrieve_starting_rotations_WAR(pecota_table, curr_year_WAR_BP):
             try:
                 starting_pitchers.loc[index, 'WAR_proj'] = pecota_table[pecota_table['name'] == pitcher['name'].values[0]]['war_162'].iloc[0]
             except:
+                starting_pitchers.loc[index, 'WAR_proj'] = 0.0001
                 failed_to_find_war_list.append(pitcher['names_wo_a'].values[0] + ' Pecota')
             
             # Getting current WAR from BP
