@@ -205,6 +205,7 @@ def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
     drop_duplicated = drop_duplicated[['Name', 'GS', 'Position']]
     drop_duplicated['Name'] = drop_duplicated.Name.apply(unidecode.unidecode)
     final = pd.merge(grouped, drop_duplicated, on = 'Name', how = 'inner')
+    final = final.drop_duplicates(subset = 'Name', keep = 'first')
 
 
     if file_path is not None:
