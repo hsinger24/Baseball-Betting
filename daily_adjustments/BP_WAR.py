@@ -50,7 +50,7 @@ def _get_driver_location():
     
     return dct
 
-def _retrieve_historical_player_war_tables(driver, year=None, get_gs = False):
+def _retrieve_historical_player_war_tables(driver, year=None):
     # create dict to store team's player tables
     table_dict = {}
     regex_name = r'(\D+\s\D+)+'
@@ -137,12 +137,16 @@ def _retrieve_historical_player_war_tables(driver, year=None, get_gs = False):
             html = driver.page_source
             player_table = pd.read_html(html)
             player_table = player_table[0]
-            if not get_gs:
-                player_table = player_table.iloc[:, [0,2,3]]
-                player_table.columns = ['Name', 'Team', 'WAR']
+            
+            player_table = player_table.iloc[:, [0,2,3,9]]
+            player_table.columns = ['Name', 'Team', 'WAR','GS']
+
+            if j==0:
+                player_table['Position'] = 'P'
             else:
-                player_table = player_table.iloc[:, [0,2,3,8]]
-                player_table.columns = ['Name', 'Team', 'WAR', 'GS']
+                player_table['Position'] = 'H'
+                player_table['GS'] = 0
+           
             player_table['Name'] = player_table.Name.apply(lambda x: re.findall(regex_name, x)[0])
             player_table['Name'] = player_table.Name.apply(lambda x: x.strip(' '))
 
@@ -165,7 +169,7 @@ def _retrieve_historical_player_war_tables(driver, year=None, get_gs = False):
         
     return table_dict
 
-def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv", get_gs = False):
+def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
     """Retrieves the current year WAR of all players who have played in the MLB this season from 
     baseball prospectus
 
@@ -196,11 +200,18 @@ def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv", get_gs = Fa
     grouped.columns = ['Name', 'WAR']
     grouped['Name'] = grouped.Name.apply(unidecode.unidecode)
 
+    # Adding GS and position
+    drop_duplicated = all_players.drop_duplicates(subset = 'Name', keep = 'first')
+    drop_duplicated = drop_duplicated[['Name', 'GS', 'Position']]
+    drop_duplicated['Name'] = drop_duplicated.Name.apply(unidecode.unidecode)
+    final = pd.merge(grouped, drop_duplicated, on = 'Name', how = 'inner')
+
+
     if file_path is not None:
         with open("data/curr_war_table.csv", 'w') as f:
-            grouped.to_csv(f)
+            final.to_csv(f)
 
-    return grouped
+    return final
 
 def load_current_year_WAR(file_path = "data/curr_war_table.csv"):
     """Loads the current year war Table from a given file

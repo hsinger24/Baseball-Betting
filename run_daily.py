@@ -50,9 +50,10 @@ team_map = {
 
 # active_rosters = retrieve_all_active_rosters(file_name = None)
 # todays_games = retrieve_todays_games_info()
-#retrieve_current_year_WAR()
+retrieve_current_year_WAR()
 current_year_WAR = load_current_year_WAR()
-pt = load_combined_pecota_table()
+print(current_year_WAR.head())
+#pt = load_combined_pecota_table()
 
 ########## GETTING CURRENT RUN DIFFERENTIAL WITH CURRENT CLUSTER LUCK ##########
 
@@ -113,5 +114,3 @@ def _calculate_cl_with_differential():
 
 ########## MAKING WAR ADJUSTMENTS FOR ACTIVE ROSTER AND STARTING ROTATION ##########
 
-starting_rotations_WAR, failed_list = retrieve_starting_rotations_WAR(pt, current_year_WAR)
-print(failed_list)
