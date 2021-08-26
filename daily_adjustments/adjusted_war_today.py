@@ -14,34 +14,36 @@ def sp_adjustment(games, starting_rotations, frac_season=0.0):
             away_team = 'Diamondbacks'  
         if (sp_home == 'TBD' or sp_away == 'TBD'):
             continue          
-
+        
+        # Getting starting rotation WAR tables for home and away team and adjusting data for players not found
         home_table = starting_rotations[home_team]
+        for index, row in home_table.iterrows():
+            if row.WAR==0.0001:
+                home_table.loc[index, 'WAR']==row.WAR_proj
+            if row.WAR_proj==0.001:
+                home_table.loc[index, 'WAR_proj']==row.WAR
+        
         away_table = starting_rotations[away_team]
+        for index, row in away_table.iterrows():
+            if row.WAR==0.0001:
+                away_table.loc[index, 'WAR']==row.WAR_proj
+            if row.WAR_proj==0.001:
+                away_table.loc[index, 'WAR_proj']==row.WAR
 
-        if home_table.loc[home_table.Name==sp_home, 'WAR'].values[0] == 0.0001:
-            home_pitch_war = home_table.loc[home_table.Name==sp_home, 'WAR_proj'].values[0]
-            home_team_war = home_table.WAR_proj.sum()*(1.0-frac_season)+home_table.WAR.sum()
-            WAR_diff_home = home_pitch_war - home_team_war
-        else:
-            home_pitch_war = (home_table.loc[home_table.Name==sp_home, 'WAR_proj'].values[0]*(1.0-frac_season)+home_table.loc[home_table.Name==sp_home, 'WAR'].values[0])*5.0
-            home_team_war = home_table.WAR_proj.sum()*(1.0-frac_season)+home_table.WAR.sum()
-            WAR_diff_home = home_pitch_war - home_team_war
+        # Getting WAR difference for both teams
+        home_pitch_war = (home_table.loc[home_table.Name==sp_home, 'WAR_proj'].values[0]*(1.0-frac_season)+home_table.loc[home_table.Name==sp_home, 'WAR'].values[0])*5.0
+        if (frac_season>=0.25) & (frac_season < 0.5):
+            home_table = home_table[home_table.GS>2] ####LEFT OFF HERE. NEED TO CHANGE STARTING ROTATION TO APPEND GS
+        home_team_war = home_table.WAR_proj.sum()*(1.0-frac_season)+home_table.WAR.sum()
+        WAR_diff_home = home_pitch_war - home_team_war
 
+        away_pitch_war = (away_table.loc[away_table.Name==sp_away, 'WAR_proj'].values[0]*(1.0-frac_season)+away_table.loc[away_table.Name==sp_away, 'WAR'].values[0])*5.0
+        away_team_war = away_table.WAR_proj.sum()*(1.0-frac_season)+away_table.WAR.sum()
+        WAR_diff_away = away_pitch_war - away_team_war
 
-        if away_table.loc[away_table.Name==sp_away, 'WAR'].values[0] == 0.0001:
-            away_pitch_war = away_table.loc[away_table.Name==sp_away, 'WAR_proj'].values[0]
-            away_team_war = away_table.WAR_proj.sum()*(1.0-frac_season)+away_table.WAR.sum()
-            WAR_diff_away = away_pitch_war - away_team_war
-        else:
-            away_pitch_war = (away_table.loc[away_table.Name==sp_away, 'WAR_proj'].values[0]*(1.0-frac_season)+away_table.loc[away_table.Name==sp_away, 'WAR'].values[0])*5.0
-            away_team_war = away_table.WAR_proj.sum()*(1.0-frac_season)+away_table.WAR.sum()
-            WAR_diff_away = away_pitch_war - away_team_war
-
-    
-
+        # Appending dictionary of result to list of games
         game_dict = {'home_team': home_team, 'away_team': away_team, 'home_pitcher': sp_home, 'home_adjustment': WAR_diff_home, 'away_pitcher': sp_away,
             'away_adjustment': WAR_diff_away}
-
         sp_adjust_list.append(game_dict)
         
     return sp_adjust_list

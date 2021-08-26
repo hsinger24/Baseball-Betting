@@ -93,6 +93,7 @@ def retrieve_starting_rotations_WAR(pecota_table, curr_year_WAR_BP):
     names = pd.read_csv("pecota_data/names.csv", index_col=0)
     starting_rotations = {}
     failed_to_find_war_list = []
+    curr_year_GS = curr_year_WAR_BP[['Name', 'GS']]
     for team in team_list:
         if team != 'Dodgers':
             link = f'https://www.fangraphs.com/teams/{team.lower().replace(" ", "")}/depth-chart'
@@ -149,6 +150,14 @@ def retrieve_starting_rotations_WAR(pecota_table, curr_year_WAR_BP):
                                 except:
                                     failed_to_find_war_list.append(pitcher['name_wo_a'].values[0] + ' BP')
                                     starting_pitchers.loc[index, 'WAR'] = 0.0001
+        starting_pitchers = pd.merge(starting_pitchers, curr_year_GS, on = 'Name', how = 'left')
+        starting_pitchers.fillna(0, inplace = True)
+
+        # Corner cases
+        if team == 'Blue Jays':
+            starting_pitchers.loc[starting_pitchers.Name=='Hyun-Jin Ryu', 'GS'] = 20
+        if team == 'Blue Jays':
+            starting_pitchers.loc[starting_pitchers.Name=='Kwang-hyun Kim', 'GS'] = 20
 
         starting_rotations[team] = starting_pitchers
     return starting_rotations, failed_to_find_war_list
