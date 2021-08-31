@@ -1,4 +1,5 @@
 import pandas as pd
+import unidecode
 
 def sp_adjustment(games, starting_rotations, frac_season=0.0):
 
@@ -14,7 +15,6 @@ def sp_adjustment(games, starting_rotations, frac_season=0.0):
             away_team = 'Diamondbacks'  
         if (sp_home == 'TBD' or sp_away == 'TBD'):
             continue          
-        
         # Getting starting rotation WAR tables for home and away team and adjusting data for players not found
         home_table = starting_rotations[home_team]
         for index, row in home_table.iterrows():
@@ -29,15 +29,26 @@ def sp_adjustment(games, starting_rotations, frac_season=0.0):
                 away_table.loc[index, 'WAR']==row.WAR_proj
             if row.WAR_proj==0.001:
                 away_table.loc[index, 'WAR_proj']==row.WAR
-
+        print(sp_home, home_team) ##### LEFT OFF HERE. NEED TO FIX NAMES MATCHING SP TABLES
+        print(sp_away, away_team)
         # Getting WAR difference for both teams
         home_pitch_war = (home_table.loc[home_table.Name==sp_home, 'WAR_proj'].values[0]*(1.0-frac_season)+home_table.loc[home_table.Name==sp_home, 'WAR'].values[0])*5.0
         if (frac_season>=0.25) & (frac_season < 0.5):
-            home_table = home_table[home_table.GS>2] ####LEFT OFF HERE. NEED TO CHANGE STARTING ROTATION TO APPEND GS
+            home_table = home_table[home_table.GS>2] 
+        if (frac_season>=0.5) & (frac_season < 0.75):
+            home_table = home_table[home_table.GS>3]
+        if frac_season>0.75:
+            home_table = home_table[home_table.GS>5]
         home_team_war = home_table.WAR_proj.sum()*(1.0-frac_season)+home_table.WAR.sum()
         WAR_diff_home = home_pitch_war - home_team_war
 
         away_pitch_war = (away_table.loc[away_table.Name==sp_away, 'WAR_proj'].values[0]*(1.0-frac_season)+away_table.loc[away_table.Name==sp_away, 'WAR'].values[0])*5.0
+        if (frac_season>=0.25) & (frac_season < 0.5):
+            away_table = away_table[away_table.GS>2] 
+        if (frac_season>=0.5) & (frac_season < 0.75):
+            away_table = away_table[away_table.GS>3]
+        if frac_season>0.75:
+            away_table = away_table[away_table.GS>5]
         away_team_war = away_table.WAR_proj.sum()*(1.0-frac_season)+away_table.WAR.sum()
         WAR_diff_away = away_pitch_war - away_team_war
 

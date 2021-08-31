@@ -156,7 +156,7 @@ def retrieve_starting_rotations_WAR(pecota_table, curr_year_WAR_BP):
         # Corner cases
         if team == 'Blue Jays':
             starting_pitchers.loc[starting_pitchers.Name=='Hyun-Jin Ryu', 'GS'] = 20
-        if team == 'Blue Jays':
+        if team == 'Cardinals':
             starting_pitchers.loc[starting_pitchers.Name=='Kwang-hyun Kim', 'GS'] = 20
 
         starting_rotations[team] = starting_pitchers

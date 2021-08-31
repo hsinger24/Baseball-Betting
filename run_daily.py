@@ -12,6 +12,7 @@ from daily_adjustments.active_rosters import *
 from daily_adjustments.BP_WAR import *
 from daily_adjustments.todays_game_info import *
 from daily_adjustments.starting_rotations_WAR import *
+from daily_adjustments.adjusted_war_today import *
 
 team_map = {
     'Giants' : 'San Francisco Giants',
@@ -49,7 +50,7 @@ team_map = {
 ########## RETRIEVING NECESSARY DATA ##########
 
 # active_rosters = retrieve_all_active_rosters(file_name = None)
-# todays_games = retrieve_todays_games_info()
+todays_games = retrieve_todays_games_info()
 #retrieve_current_year_WAR()
 current_year_WAR = load_current_year_WAR()
 pt = load_combined_pecota_table()
@@ -114,4 +115,5 @@ def _calculate_cl_with_differential():
 ########## MAKING WAR ADJUSTMENTS FOR ACTIVE ROSTER AND STARTING ROTATION ##########
 
 starting_rotations, failed_to_find_pitchers = retrieve_starting_rotations_WAR(pt, current_year_WAR)
-print(starting_rotations)
+print(failed_to_find_pitchers)
+#sp_adjustment(todays_games, starting_rotations, frac_season = 0.81)
