@@ -3,6 +3,7 @@ import unidecode
 
 def sp_adjustment(games, starting_rotations, frac_season=0.0):
 
+    names = pd.read_csv("pecota_data/names.csv", index_col=0)
     sp_adjust_list = []
     for game in games:
         sp_home = game['home_team']['starting_pitcher']
@@ -14,7 +15,8 @@ def sp_adjustment(games, starting_rotations, frac_season=0.0):
         if away_team == 'D-backs':
             away_team = 'Diamondbacks'  
         if (sp_home == 'TBD' or sp_away == 'TBD'):
-            continue          
+            continue 
+
         # Getting starting rotation WAR tables for home and away team and adjusting data for players not found
         home_table = starting_rotations[home_team]
         for index, row in home_table.iterrows():
@@ -22,17 +24,50 @@ def sp_adjustment(games, starting_rotations, frac_season=0.0):
                 home_table.loc[index, 'WAR']==row.WAR_proj
             if row.WAR_proj==0.001:
                 home_table.loc[index, 'WAR_proj']==row.WAR
-        
         away_table = starting_rotations[away_team]
         for index, row in away_table.iterrows():
             if row.WAR==0.0001:
                 away_table.loc[index, 'WAR']==row.WAR_proj
             if row.WAR_proj==0.001:
                 away_table.loc[index, 'WAR_proj']==row.WAR
-        print(sp_home, home_team) ##### LEFT OFF HERE. NEED TO FIX NAMES MATCHING SP TABLES
-        print(sp_away, away_team)
+
+        # Getting possibility of names for both home and away pitcher
+        sp_home_short = sp_home
+        sp_away_short = sp_away
+        for col in names.columns:
+                if sp_home in names[col].values:
+                    sp_home = names[names[col]==sp_home]
+                    break
+        if type(sp_home) == str:
+                print(sp_home, home_team)
+        for col in names.columns:
+                if sp_away in names[col].values:
+                    sp_away = names[names[col]==sp_away]
+                    break
+        if type(sp_away) == str:
+                print(sp_away, home_team)
+
         # Getting WAR difference for both teams
-        home_pitch_war = (home_table.loc[home_table.Name==sp_home, 'WAR_proj'].values[0]*(1.0-frac_season)+home_table.loc[home_table.Name==sp_home, 'WAR'].values[0])*5.0
+        try:
+            home_pitch_war = (home_table.loc[home_table.Name==sp_home['name'].values[0], 'WAR_proj'].values[0]*(1.0-frac_season)+home_table.loc[home_table.Name==sp_home['name'].values[0], 'WAR'].values[0])*5.0
+        except:
+            try:
+                home_pitch_war = (home_table.loc[home_table.Name==sp_home['name_wo_a'].values[0], 'WAR_proj'].values[0]*(1.0-frac_season)+home_table.loc[home_table.Name==sp_home['name_wo_a'].values[0], 'WAR'].values[0])*5.0
+            except:
+                try:
+                    home_pitch_war = (home_table.loc[home_table.Name==sp_home['name_alt_1'].values[0], 'WAR_proj'].values[0]*(1.0-frac_season)+home_table.loc[home_table.Name==sp_home['name_alt_1'].values[0], 'WAR'].values[0])*5.0
+                except:
+                    try:
+                        home_pitch_war = (home_table.loc[home_table.Name==sp_home['name_alt_2'].values[0], 'WAR_proj'].values[0]*(1.0-frac_season)+home_table.loc[home_table.Name==sp_home['name_alt_2'].values[0], 'WAR'].values[0])*5.0
+                    except:
+                        try:
+                            home_pitch_war = (home_table.loc[home_table.Name==sp_home['name_alt_3'].values[0], 'WAR_proj'].values[0]*(1.0-frac_season)+home_table.loc[home_table.Name==sp_home['name_alt_3'].values[0], 'WAR'].values[0])*5.0
+                        except:
+                            try:
+                                home_pitch_war = (home_table.loc[home_table.Name==sp_home['name_alt_4'].values[0], 'WAR_proj'].values[0]*(1.0-frac_season)+home_table.loc[home_table.Name==sp_home['name_alt_4'].values[0], 'WAR'].values[0])*5.0
+                            except:
+                                print('All names failed for', sp_home)
+                                home_pitch_war = 0
         if (frac_season>=0.25) & (frac_season < 0.5):
             home_table = home_table[home_table.GS>2] 
         if (frac_season>=0.5) & (frac_season < 0.75):
@@ -41,8 +76,26 @@ def sp_adjustment(games, starting_rotations, frac_season=0.0):
             home_table = home_table[home_table.GS>5]
         home_team_war = home_table.WAR_proj.sum()*(1.0-frac_season)+home_table.WAR.sum()
         WAR_diff_home = home_pitch_war - home_team_war
-
-        away_pitch_war = (away_table.loc[away_table.Name==sp_away, 'WAR_proj'].values[0]*(1.0-frac_season)+away_table.loc[away_table.Name==sp_away, 'WAR'].values[0])*5.0
+        try:
+            away_pitch_war = (away_table.loc[away_table.Name==sp_away['name'].values[0], 'WAR_proj'].values[0]*(1.0-frac_season)+away_table.loc[away_table.Name==sp_away['name'].values[0], 'WAR'].values[0])*5.0
+        except:
+            try:
+                away_pitch_war = (away_table.loc[away_table.Name==sp_away['name_wo_a'].values[0], 'WAR_proj'].values[0]*(1.0-frac_season)+away_table.loc[away_table.Name==sp_away['name_wo_a'].values[0], 'WAR'].values[0])*5.0
+            except:
+                try:
+                    away_pitch_war = (away_table.loc[away_table.Name==sp_away['name_alt_1'].values[0], 'WAR_proj'].values[0]*(1.0-frac_season)+away_table.loc[away_table.Name==sp_away['name_alt_1'].values[0], 'WAR'].values[0])*5.0
+                except:
+                    try:
+                        away_pitch_war = (away_table.loc[away_table.Name==sp_away['name_alt_2'].values[0], 'WAR_proj'].values[0]*(1.0-frac_season)+away_table.loc[away_table.Name==sp_away['name_alt_2'].values[0], 'WAR'].values[0])*5.0
+                    except:
+                        try:
+                            away_pitch_war = (away_table.loc[away_table.Name==sp_away['name_alt_3'].values[0], 'WAR_proj'].values[0]*(1.0-frac_season)+away_table.loc[away_table.Name==sp_away['name_alt_3'].values[0], 'WAR'].values[0])*5.0
+                        except:
+                            try:
+                                away_pitch_war = (away_table.loc[away_table.Name==sp_away['name_alt_4'].values[0], 'WAR_proj'].values[0]*(1.0-frac_season)+away_table.loc[away_table.Name==sp_away['name_alt_4'].values[0], 'WAR'].values[0])*5.0
+                            except:
+                                print('All names failed for', sp_away)
+                                away_pitch_war = 0
         if (frac_season>=0.25) & (frac_season < 0.5):
             away_table = away_table[away_table.GS>2] 
         if (frac_season>=0.5) & (frac_season < 0.75):
@@ -53,7 +106,7 @@ def sp_adjustment(games, starting_rotations, frac_season=0.0):
         WAR_diff_away = away_pitch_war - away_team_war
 
         # Appending dictionary of result to list of games
-        game_dict = {'home_team': home_team, 'away_team': away_team, 'home_pitcher': sp_home, 'home_adjustment': WAR_diff_home, 'away_pitcher': sp_away,
+        game_dict = {'home_team': home_team, 'away_team': away_team, 'home_pitcher': sp_home_short, 'home_adjustment': WAR_diff_home, 'away_pitcher': sp_away_short,
             'away_adjustment': WAR_diff_away}
         sp_adjust_list.append(game_dict)
         
