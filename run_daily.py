@@ -46,6 +46,10 @@ team_map = {
     'Orioles': 'Baltimore Orioles',
     'Diamondbacks': 'Arizona Diamondbacks'
 }
+########## SETTING NECESSARY PARAMETERS ##########
+
+frac_season = 0.82
+current_year = 2020
 
 ########## RETRIEVING NECESSARY DATA ##########
 
@@ -110,13 +114,53 @@ def _calculate_cl_with_differential():
     merged = pd.merge(run_diff, cl, on = 'Team')
     return merged
 
-#current_run_differential = _calculate_cl_with_differential()
+current_run_differential = _calculate_cl_with_differential()
+#print(current_run_differential)
 
 ########## MAKING WAR ADJUSTMENTS FOR ACTIVE ROSTER AND STARTING ROTATION ##########
 
-#starting_rotations, failed_to_find_pitchers = retrieve_starting_rotations_WAR(pt, current_year_WAR)
+starting_rotations, failed_to_find_pitchers = retrieve_starting_rotations_WAR(pt, current_year_WAR)
 #print(failed_to_find_pitchers)
-#sp_adjustments = sp_adjustment(todays_games, starting_rotations, frac_season = 0.82)
+sp_adjustments = sp_adjustment(todays_games, starting_rotations, frac_season = frac_season)
+#print(sp_adjustments)
 overall_war_predictions_preseason = pd.read_csv('data/overall_war_predictions_preseason.csv')
-active_roster_war, failed_to_find_players = active_roster_war_table(active_rosters, overall_war_predictions_preseason, current_year_WAR, pt, 2020, 0.82)
-print(failed_to_find_players)
+active_roster_war, failed_to_find_players = active_roster_war_table(active_rosters, overall_war_predictions_preseason, current_year_WAR, pt, current_year, frac_season)
+print(active_roster_war)
+
+########## COMBINING ALL INPUTS TO GET TODAY'S WIN PERCENTAGE ##########
+
+def todays_win_percentages(preseason_projections, current_run_differential, sp_adjustments, active_roster_war, frac_season):
+    
+    # Creating df, filling team column
+    todays_projections = pd.DataFrame(columns = ['Team', 'Preseason_Projections', 'CY_Win_Pct', 'SP_Adjustment', 'Active_Roster_Adjustment', 'Today_Win_Pct'])
+    todays_projections['Team'] = current_run_differential.Team
+    for column in list(todays_projections.columns):
+        if column != 'Team':
+            todays_projections[column] = 0
+
+    # Putting preseason projections into table
+    preseason_projections['Team'] = preseason_projections.Team.apply(lambda x: team_map[x])
+    for index, row in todays_projections.iterrows():
+        team = row.Team
+        preseason_win_pct = preseason_projections.loc[preseason_projections.Team==team, 'Win_Percentage'].values[0]
+        todays_projections.loc[index, 'Preseason_Projections'] = preseason_win_pct
+    
+    # Putting current year win % into table
+    current_run_differential['Adjusted_Runs_Scored'] = current_run_differential['Runs_162'] + current_run_differential['Offensive_Adjustment']
+    current_run_differential['Adjusted_Runs_Allowed'] = current_run_differential['Runs_Allowed_162'] - current_run_differential['Defensive_Adjustment']
+    current_run_differential['Win_Percentage'] = .5 + 0.000683 * \
+        (current_run_differential.Adjusted_Runs_Scored - current_run_differential.Adjusted_Runs_Allowed)
+    for index, row in todays_projections.iterrows():
+        team = row.Team
+        cy_win_pct = current_run_differential.loc[current_run_differential.Team==team, 'Win_Percentage'].values[0]
+        todays_projections.loc[index, 'CY_Win_Pct'] = cy_win_pct
+    # Putting SP Adjustment into tables
+    for matchup in sp_adjustments:
+        home_team = team_map[matchup['home_team']]
+        away_team = team_map[matchup['away_team']]
+        todays_projections.loc[todays_projections.Team==home_team, 'SP_Adjustment'] = matchup['home_adjustment']
+        todays_projections.loc[todays_projections.Team==away_team, 'SP_Adjustment'] = matchup['away_adjustment']
+    return todays_projections
+
+# preseason_projections = pd.read_csv('data/preseason_projections.csv')
+# print(todays_win_percentages(preseason_projections, current_run_differential, sp_adjustments, active_roster_war, frac_season))

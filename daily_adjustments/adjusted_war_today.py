@@ -183,6 +183,8 @@ def active_roster_war_table(active_rosters, overall_war_predictions_preseason, c
         preseason_war_proj = overall_war_predictions_preseason.loc[overall_war_predictions_preseason.Team==team, str(current_year)].values[0]
         team_series = pd.Series([team, active_roster_war, preseason_war_proj], index = active_roster_war_table.columns)
         active_roster_war_table = active_roster_war_table.append(team_series, ignore_index = True)
+    active_roster_war_table['WAR_difference'] = active_roster_war_table.active_roster_WAR - active_roster_war_table.preseason_WAR_proj
+    active_roster_war_table['Run_difference'] = active_roster_war_table['WAR_difference']*10
     return active_roster_war_table, failed_to_find_players
 
                             
