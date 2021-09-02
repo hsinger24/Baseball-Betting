@@ -1,6 +1,7 @@
 1. Make SP adjustments
     1. Fix SP Adjustments so if name not found in starting rotations table, get their projected WAR from pecota
 2. Make active roster adjustments
+    1. Fix so injured players only looks at projected WAR
 3. Create final configuration
     1. Things we need to do once vs. daily
     2. What our daily output will look like

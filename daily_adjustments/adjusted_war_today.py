@@ -74,7 +74,10 @@ def sp_adjustment(games, starting_rotations, frac_season=0.0):
             home_table = home_table[home_table.GS>3]
         if frac_season>0.75:
             home_table = home_table[home_table.GS>5]
-        home_team_war = home_table.WAR_proj.sum()*(1.0-frac_season)+home_table.WAR.sum()
+        if frac_season>0.25:
+            home_team_war = home_table.WAR_proj.sum()*(1.0-frac_season)+home_table.WAR.sum()
+        else:
+            home_team_war = home_table.WAR_proj.sum()
         WAR_diff_home = home_pitch_war - home_team_war
         try:
             away_pitch_war = (away_table.loc[away_table.Name==sp_away['name'].values[0], 'WAR_proj'].values[0]*(1.0-frac_season)+away_table.loc[away_table.Name==sp_away['name'].values[0], 'WAR'].values[0])*5.0
@@ -102,7 +105,10 @@ def sp_adjustment(games, starting_rotations, frac_season=0.0):
             away_table = away_table[away_table.GS>3]
         if frac_season>0.75:
             away_table = away_table[away_table.GS>5]
-        away_team_war = away_table.WAR_proj.sum()*(1.0-frac_season)+away_table.WAR.sum()
+        if frac_season>0.25:
+            away_team_war = away_table.WAR_proj.sum()*(1.0-frac_season)+away_table.WAR.sum()
+        else:
+            away_team_war = away_table.WAR_proj.sum()
         WAR_diff_away = away_pitch_war - away_team_war
 
         # Appending dictionary of result to list of games
@@ -147,22 +153,22 @@ def active_roster_war_table(active_rosters, overall_war_predictions_preseason, c
                                     failed_to_find_players.append(player_name + 'BP')
                                     current_year_war = 0
             try:
-                projected_war = pecota_table[pecota_table.name == player['name'].values[0]].iloc[0,1]
+                projected_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
             except:
                 try:
-                    projected_war = pecota_table[pecota_table.name == player['name_wo_a'].values[0]].iloc[0,1]
+                    projected_war = pecota_table[pecota_table['name'] == player['name_wo_a'].values[0]]['war_162'].iloc[0]
                 except:
                     try:
-                        projected_war = pecota_table[pecota_table.name == player['name_alt_1'].values[0]].iloc[0,1]
+                        projected_war = pecota_table[pecota_table['name'] == player['name_alt_1'].values[0]]['war_162'].iloc[0]
                     except:
                         try:
-                            projected_war = pecota_table[pecota_table.name == player['name_alt_2'].values[0]].iloc[0,1]
+                            projected_war = pecota_table[pecota_table['name'] == player['name_alt_2'].values[0]]['war_162'].iloc[0]
                         except:
                             try:
-                                projected_war = pecota_table[pecota_table.name == player['name_alt_3'].values[0]].iloc[0,1]
+                                projected_war = pecota_table[pecota_table['name'] == player['name_alt_3'].values[0]]['war_162'].iloc[0]
                             except:
                                 try:
-                                    projected_war = pecota_table[pecota_table.name == player['name_alt_4'].values[0]].iloc[0,1]
+                                    projected_war = pecota_table[pecota_table['name'] == player['name_alt_4'].values[0]]['war_162'].iloc[0]
                                 except:
                                     failed_to_find_players.append(player_name + 'Pecota')
                                     projected_war = 0
