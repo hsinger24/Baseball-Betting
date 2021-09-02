@@ -49,7 +49,7 @@ team_map = {
 
 ########## RETRIEVING NECESSARY DATA ##########
 
-# active_rosters = retrieve_all_active_rosters(file_name = None)
+active_rosters = retrieve_all_active_rosters(file_name = None)
 todays_games = retrieve_todays_games_info()
 #retrieve_current_year_WAR()
 current_year_WAR = load_current_year_WAR()
@@ -114,5 +114,9 @@ def _calculate_cl_with_differential():
 
 ########## MAKING WAR ADJUSTMENTS FOR ACTIVE ROSTER AND STARTING ROTATION ##########
 
-starting_rotations, failed_to_find_pitchers = retrieve_starting_rotations_WAR(pt, current_year_WAR)
-print(sp_adjustment(todays_games, starting_rotations, frac_season = 0.81))
+#starting_rotations, failed_to_find_pitchers = retrieve_starting_rotations_WAR(pt, current_year_WAR)
+#sp_adjustments = sp_adjustment(todays_games, starting_rotations, frac_season = 0.82)
+overall_war_predictions_preseason = pd.read_csv('data/overall_war_predictions_preseason.csv')
+active_roster_war, failed_to_find_players = active_roster_war_table(active_rosters, overall_war_predictions_preseason, current_year_WAR, pt, 2020, 0.82)
+print(failed_to_find_players)
+# Need to get WAR preseason predictions (not currently saved) before calling active roster adjustments

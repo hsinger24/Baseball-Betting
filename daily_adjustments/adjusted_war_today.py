@@ -112,24 +112,72 @@ def sp_adjustment(games, starting_rotations, frac_season=0.0):
         
     return sp_adjust_list
 
-def active_roster_war_table(active_rosters, overall_war_predictions_preseason, curr_year_WAR_BP, frac_season = 0.0):
+def active_roster_war_table(active_rosters, overall_war_predictions_preseason, curr_year_WAR_BP, pecota_table, current_year, frac_season = 0.0):
 
-    active_roster_war_table = pd.DataFrame(columns = ['Team', 'WAR', 'WAR_proj'])
-    fucked_name_list = []
+    names = pd.read_csv("pecota_data/names.csv", index_col=0)
+    active_roster_war_table = pd.DataFrame(columns = ['Team', 'active_roster_WAR', 'preseason_WAR_proj'])
+    failed_to_find_players = []
     for team_dict in active_rosters:
-        team_table = pd.DataFrame(columns = ['Name', 'WAR'])
+        team_table = pd.DataFrame(columns = ['Name', 'WAR', 'WAR_Proj'])
         team = team_dict['team_name']
         roster = team_dict['team_roster']
-        for player, _ in roster:
+        for player_name, _ in roster:
+            for col in names.columns:
+                if player_name in names[col].values:
+                    player = names[names[col]==player_name]
+                    break
             try:
-                team_table = team_table.append(curr_year_WAR_BP[curr_year_WAR_BP.Name == player].iloc[0,1])
+                current_year_war = curr_year_WAR_BP[curr_year_WAR_BP.Name == player['name'].values[0]].iloc[0,1]
             except:
-                fucked_name_list.append(player)
-        active_roster_total_war = team_table.WAR.sum()
-        war_proj = overall_war_predictions_preseason.loc[overall_war_predictions_preseason.team_name==team, 'projected_war'].values[0]
-        team_series = pd.Series([team, active_roster_total_war, war_proj], index = active_roster_war_table.columns)
+                try:
+                    current_year_war = curr_year_WAR_BP[curr_year_WAR_BP.Name == player['name_wo_a'].values[0]].iloc[0,1]
+                except:
+                    try:
+                        current_year_war = curr_year_WAR_BP[curr_year_WAR_BP.Name == player['name_alt_1'].values[0]].iloc[0,1]
+                    except:
+                        try:
+                            current_year_war = curr_year_WAR_BP[curr_year_WAR_BP.Name == player['name_alt_2'].values[0]].iloc[0,1]
+                        except:
+                            try:
+                                current_year_war = curr_year_WAR_BP[curr_year_WAR_BP.Name == player['name_alt_3'].values[0]].iloc[0,1]
+                            except:
+                                try:
+                                    current_year_war = curr_year_WAR_BP[curr_year_WAR_BP.Name == player['name_alt_4'].values[0]].iloc[0,1]
+                                except:
+                                    failed_to_find_players.append(player_name + 'BP')
+                                    current_year_war = 0
+            try:
+                projected_war = pecota_table[pecota_table.name == player['name'].values[0]].iloc[0,1]
+            except:
+                try:
+                    projected_war = pecota_table[pecota_table.name == player['name_wo_a'].values[0]].iloc[0,1]
+                except:
+                    try:
+                        projected_war = pecota_table[pecota_table.name == player['name_alt_1'].values[0]].iloc[0,1]
+                    except:
+                        try:
+                            projected_war = pecota_table[pecota_table.name == player['name_alt_2'].values[0]].iloc[0,1]
+                        except:
+                            try:
+                                projected_war = pecota_table[pecota_table.name == player['name_alt_3'].values[0]].iloc[0,1]
+                            except:
+                                try:
+                                    projected_war = pecota_table[pecota_table.name == player['name_alt_4'].values[0]].iloc[0,1]
+                                except:
+                                    failed_to_find_players.append(player_name + 'Pecota')
+                                    projected_war = 0
+            player_series = pd.Series([player_name, current_year_war, projected_war], index = team_table.columns)
+            team_table = team_table.append(player_series, ignore_index = True)
+        active_roster_total_war_current = team_table.WAR.sum()
+        active_roster_total_war_proj = team_table.WAR_Proj.sum()
+        if frac_season>0.25:
+            active_roster_war = active_roster_total_war_proj*(1.0-frac_season) + active_roster_total_war_current
+        else:
+            active_roster_war = active_roster_total_war_proj
+        preseason_war_proj = overall_war_predictions_preseason.loc[overall_war_predictions_preseason.Team==team, str(current_year)].values[0]
+        team_series = pd.Series([team, active_roster_war, preseason_war_proj], index = active_roster_war_table.columns)
         active_roster_war_table = active_roster_war_table.append(team_series, ignore_index = True)
-    return active_roster_war_table, fucked_name_list
+    return active_roster_war_table, failed_to_find_players
 
                             
 
