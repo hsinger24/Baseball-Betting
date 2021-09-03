@@ -1,3 +1,4 @@
+########## IMPORTS ##########
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
@@ -13,6 +14,8 @@ from daily_adjustments.BP_WAR import *
 from daily_adjustments.todays_game_info import *
 from daily_adjustments.starting_rotations_WAR import *
 from daily_adjustments.adjusted_war_today import *
+
+from odds_and_other_projections import *
 
 team_map = {
     'Giants' : 'San Francisco Giants',
@@ -44,12 +47,15 @@ team_map = {
     'Pirates': 'Pittsburgh Pirates',
     'Rangers': 'Texas Rangers',
     'Orioles': 'Baltimore Orioles',
-    'Diamondbacks': 'Arizona Diamondbacks'
+    'Diamondbacks': 'Arizona Diamondbacks',
+    'D-backs' : 'Arizona Diamondbacks'
 }
 ########## SETTING NECESSARY PARAMETERS ##########
 
 frac_season = 0.82
 current_year = 2020
+capital = 100000
+kelly = 10
 
 ########## RETRIEVING NECESSARY DATA ##########
 
@@ -58,6 +64,7 @@ todays_games = retrieve_todays_games_info()
 #retrieve_current_year_WAR()
 current_year_WAR = load_current_year_WAR()
 pt = load_combined_pecota_table()
+odds = retrieve_odds()
 
 ########## GETTING CURRENT RUN DIFFERENTIAL WITH CURRENT CLUSTER LUCK ##########
 
@@ -117,17 +124,18 @@ def _calculate_cl_with_differential():
 current_run_differential = _calculate_cl_with_differential()
 #print(current_run_differential)
 
-########## MAKING WAR ADJUSTMENTS FOR ACTIVE ROSTER AND STARTING ROTATION ##########
+# ########## MAKING WAR ADJUSTMENTS FOR ACTIVE ROSTER AND STARTING ROTATION ##########
 
 starting_rotations, failed_to_find_pitchers = retrieve_starting_rotations_WAR(pt, current_year_WAR)
-#print(failed_to_find_pitchers)
+print(failed_to_find_pitchers)
 sp_adjustments = sp_adjustment(todays_games, starting_rotations, frac_season = frac_season)
-#print(sp_adjustments)
+print(sp_adjustments)
 overall_war_predictions_preseason = pd.read_csv('data/overall_war_predictions_preseason.csv')
 active_roster_war, failed_to_find_players = active_roster_war_table(active_rosters, overall_war_predictions_preseason, current_year_WAR, pt, current_year, frac_season)
+print(failed_to_find_players)
 print(active_roster_war)
 
-########## COMBINING ALL INPUTS TO GET TODAY'S WIN PERCENTAGE ##########
+########## COMBINING ALL INPUTS TO GET TODAY'S WIN PERCENTAGE FOR EACH TEAM ##########
 
 def todays_win_percentages(preseason_projections, current_run_differential, sp_adjustments, active_roster_war, frac_season):
     
@@ -158,9 +166,106 @@ def todays_win_percentages(preseason_projections, current_run_differential, sp_a
     for matchup in sp_adjustments:
         home_team = team_map[matchup['home_team']]
         away_team = team_map[matchup['away_team']]
-        todays_projections.loc[todays_projections.Team==home_team, 'SP_Adjustment'] = matchup['home_adjustment']
-        todays_projections.loc[todays_projections.Team==away_team, 'SP_Adjustment'] = matchup['away_adjustment']
+        todays_projections.loc[todays_projections.Team==home_team, 'SP_Adjustment'] = matchup['home_adjustment']*10
+        todays_projections.loc[todays_projections.Team==away_team, 'SP_Adjustment'] = matchup['away_adjustment']*10
+    # Putting active roster adjustment into table
+    for index, row in active_roster_war.iterrows():
+        team_short = row.Team
+        team_long = team_map[team_short]
+        Run_difference = row.Run_difference
+        todays_projections.loc[todays_projections.Team==team_long, 'Active_Roster_Adjustment'] = Run_difference
+    # Getting today's win % based on inputs
+    if frac_season>0.25:
+        todays_projections['Today_Win_Pct'] = todays_projections.Preseason_Projections*(1.0-frac_season) + (todays_projections.CY_Win_Pct * frac_season) \
+            + 0.000683 * (todays_projections.SP_Adjustment + todays_projections.Active_Roster_Adjustment)
+    else:
+        todays_projections['Today_Win_Pct'] = todays_projections.Preseason_Projections + \
+            0.000683 * (todays_projections.SP_Adjustment + todays_projections.Active_Roster_Adjustment)
+
     return todays_projections
 
-# preseason_projections = pd.read_csv('data/preseason_projections.csv')
-# print(todays_win_percentages(preseason_projections, current_run_differential, sp_adjustments, active_roster_war, frac_season))
+preseason_projections = pd.read_csv('data/preseason_projections.csv')
+todays_win_percentages = todays_win_percentages(preseason_projections, current_run_differential, sp_adjustments, active_roster_war, frac_season)
+print(todays_win_percentages)
+
+########## TODAYS BETS ##########
+
+def todays_bets(todays_games, todays_win_percentages, odds, capital, kelly):
+
+    # Creating kelly calculator function
+    def kelly_criterion_home():
+        if home_diff<0:
+            return 0
+        else:
+            p = home_prob
+            q = 1-p
+            ml = home_ml
+            if ml>=0:
+                b = (ml/100)
+            if ml<0:
+                b = (100/abs(ml))
+            kc = ((p*b) - q) / b
+            if (kc > 0.5) & (kc<0.6):
+                return kc/(kelly+2)
+            if (kc > 0.6) & (kc<0.7):
+                return kc/(kelly+4)
+            if kc > 0.7:
+                return kc/(kelly+7)
+            else:
+                return kc/kelly
+    def kelly_criterion_away():
+        if away_diff<0:
+            return 0
+        else:
+            p = away_prob
+            q = 1-p
+            ml = away_ml
+            if ml>=0:
+                b = (ml/100)
+            if ml<0:
+                b = (100/abs(ml))
+            kc = ((p*b) - q) / b
+            if (kc > 0.5) & (kc<0.6):
+                return kc/(kelly+2)
+            if (kc > 0.6) & (kc<0.7):
+                return kc/(kelly+4)
+            if kc > 0.7:
+                return kc/(kelly+7)
+            else:
+                return kc/kelly
+
+    # Creating data frame
+    todays_bets = pd.DataFrame(columns = ['Home_Team', 'Away_Team', 'Home_Prob', 'Away_Prob', 'Home_ML', 'Away_ML', 
+    'Home_ML_Prob', 'Away_ML_Prob', 'Home_Diff','Away_Diff', 'Home_KC', 'Away_KC', 'Home_Bet', 'Away_Bet'])
+
+    # Formatting odds to match team name
+    odds['Home_Team'] = odds.Home_Team.apply(lambda x: team_map[x])
+    odds['Away_Team'] = odds.Away_Team.apply(lambda x: team_map[x])
+
+    # Filling df with relevant info
+    for game in todays_games:
+        home_team = team_map[game['home_team']['team_name']]
+        away_team = team_map[game['away_team']['team_name']]
+        home_prob_orig = todays_win_percentages.loc[todays_win_percentages.Team==home_team, 'Today_Win_Pct'].values[0]
+        away_prob_orig = todays_win_percentages.loc[todays_win_percentages.Team==away_team, 'Today_Win_Pct'].values[0]
+        home_prob = home_prob_orig*(1-away_prob_orig)
+        away_prob = away_prob_orig*(1-home_prob_orig)
+        home_prob = home_prob/(home_prob+away_prob)
+        home_prob = home_prob*1.08
+        away_prob = 1 - home_prob
+        home_ml = odds.loc[odds.Home_Team==home_team,'Home_Odds'].values[0]
+        away_ml = odds.loc[odds.Away_Team==away_team, 'Away_Odds'].values[0]
+        home_ml_prob = odds.loc[odds.Home_Team==home_team,'Home_Prob'].values[0]/100
+        away_ml_prob = odds.loc[odds.Away_Team==away_team, 'Away_Prob'].values[0]/100
+        home_diff = home_prob - home_ml_prob
+        away_diff = away_prob - away_ml_prob
+        home_kc = kelly_criterion_home()
+        away_kc = kelly_criterion_away()
+        home_bet = capital * home_kc
+        away_bet = capital * away_kc
+        series = pd.Series([home_team, away_team, home_prob, away_prob, home_ml, away_ml, home_ml_prob, away_ml_prob,
+        home_diff, away_diff, home_kc, away_kc, home_bet, away_bet], index = todays_bets.columns)
+        todays_bets = todays_bets.append(series, ignore_index = True)
+    return todays_bets
+
+print(todays_bets(todays_games = todays_games, todays_win_percentages = todays_win_percentages, odds = odds, capital = capital, kelly = kelly))

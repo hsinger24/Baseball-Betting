@@ -14,7 +14,7 @@ def _calculate_odds(odds):
     if odds>0:
         return (100/(odds+100))*100
 
-def _retrieve_odds():
+def retrieve_odds():
     odds_team_mapping = {
     'Cleveland Indians' : 'Indians',
     'St. Louis Cardinals' : 'Cardinals',
@@ -202,7 +202,7 @@ def retrieve_external_data(file_path = 'data/external_data.csv'):
     merged = pd.merge(_retrieve_athletic(), _retrieve_538(), on = ['Home_Team', 'Away_Team', 'Date'], how = 'inner')
     merged.columns = ['Date', 'Away_Team', 'Home_Team','Away_Prob_Athletic', 'Home_Prob_Athletic', 'Away_Prob_538', 
                     'Home_Prob_538']
-    final = pd.merge(_retrieve_odds(), merged, on = ['Home_Team', 'Away_Team'], how = 'inner')
+    final = pd.merge(retrieve_odds(), merged, on = ['Home_Team', 'Away_Team'], how = 'inner')
     final.drop(['Home_Odds', 'Away_Odds'], axis = 1, inplace = True)
     final = final[['Date', 'Away_Team', 'Home_Team','Away_Prob_Athletic', 'Home_Prob_Athletic',
                 'Away_Prob_538', 'Home_Prob_538', 'Away_Prob', 'Home_Prob']]
