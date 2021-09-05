@@ -386,5 +386,5 @@ def todays_bets_external(capital_athletic, capital_538, capital_combined, kelly)
     return data
 
 todays_bets_external = todays_bets_external(capital_athletic = capital_athletic, capital_538 = capital_538, capital_combined = capital_combined, kelly = kelly)
-todays_bets_external.to_csv('past_bets/external/bets_external' + today + '.csv')
+todays_bets_external.to_csv('past_bets/external/bets_external_' + today + '.csv')
 print(todays_bets_external)

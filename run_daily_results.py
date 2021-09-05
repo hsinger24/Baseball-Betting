@@ -38,7 +38,10 @@ today = dt.date.today()
 yesterday = today - dt.timedelta(days=1)
 yesterday_string = str(yesterday)
 yesterday_string = yesterday_string.replace('-', '')
-yesterdays_capital = int(input("Hank, please input yesterday's capital: "))
+yesterdays_capital = float(input("Hank, please input yesterday's capital for the base model: "))
+yesterday_capital_athletic = float(input("Hank, please input yesterday's capital for the Athletic model: "))
+yesterday_capital_538 = float(input("Hank, please input yesterday's capital for the 538 model: "))
+yesterday_capital_combined = float(input("Hank, please input yesterday's capital for the combined model: "))
 
 ########## RUN DAILY TO CALCULATE YESTERDAYS RESULTS AND UPDATE TRACKER FOR BASE MODEL ##########
 
@@ -111,3 +114,50 @@ yesterdays_bets = calculate_yesterdays_bets_results(yesterday_string = yesterday
 # results_tracker_base = pd.read_csv('results_tracker/results_tracker_base.csv')
 # results_tracker_base = results_tracker_base.append(yesterdays_bets)
 # results_tracker_base.to_csv(results_tracker/results_tracker_base.csv')
+
+########## RUN DAILY TO CALCULATE YESTERDAYS RESULTS AND UPDATE TRACKER FOR EXTERNAL MODELS ##########
+
+def calculate_yesterdays_bets_results_external(yesterday_string, capital_athletic, capital_538, capital_combined):
+    # Getting yesterday's results from CBS
+    link = 'https://www.cbssports.com/mlb/scoreboard/' + yesterday_string + '/'
+    tables = pd.read_html(link)
+    results_table = pd.DataFrame(columns = ['Home_Team', 'Away_Team', 'Winner'])
+    for table in tables:
+        if list(table.columns) == ['Unnamed: 0', 'R', 'H', 'E']:
+
+            # Getting team names
+            team_away_list = table.iloc[0,0].split(' ')
+            del team_away_list[-2:]
+            if len(team_away_list) == 2:
+                team_away = team_away_list[0] + ' ' + team_away_list[1]
+            else:
+                team_away = team_away_list[0]
+            team_home_list = table.iloc[1,0].split(' ')
+            del team_home_list[-2:]
+            if len(team_home_list) == 2:
+                team_home = team_home_list[0] + ' ' + team_home_list[1]
+            else:
+                team_home = team_home_list[0]
+            
+            # Getting score and determining winner
+            runs_away = table.iloc[0,1]
+            runs_home = table.iloc[1,1]
+            if runs_away>runs_home:
+                winner = team_away
+            else:
+                winner = team_home
+
+            # Appending to results table
+            series = pd.Series([team_home, team_away, winner], index = results_table.columns)
+            results_table = results_table.append(series, ignore_index = True)        
+        else:
+            continue
+    for column in list(results_table.columns):
+        results_table[column] = results_table[column].apply(lambda x: team_map[x])
+    
+    # Reading in yesterdays bets and creating tracker columns
+    yesterdays_bets = pd.read_csv('past_bets/external/bets_external_' + yesterday_string + '.csv', index_col = 0)
+    yesterdays_bets = yesterdays_bets[(yesterdays_bets.Home_Bet>0) | (yesterdays_bets.Away_Bet>0)]
+    yesterdays_bets.reset_index(drop = True, inplace = True)
+
+    return
