@@ -2,6 +2,7 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
+import datetime as dt
 
 from war_functions.pecota_tables import *
 
@@ -56,12 +57,13 @@ frac_season = 0.82
 current_year = 2020
 capital = 100000
 kelly = 10
+today = dt.date.today()
 
 ########## RETRIEVING NECESSARY DATA ##########
 
 active_rosters = retrieve_all_active_rosters(file_name = None)
 todays_games = retrieve_todays_games_info()
-#retrieve_current_year_WAR()
+retrieve_current_year_WAR()
 current_year_WAR = load_current_year_WAR()
 pt = load_combined_pecota_table()
 odds = retrieve_odds()
@@ -127,13 +129,13 @@ current_run_differential = _calculate_cl_with_differential()
 # ########## MAKING WAR ADJUSTMENTS FOR ACTIVE ROSTER AND STARTING ROTATION ##########
 
 starting_rotations, failed_to_find_pitchers = retrieve_starting_rotations_WAR(pt, current_year_WAR)
-#print(failed_to_find_pitchers)
+print(failed_to_find_pitchers)
 sp_adjustments = sp_adjustment(todays_games, starting_rotations, frac_season = frac_season)
-#print(sp_adjustments)
+print(sp_adjustments)
 overall_war_predictions_preseason = pd.read_csv('data/overall_war_predictions_preseason.csv')
 active_roster_war, failed_to_find_players = active_roster_war_table(active_rosters, overall_war_predictions_preseason, current_year_WAR, pt, current_year, frac_season)
-#print(failed_to_find_players)
-#print(active_roster_war)
+print(failed_to_find_players)
+print(active_roster_war)
 
 ########## COMBINING ALL INPUTS TO GET TODAY'S WIN PERCENTAGE FOR EACH TEAM ##########
 
@@ -186,7 +188,7 @@ def todays_win_percentages(preseason_projections, current_run_differential, sp_a
 
 preseason_projections = pd.read_csv('data/preseason_projections.csv')
 todays_win_percentages = todays_win_percentages(preseason_projections, current_run_differential, sp_adjustments, active_roster_war, frac_season)
-#print(todays_win_percentages)
+print(todays_win_percentages)
 
 ########## TODAYS BETS ##########
 
@@ -269,5 +271,5 @@ def todays_bets(todays_games, todays_win_percentages, odds, capital, kelly):
     return todays_bets
 
 todays_bets = todays_bets(todays_games = todays_games, todays_win_percentages = todays_win_percentages, odds = odds, capital = capital, kelly = kelly)
-todays_bets.to_csv('data/yesterdays_bet.csv')
+todays_bets.to_csv('past_bets/bets' + str(today) + '.csv')
 print(todays_bets)
