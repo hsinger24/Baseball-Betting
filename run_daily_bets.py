@@ -190,7 +190,7 @@ preseason_projections = pd.read_csv('data/preseason_projections.csv')
 todays_win_percentages = todays_win_percentages(preseason_projections, current_run_differential, sp_adjustments, active_roster_war, frac_season)
 print(todays_win_percentages)
 
-########## TODAYS BETS ##########
+########## TODAYS BETS (BASE MODEL) ##########
 
 def todays_bets(todays_games, todays_win_percentages, odds, capital, kelly):
 
@@ -274,5 +274,8 @@ def todays_bets(todays_games, todays_win_percentages, odds, capital, kelly):
     return todays_bets
 
 todays_bets = todays_bets(todays_games = todays_games, todays_win_percentages = todays_win_percentages, odds = odds, capital = capital, kelly = kelly)
-todays_bets.to_csv('past_bets/bets' + today + '.csv')
+todays_bets.to_csv('past_bets/base/bets' + today + '.csv')
 print(todays_bets)
+
+########## TODAYS BETS (EXTERNAL MODELS)
+

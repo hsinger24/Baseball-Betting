@@ -38,11 +38,11 @@ today = dt.date.today()
 yesterday = today - dt.timedelta(days=1)
 yesterday_string = str(yesterday)
 yesterday_string = yesterday_string.replace('-', '')
-capital = int(input('Hank, please input your current capital: '))
+yesterdays_capital = int(input("Hank, please input yesterday's capital: "))
 
-########## RUN DAILY TO CALCULATE YESTERDAYS RESULTS AND UPDATE TRACKER ##########
+########## RUN DAILY TO CALCULATE YESTERDAYS RESULTS AND UPDATE TRACKER FOR BASE MODEL ##########
 
-def calculate_yesterdays_bets_results(yesterday_string, capital):
+def calculate_yesterdays_bets_results(yesterday_string, yesterdays_capital):
     
     # Getting yesterdays results from CBS
     link = 'https://www.cbssports.com/mlb/scoreboard/' + yesterday_string + '/'
@@ -82,7 +82,7 @@ def calculate_yesterdays_bets_results(yesterday_string, capital):
         results_table[column] = results_table[column].apply(lambda x: team_map[x])
 
     # Reading in yesterdays bets and creating tracker columns
-    yesterdays_bets = pd.read_csv('past_bets/bets_' + yesterday_string + '.csv', index_col = 0)
+    yesterdays_bets = pd.read_csv('past_bets/base/bets_' + yesterday_string + '.csv', index_col = 0)
     yesterdays_bets['Won'] = 0
     yesterdays_bets['Money_Tracker'] = 0
     yesterdays_bets = yesterdays_bets[(yesterdays_bets.Home_Bet>0) | (yesterdays_bets.Away_Bet>0)]
@@ -96,18 +96,18 @@ def calculate_yesterdays_bets_results(yesterday_string, capital):
                 yesterdays_bets.loc[index, 'Won'] = 1
         if yesterdays_bets.loc[index, 'Won'] == 1:
             if index == 0:
-                yesterdays_bets.loc[index, 'Money_Tracker'] = capital + row.Home_Bet + row.Away_Bet
+                yesterdays_bets.loc[index, 'Money_Tracker'] = yesterdays_capital + row.Home_Bet + row.Away_Bet
             else:
                 yesterdays_bets.loc[index, 'Money_Tracker'] = yesterdays_bets.loc[(index-1), 'Money_Tracker'] + row.Home_Bet + row.Away_Bet
         else:
             if index == 0:
-                yesterdays_bets.loc[index, 'Money_Tracker'] = capital - row.Home_Bet + row.Away_Bet
+                yesterdays_bets.loc[index, 'Money_Tracker'] = yesterdays_capital - row.Home_Bet + row.Away_Bet
             else:
                 yesterdays_bets.loc[index, 'Money_Tracker'] = yesterdays_bets.loc[(index-1), 'Money_Tracker'] - row.Home_Bet - row.Away_Bet
     yesterdays_bets['Date'] = today
     return yesterdays_bets
 
-yesterdays_bets = calculate_yesterdays_bets_results(yesterday_string, capital)
-# results_tracker = pd.read_csv('results_tracker.csv')
-# results_tracker = results_tracker.append(yesterdays_bets)
-# results_tracker.to_csv('results_tracker.csv')
+yesterdays_bets = calculate_yesterdays_bets_results(yesterday_string = yesterday_string, yesterdays_capital = yesterdays_capital)
+# results_tracker_base = pd.read_csv('results_tracker/results_tracker_base.csv')
+# results_tracker_base = results_tracker_base.append(yesterdays_bets)
+# results_tracker_base.to_csv(results_tracker/results_tracker_base.csv')

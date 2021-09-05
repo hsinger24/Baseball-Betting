@@ -123,7 +123,7 @@ def _retrieve_538():
     final_538['Home_Team'] = final_538['Home_Team'].apply(lambda x: fivethirtyeight_team_mapping[x])
     final_538['Date'] = final_538.Date.apply(lambda x: re.findall(regex,x))
     final_538['Date'] = final_538.Date.apply(lambda x: x[0])
-    final_538['Date'] = '0' + final_538.Date
+    final_538['Date'] = pd.to_datetime(final_538.Date, format = '%m/%d')
     return final_538
 
 def _retrieve_athletic():
@@ -189,6 +189,7 @@ def _retrieve_athletic():
     final_athletic = final_athletic[['DATE_x','Home_Team_x', 'Away_Team_x', 'THE BAT XWIN%_x', 'THE BAT XWIN%_y']]
     final_athletic.columns = ['Date','Away_Team', 'Home_Team', 'Away_Prob', 'Home_Prob']
     browser.quit()
+    final_athletic['Date'] = pd.to_datetime(final_athletic.Date, format = "%m/%d")
     return final_athletic
 
 def retrieve_external_data(file_path = 'data/external_data.csv'):
@@ -208,6 +209,8 @@ def retrieve_external_data(file_path = 'data/external_data.csv'):
                 'Away_Prob_538', 'Home_Prob_538', 'Away_Prob', 'Home_Prob']]
     final.columns = ['Date', 'Away_Team', 'Home_Team','Away_Prob_Athletic', 'Home_Prob_Athletic', 'Away_Prob_538', 
                     'Home_Prob_538', 'Away_Prob_Implied', 'Home_Prob_Implied']
+    final['Date'] = dt.date.today()
+    final.dropna(inplace = True)
     if file_path is not None:
         with open(file_path, "w") as f:
             final.to_csv(f)
@@ -222,3 +225,5 @@ def load_external_data(file_path = 'data/external_data.csv'):
         pandas.DataFrame: External Data Table
     """
     return pd.read_csv(file_path, index_col=0)
+
+print(retrieve_external_data())
