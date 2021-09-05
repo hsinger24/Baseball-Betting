@@ -1,3 +1,4 @@
 import datetime as dt
 
-print(dt.date.today())
+value = int(input('Hank: Please input your current capital: '))
+print(type(value))

@@ -38,7 +38,7 @@ today = dt.date.today()
 yesterday = today - dt.timedelta(days=1)
 yesterday_string = str(yesterday)
 yesterday_string = yesterday_string.replace('-', '')
-capital = 100000
+capital = int(input('Hank, please input your current capital: '))
 
 ########## RUN DAILY TO CALCULATE YESTERDAYS RESULTS AND UPDATE TRACKER ##########
 
