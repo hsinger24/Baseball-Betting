@@ -211,11 +211,31 @@ def retrieve_external_data(file_path = 'data/external_data.csv'):
                     'Home_Prob_538', 'Away_Prob_Implied', 'Home_Prob_Implied']
     final['Date'] = dt.date.today()
     final.dropna(inplace = True)
+    odds = retrieve_odds()
+    merged = pd.merge(final, odds, on = ['Home_Team', 'Away_Team'], how = 'inner')
+    merged = merged[['Date', 'Away_Team', 'Home_Team', 'Away_Prob_Athletic', 'Home_Prob_Athletic', 'Away_Prob_538', 
+    'Home_Prob_538', 'Home_Odds', 'Away_Odds', 'Home_Prob', 'Away_Prob']]
+    merged.columns = ['Date', 'Away_Team', 'Home_Team','Away_Prob_Athletic', 'Home_Prob_Athletic', 'Away_Prob_538', 
+                        'Home_Prob_538', 'Home_ML', 'Away_ML', 'Home_Prob_Implied', 'Away_Prob_Implied']
+    merged['Away_Prob_Athletic'] = merged.Away_Prob_Athletic.str.strip('%')
+    merged['Away_Prob_Athletic'] = merged.Away_Prob_Athletic.astype(float)
+    merged['Away_Prob_Athletic'] = merged.Away_Prob_Athletic/100
+    merged['Home_Prob_Athletic'] = merged.Home_Prob_Athletic.str.strip('%')
+    merged['Home_Prob_Athletic'] = merged.Home_Prob_Athletic.astype(float)
+    merged['Home_Prob_Athletic'] = merged.Home_Prob_Athletic/100
+    merged['Away_Prob_538'] = merged.Away_Prob_538.str.strip('%')
+    merged['Away_Prob_538'] = merged.Away_Prob_538.astype(float)
+    merged['Away_Prob_538'] = merged.Away_Prob_538/100
+    merged['Home_Prob_538'] = merged.Home_Prob_538.str.strip('%')
+    merged['Home_Prob_538'] = merged.Home_Prob_538.astype(float)
+    merged['Home_Prob_538'] = merged.Home_Prob_538/100
+    merged['Away_Prob_Implied'] = merged.Away_Prob_Implied/100
+    merged['Home_Prob_Implied'] = merged.Home_Prob_Implied/100
     if file_path is not None:
         with open(file_path, "w") as f:
-            final.to_csv(f)
+            merged.to_csv(f)
 
-    return final
+    return merged
 
 def load_external_data(file_path = 'data/external_data.csv'):
     """Loads external data table from a given file
@@ -226,4 +246,3 @@ def load_external_data(file_path = 'data/external_data.csv'):
     """
     return pd.read_csv(file_path, index_col=0)
 
-print(retrieve_external_data())
