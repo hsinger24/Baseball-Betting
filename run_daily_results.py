@@ -39,9 +39,9 @@ yesterday = today - dt.timedelta(days=1)
 yesterday_string = str(yesterday)
 yesterday_string = yesterday_string.replace('-', '')
 yesterdays_capital = float(input("Hank, please input yesterday's capital for the base model: "))
-yesterday_capital_athletic = float(input("Hank, please input yesterday's capital for the Athletic model: "))
-yesterday_capital_538 = float(input("Hank, please input yesterday's capital for the 538 model: "))
-yesterday_capital_combined = float(input("Hank, please input yesterday's capital for the combined model: "))
+yesterdays_capital_athletic = float(input("Hank, please input yesterday's capital for the Athletic model: "))
+yesterdays_capital_538 = float(input("Hank, please input yesterday's capital for the 538 model: "))
+yesterdays_capital_combined = float(input("Hank, please input yesterday's capital for the combined model: "))
 
 ########## RUN DAILY TO CALCULATE YESTERDAYS RESULTS AND UPDATE TRACKER FOR BASE MODEL ##########
 
@@ -117,7 +117,7 @@ results_tracker_base.to_csv('results_tracker/results_tracker_base.csv')
 
 ########## RUN DAILY TO CALCULATE YESTERDAYS RESULTS AND UPDATE TRACKER FOR EXTERNAL MODELS ##########
 
-def calculate_yesterdays_bets_results_external(yesterday_string, capital_athletic, capital_538, capital_combined): 
+def calculate_yesterdays_bets_results_external(yesterday_string, yesterdays_capital_athletic, yesterdays_capital_538, yesterdays_capital_combined): 
     # Getting yesterday's results from CBS
     link = 'https://www.cbssports.com/mlb/scoreboard/' + yesterday_string + '/'
     tables = pd.read_html(link)
@@ -157,7 +157,79 @@ def calculate_yesterdays_bets_results_external(yesterday_string, capital_athleti
     
     # Reading in yesterdays bets and creating tracker columns
     yesterdays_bets = pd.read_csv('past_bets/external/bets_external_' + yesterday_string + '.csv', index_col = 0)
-    yesterdays_bets = yesterdays_bets[(yesterdays_bets.Home_Bet>0) | (yesterdays_bets.Away_Bet>0)]
+    yesterdays_bets = yesterdays_bets[(yesterdays_bets.Bet_Athletic>0) | (yesterdays_bets.Bet_538>0) | (yesterdays_bets.Bet_Combined>0)]
     yesterdays_bets.reset_index(drop = True, inplace = True)
+    yesterdays_bets['Won_Athletic'] = 0
+    yesterdays_bets['Tracker_Athletic'] = 0
+    yesterdays_bets['Won_538'] = 0
+    yesterdays_bets['Tracker_538'] = 0
+    yesterdays_bets['Won_Combined'] = 0
+    yesterdays_bets['Tracker_Combined'] = 0
+    for index, row in yesterdays_bets.iterrows():
+        if row.Bet_Athletic>0:
+            if (row.Home_KC_Athletic>0) & (row.Home_Team in results_table['Winner'].values):
+                yesterdays_bets['Won_Athletic'] = 1
+            elif (row.Away_KC_Athletic>0) & (row.Away_Team in results_table['Winner'].values):
+                yesterdays_bets['Won_Athletic'] = 1
+            else:
+                yesterdays_bets['Won_Athletic'] = 0
+        else:
+            yesterdays_bets.loc[index, 'Won_Athletic'] = -1
+        if row.Bet_538>0:
+            if (row.Home_KC_538>0) & (row.Home_Team in results_table['Winner'].values):
+                yesterdays_bets['Won_538'] = 1
+            elif (row.Away_KC_538>0) & (row.Away_Team in results_table['Winner'].values):
+                yesterdays_bets['Won_538'] = 1
+            else:
+                yesterdays_bets['Won_538'] = 0
+        else:
+            yesterdays_bets.loc[index, 'Won_538'] = -1
+        if row.Bet_Combined>0:
+            if (row.Home_Combined>0) & (row.Home_Team in results_table['Winner'].values):
+                yesterdays_bets['Won_Combined'] = 1
+            elif (row.Away_Combined>0) & (row.Away_Team in results_table['Winner'].values):
+                yesterdays_bets['Won_Combined'] = 1
+            else:
+                yesterdays_bets['Won_Combined'] = 0
+        else:
+            yesterdays_bets.loc[index, 'Won_Combined'] = -1
+        if yesterdays_bets.loc[index, 'Won_Athletic'] == 1:
+            if index == 0:
+                yesterdays_bets.loc[index, 'Tracker_Athletic'] = yesterdays_capital_athletic + row.Bet_Athletic
+            else:
+                yesterdays_bets.loc[index, 'Tracker_Athletic'] = yesterdays_bets.loc[(index-1), 'Tracker_Athletic'] + row.Bet_Athletic
+        else:
+            if index == 0:
+                yesterdays_bets.loc[index, 'Tracker_Athletic'] = yesterdays_capital_athletic - row.Bet_Athletic
+            else:
+                yesterdays_bets.loc[index, 'Tracker_Athletic'] = yesterdays_bets.loc[(index-1), 'Tracker_Athletic'] - row.Bet_Athletic
+        if yesterdays_bets.loc[index, 'Won_538'] == 1:
+            if index == 0:
+                yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_capital_538 + row.Bet_538
+            else:
+                yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_bets.loc[(index-1), 'Tracker_538'] + row.Bet_538
+        else:
+            if index == 0:
+                yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_capital_538 - row.Bet_538
+            else:
+                yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_bets.loc[(index-1), 'Tracker_538'] - row.Bet_538
+        if yesterdays_bets.loc[index, 'Won_Combined'] == 1:
+            if index == 0:
+                yesterdays_bets.loc[index, 'Tracker_Combined'] = yesterdays_capital_combined + row.Bet_Combined
+            else:
+                yesterdays_bets.loc[index, 'Tracker_Combined'] = yesterdays_bets.loc[(index-1), 'Tracker_Combined'] + row.Bet_Combined
+        else:
+            if index == 0:
+                yesterdays_bets.loc[index, 'Tracker_Combined'] = yesterdays_capital_combined - row.Bet_Combined
+            else:
+                yesterdays_bets.loc[index, 'Tracker_Combined'] = yesterdays_bets.loc[(index-1), 'Tracker_Combined'] - row.Bet_Combined
+         
+    return yesterdays_bets
 
-    return
+yesterdays_bets = calculate_yesterdays_bets_results_external(yesterday_string = yesterday_string, 
+    yesterdays_capital_athletic = yesterdays_capital_athletic, yesterdays_capital_538 = yesterdays_capital_538,
+    yesterdays_capital_combined =  yesterdays_capital_combined)
+yesterdays_bets.to_csv('results_tracker/results_tracker_external.csv')
+# results_tracker_external = pd.read_csv('results_tracker/results_tracker_external.csv')
+# results_tracker_external = results_tracker_external.append(yesterdays_bets)
+# results_tracker_external.to_csv('results_tracker/results_tracker_external.csv')
