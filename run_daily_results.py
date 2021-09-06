@@ -111,13 +111,13 @@ def calculate_yesterdays_bets_results(yesterday_string, yesterdays_capital):
     return yesterdays_bets
 
 yesterdays_bets = calculate_yesterdays_bets_results(yesterday_string = yesterday_string, yesterdays_capital = yesterdays_capital)
-# results_tracker_base = pd.read_csv('results_tracker/results_tracker_base.csv')
-# results_tracker_base = results_tracker_base.append(yesterdays_bets)
-# results_tracker_base.to_csv(results_tracker/results_tracker_base.csv')
+results_tracker_base = pd.read_csv('results_tracker/results_tracker_base.csv')
+results_tracker_base = results_tracker_base.append(yesterdays_bets)
+results_tracker_base.to_csv('results_tracker/results_tracker_base.csv')
 
 ########## RUN DAILY TO CALCULATE YESTERDAYS RESULTS AND UPDATE TRACKER FOR EXTERNAL MODELS ##########
 
-def calculate_yesterdays_bets_results_external(yesterday_string, capital_athletic, capital_538, capital_combined):
+def calculate_yesterdays_bets_results_external(yesterday_string, capital_athletic, capital_538, capital_combined): 
     # Getting yesterday's results from CBS
     link = 'https://www.cbssports.com/mlb/scoreboard/' + yesterday_string + '/'
     tables = pd.read_html(link)

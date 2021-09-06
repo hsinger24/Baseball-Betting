@@ -66,7 +66,7 @@ today = str(dt.date.today()).replace('-', '')
 
 active_rosters = retrieve_all_active_rosters(file_name = None)
 todays_games = retrieve_todays_games_info()
-#retrieve_current_year_WAR()
+retrieve_current_year_WAR()
 current_year_WAR = load_current_year_WAR()
 pt = load_combined_pecota_table()
 odds = retrieve_odds()
@@ -277,7 +277,7 @@ def todays_bets(todays_games, todays_win_percentages, odds, capital, kelly):
     return todays_bets
 
 todays_bets = todays_bets(todays_games = todays_games, todays_win_percentages = todays_win_percentages, odds = odds, capital = capital, kelly = kelly)
-todays_bets.to_csv('past_bets/base/bets' + today + '.csv')
+todays_bets.to_csv('past_bets/base/bets_' + today + '.csv')
 print(todays_bets)
 
 ########## TODAYS BETS (EXTERNAL MODELS)
