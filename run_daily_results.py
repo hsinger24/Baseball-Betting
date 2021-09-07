@@ -45,6 +45,19 @@ yesterdays_capital_combined = float(input("Hank, please input yesterday's capita
 
 ########## RUN DAILY TO CALCULATE YESTERDAYS RESULTS AND UPDATE TRACKER FOR BASE MODEL ##########
 
+def calculate_payoff(row):
+    if row.Home_KC>0:
+        if row.Home_ML>0:
+            payoff = (row.Home_ML/100)*row.Home_Bet
+        if row.Home_ML<0:
+            payoff = row.Home_Bet/((abs(row.Home_ML)/100))
+    elif row.Away_KC>0:
+        if row.Away_ML>0:
+            payoff = (row.Away_ML/100)*row.Away_Bet
+        if row.Away_ML<0:
+            payoff = row.Away_Bet/((abs(row.Away_ML)/100))
+    return payoff
+
 def calculate_yesterdays_bets_results(yesterday_string, yesterdays_capital):
     
     # Getting yesterdays results from CBS
@@ -91,6 +104,7 @@ def calculate_yesterdays_bets_results(yesterday_string, yesterdays_capital):
     yesterdays_bets = yesterdays_bets[(yesterdays_bets.Home_Bet>0) | (yesterdays_bets.Away_Bet>0)]
     yesterdays_bets.reset_index(drop = True, inplace = True)
     for index,row in yesterdays_bets.iterrows():
+        payoff = calculate_payoff(row)
         if row.Home_Bet>0:
             if row.Home_Team in results_table['Winner'].values:
                 yesterdays_bets.loc[index, 'Won'] = 1
@@ -99,23 +113,68 @@ def calculate_yesterdays_bets_results(yesterday_string, yesterdays_capital):
                 yesterdays_bets.loc[index, 'Won'] = 1
         if yesterdays_bets.loc[index, 'Won'] == 1:
             if index == 0:
-                yesterdays_bets.loc[index, 'Money_Tracker'] = yesterdays_capital + row.Home_Bet + row.Away_Bet
+                yesterdays_bets.loc[index, 'Money_Tracker'] = yesterdays_capital + payoff
             else:
-                yesterdays_bets.loc[index, 'Money_Tracker'] = yesterdays_bets.loc[(index-1), 'Money_Tracker'] + row.Home_Bet + row.Away_Bet
+                yesterdays_bets.loc[index, 'Money_Tracker'] = yesterdays_bets.loc[(index-1), 'Money_Tracker'] + payoff
         else:
             if index == 0:
-                yesterdays_bets.loc[index, 'Money_Tracker'] = yesterdays_capital - row.Home_Bet + row.Away_Bet
+                yesterdays_bets.loc[index, 'Money_Tracker'] = yesterdays_capital - row.Home_Bet - row.Away_Bet
             else:
                 yesterdays_bets.loc[index, 'Money_Tracker'] = yesterdays_bets.loc[(index-1), 'Money_Tracker'] - row.Home_Bet - row.Away_Bet
     yesterdays_bets['Date'] = today
     return yesterdays_bets
 
-yesterdays_bets = calculate_yesterdays_bets_results(yesterday_string = yesterday_string, yesterdays_capital = yesterdays_capital)
-results_tracker_base = pd.read_csv('results_tracker/results_tracker_base.csv')
-results_tracker_base = results_tracker_base.append(yesterdays_bets)
-results_tracker_base.to_csv('results_tracker/results_tracker_base.csv')
+# yesterdays_bets = calculate_yesterdays_bets_results(yesterday_string = yesterday_string, yesterdays_capital = yesterdays_capital)
+# results_tracker_base = pd.read_csv('results_tracker/results_tracker_base.csv')
+# results_tracker_base = results_tracker_base.append(yesterdays_bets)
+# results_tracker_base.to_csv('results_tracker/results_tracker_base.csv')
 
 ########## RUN DAILY TO CALCULATE YESTERDAYS RESULTS AND UPDATE TRACKER FOR EXTERNAL MODELS ##########
+
+def calculate_payoff_external(row, Athletic = False, Fivethirtyeight = False, Combined = False):
+    if Athletic:
+        if row.Bet_Athletic<=0:
+            payoff = 0
+        else:
+            if row.Home_KC_Athletic>0:
+                if row.Home_ML>0:
+                    payoff = (row.Home_ML/100)*row.Bet_Athletic
+                if row.Home_ML<0:
+                    payoff = row.Bet_Athletic/((abs(row.Home_ML)/100))
+            if row.Away_KC_Athletic>0:
+                if row.Away_ML>0:
+                    payoff = (row.Away_ML/100)*row.Bet_Athletic
+                if row.Away_ML<0:
+                    payoff = row.Bet_Athletic/((abs(row.Away_ML)/100))
+    if Fivethirtyeight:
+        if row.Bet_538<=0:
+            payoff = 0
+        else:
+            if row.Home_KC_538>0:
+                if row.Home_ML>0:
+                    payoff = (row.Home_ML/100)*row.Bet_538
+                if row.Home_ML<0:
+                    payoff = row.Bet_538/((abs(row.Home_ML)/100))
+            if row.Away_KC_538>0:
+                if row.Away_ML>0:
+                    payoff = (row.Away_ML/100)*row.Bet_538
+                if row.Away_ML<0:
+                    payoff = row.Bet_538/((abs(row.Away_ML)/100))
+    if Combined:
+        if row.Bet_Combined<=0:
+            payoff = 0
+        else:
+            if row.Home_Combined>0:
+                if row.Home_ML>0:
+                    payoff = (row.Home_ML/100)*row.Bet_Combined
+                if row.Home_ML<0:
+                    payoff = row.Bet_Combined/((abs(row.Home_ML)/100))
+            if row.Away_Combined>0:
+                if row.Away_ML>0:
+                    payoff = (row.Away_ML/100)*row.Bet_Combined
+                if row.Away_ML<0:
+                    payoff = row.Bet_Combined/((abs(row.Away_ML)/100))
+    return payoff
 
 def calculate_yesterdays_bets_results_external(yesterday_string, yesterdays_capital_athletic, yesterdays_capital_538, yesterdays_capital_combined): 
     # Getting yesterday's results from CBS
@@ -166,38 +225,43 @@ def calculate_yesterdays_bets_results_external(yesterday_string, yesterdays_capi
     yesterdays_bets['Won_Combined'] = 0
     yesterdays_bets['Tracker_Combined'] = 0
     for index, row in yesterdays_bets.iterrows():
+        home_team = team_map[row.Home_Team]
+        away_team = team_map[row.Away_Team]
+        payoff_athletic = calculate_payoff_external(row, Athletic = True)
+        payoff_538 = calculate_payoff_external(row, Fivethirtyeight = True)
+        payoff_combined = calculate_payoff_external(row, Combined = True)
         if row.Bet_Athletic>0:
-            if (row.Home_KC_Athletic>0) & (row.Home_Team in results_table['Winner'].values):
-                yesterdays_bets['Won_Athletic'] = 1
-            elif (row.Away_KC_Athletic>0) & (row.Away_Team in results_table['Winner'].values):
-                yesterdays_bets['Won_Athletic'] = 1
+            if (row.Home_KC_Athletic>0) & (home_team in results_table['Winner'].values):
+                yesterdays_bets.loc[index, 'Won_Athletic'] = 1
+            elif (row.Away_KC_Athletic>0) & (away_team in results_table['Winner'].values):
+                yesterdays_bets.loc[index, 'Won_Athletic'] = 1
             else:
-                yesterdays_bets['Won_Athletic'] = 0
+                yesterdays_bets.loc[index, 'Won_Athletic'] = 0
         else:
             yesterdays_bets.loc[index, 'Won_Athletic'] = -1
         if row.Bet_538>0:
-            if (row.Home_KC_538>0) & (row.Home_Team in results_table['Winner'].values):
-                yesterdays_bets['Won_538'] = 1
-            elif (row.Away_KC_538>0) & (row.Away_Team in results_table['Winner'].values):
-                yesterdays_bets['Won_538'] = 1
+            if (row.Home_KC_538>0) & (home_team in results_table['Winner'].values):
+                yesterdays_bets.loc[index, 'Won_538'] = 1
+            elif (row.Away_KC_538>0) & (away_team in results_table['Winner'].values):
+                yesterdays_bets.loc[index, 'Won_538'] = 1
             else:
-                yesterdays_bets['Won_538'] = 0
+                yesterdays_bets.loc[index, 'Won_538'] = 0
         else:
             yesterdays_bets.loc[index, 'Won_538'] = -1
         if row.Bet_Combined>0:
-            if (row.Home_Combined>0) & (row.Home_Team in results_table['Winner'].values):
-                yesterdays_bets['Won_Combined'] = 1
-            elif (row.Away_Combined>0) & (row.Away_Team in results_table['Winner'].values):
-                yesterdays_bets['Won_Combined'] = 1
+            if (row.Home_Combined>0) & (home_team in results_table['Winner'].values):
+                yesterdays_bets.loc[index, 'Won_Combined'] = 1
+            elif (row.Away_Combined>0) & (away_team in results_table['Winner'].values):
+                yesterdays_bets.loc[index, 'Won_Combined'] = 1
             else:
-                yesterdays_bets['Won_Combined'] = 0
+                yesterdays_bets.loc[index, 'Won_Combined'] = 0
         else:
             yesterdays_bets.loc[index, 'Won_Combined'] = -1
         if yesterdays_bets.loc[index, 'Won_Athletic'] == 1:
             if index == 0:
-                yesterdays_bets.loc[index, 'Tracker_Athletic'] = yesterdays_capital_athletic + row.Bet_Athletic
+                yesterdays_bets.loc[index, 'Tracker_Athletic'] = yesterdays_capital_athletic + payoff_athletic
             else:
-                yesterdays_bets.loc[index, 'Tracker_Athletic'] = yesterdays_bets.loc[(index-1), 'Tracker_Athletic'] + row.Bet_Athletic
+                yesterdays_bets.loc[index, 'Tracker_Athletic'] = yesterdays_bets.loc[(index-1), 'Tracker_Athletic'] + payoff_athletic
         else:
             if index == 0:
                 yesterdays_bets.loc[index, 'Tracker_Athletic'] = yesterdays_capital_athletic - row.Bet_Athletic
@@ -205,9 +269,9 @@ def calculate_yesterdays_bets_results_external(yesterday_string, yesterdays_capi
                 yesterdays_bets.loc[index, 'Tracker_Athletic'] = yesterdays_bets.loc[(index-1), 'Tracker_Athletic'] - row.Bet_Athletic
         if yesterdays_bets.loc[index, 'Won_538'] == 1:
             if index == 0:
-                yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_capital_538 + row.Bet_538
+                yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_capital_538 + payoff_538
             else:
-                yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_bets.loc[(index-1), 'Tracker_538'] + row.Bet_538
+                yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_bets.loc[(index-1), 'Tracker_538'] + payoff_538
         else:
             if index == 0:
                 yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_capital_538 - row.Bet_538
@@ -215,9 +279,9 @@ def calculate_yesterdays_bets_results_external(yesterday_string, yesterdays_capi
                 yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_bets.loc[(index-1), 'Tracker_538'] - row.Bet_538
         if yesterdays_bets.loc[index, 'Won_Combined'] == 1:
             if index == 0:
-                yesterdays_bets.loc[index, 'Tracker_Combined'] = yesterdays_capital_combined + row.Bet_Combined
+                yesterdays_bets.loc[index, 'Tracker_Combined'] = yesterdays_capital_combined + payoff_combined
             else:
-                yesterdays_bets.loc[index, 'Tracker_Combined'] = yesterdays_bets.loc[(index-1), 'Tracker_Combined'] + row.Bet_Combined
+                yesterdays_bets.loc[index, 'Tracker_Combined'] = yesterdays_bets.loc[(index-1), 'Tracker_Combined'] + payoff_combined
         else:
             if index == 0:
                 yesterdays_bets.loc[index, 'Tracker_Combined'] = yesterdays_capital_combined - row.Bet_Combined
