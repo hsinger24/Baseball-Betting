@@ -1,5 +1,6 @@
 import pandas as pd
 import time
+import ssl
  
 
 team_list = ['Diamondbacks', 'Braves', 'Orioles', 'Red Sox', 'Cubs', 'White Sox', 'Reds', 'Indians', 'Rockies',
@@ -86,6 +87,7 @@ def retrieve_starting_rotations_WAR(pecota_table, curr_year_WAR_BP):
     
     ##### Issue: Players just called up: for these players, use only Projected ##### 
     
+    ssl._create_default_https_context = ssl._create_unverified_context
     team_list = ['Diamondbacks', 'Braves', 'Orioles', 'Red Sox', 'Cubs', 'White Sox', 'Reds', 'Indians', 'Rockies',
                  'Tigers', 'Astros', 'Royals', 'Marlins', 'Brewers', 'Twins', 'Mets', 'Yankees',
                  'Athletics', 'Phillies', 'Pirates', 'Padres', 'Giants', 'Mariners', 'Cardinals', 'Rays', 'Rangers',

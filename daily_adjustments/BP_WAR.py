@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
+from webdriver_manager.chrome import ChromeDriverManager
 import time
 import pandas as pd
 import re
@@ -179,15 +180,16 @@ def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
     Returns:
         pandas.DataFrame: The current year war table
     """
-    driver_dict = _get_driver_location()
-    driver = None
-    if driver_dict['driver_type'] == 'Chrome':
-        driver = webdriver.Chrome(driver_dict['driver_loc'])
-    elif driver_dict['driver_type'] == 'Firefox':
-        driver = webdriver.Firefox(driver_dict['driver_loc'])
-    else:
-        print("Error")
-        return
+    # driver_dict = _get_driver_location()
+    # driver = None
+    # if driver_dict['driver_type'] == 'Chrome':
+    #     driver = webdriver.Chrome(driver_dict['driver_loc'])
+    # elif driver_dict['driver_type'] == 'Firefox':
+    #     driver = webdriver.Firefox(driver_dict['driver_loc'])
+    # else:
+    #     print("Error")
+    #     return
+    driver = webdriver.Chrome(ChromeDriverManager().install())
 
     table_dict = _retrieve_historical_player_war_tables(driver)
     driver.quit()

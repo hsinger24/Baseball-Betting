@@ -124,10 +124,10 @@ def calculate_yesterdays_bets_results(yesterday_string, yesterdays_capital):
     yesterdays_bets['Date'] = today
     return yesterdays_bets
 
-# yesterdays_bets = calculate_yesterdays_bets_results(yesterday_string = yesterday_string, yesterdays_capital = yesterdays_capital)
-# results_tracker_base = pd.read_csv('results_tracker/results_tracker_base.csv')
-# results_tracker_base = results_tracker_base.append(yesterdays_bets)
-# results_tracker_base.to_csv('results_tracker/results_tracker_base.csv')
+yesterdays_bets = calculate_yesterdays_bets_results(yesterday_string = yesterday_string, yesterdays_capital = yesterdays_capital)
+results_tracker_base = pd.read_csv('results_tracker/results_tracker_base.csv')
+results_tracker_base = results_tracker_base.append(yesterdays_bets)
+results_tracker_base.to_csv('results_tracker/results_tracker_base.csv')
 
 ########## RUN DAILY TO CALCULATE YESTERDAYS RESULTS AND UPDATE TRACKER FOR EXTERNAL MODELS ##########
 
@@ -293,7 +293,6 @@ def calculate_yesterdays_bets_results_external(yesterday_string, yesterdays_capi
 yesterdays_bets = calculate_yesterdays_bets_results_external(yesterday_string = yesterday_string, 
     yesterdays_capital_athletic = yesterdays_capital_athletic, yesterdays_capital_538 = yesterdays_capital_538,
     yesterdays_capital_combined =  yesterdays_capital_combined)
-yesterdays_bets.to_csv('results_tracker/results_tracker_external.csv')
-# results_tracker_external = pd.read_csv('results_tracker/results_tracker_external.csv')
-# results_tracker_external = results_tracker_external.append(yesterdays_bets)
-# results_tracker_external.to_csv('results_tracker/results_tracker_external.csv')
+results_tracker_external = pd.read_csv('results_tracker/results_tracker_external.csv')
+results_tracker_external = results_tracker_external.append(yesterdays_bets)
+results_tracker_external.to_csv('results_tracker/results_tracker_external.csv')
