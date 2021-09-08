@@ -4,5 +4,6 @@
     1. Fix so injured players only looks at projected WAR
 3. Fix instance where there are no odds on yahoo for the game
     1. Right now we just skip through that game (todays_bets function) in run_daily_bets
-4. Go through and create comments for all code and functions
+4. Fix Athletic scraping to input username and password
+5. Go through and create comments for all code and functions
 

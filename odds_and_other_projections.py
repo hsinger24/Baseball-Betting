@@ -7,6 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
 
 def _calculate_odds(odds):
     if odds<0:
@@ -166,8 +167,20 @@ def _retrieve_athletic():
     options.add_argument("--start-maximized")
     options.add_argument('--disable-web-security')
     options.add_argument('--allow-running-insecure-content')
-    browser = webdriver.Chrome(executable_path = "../chromedriver", options = options)
+    browser = webdriver.Chrome(ChromeDriverManager().install())
     browser.get(url)
+    log_in = browser.find_element_by_xpath("//*[@id='navbar-top']/div/div/div/div[3]/div/a[1]")
+    log_in.click()
+    log_in_email = browser.find_element_by_xpath("//*[@id='email-login-button']")
+    log_in_email.click()
+    email = browser.find_element_by_xpath("//*[@id='email-login-form']/div[2]/input")
+    email.click()
+    email.send_keys('singerfam1@gmail.com')
+    password = browser.find_element_by_xpath("//*[@id='email-login-form']/div[3]/input")
+    password.click()
+    password.send_keys('Tredwell01!')
+    log_in = browser.find_element_by_xpath("//*[@id='email-login-form']/button")
+    log_in.click()
     html = browser.page_source.encode('utf-8')
     soup = BeautifulSoup(html, 'lxml')
     tables = pd.read_html(html)

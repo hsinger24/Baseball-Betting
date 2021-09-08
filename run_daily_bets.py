@@ -66,7 +66,7 @@ today = str(dt.date.today()).replace('-', '')
 
 active_rosters = retrieve_all_active_rosters(file_name = None)
 todays_games = retrieve_todays_games_info()
-#retrieve_current_year_WAR()
+retrieve_current_year_WAR()
 current_year_WAR = load_current_year_WAR()
 pt = load_combined_pecota_table()
 odds = retrieve_odds()
