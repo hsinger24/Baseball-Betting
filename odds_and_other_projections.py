@@ -263,5 +263,3 @@ def load_external_data(file_path = 'data/external_data.csv'):
         pandas.DataFrame: External Data Table
     """
     return pd.read_csv(file_path, index_col=0)
-
-print(retrieve_external_data())
