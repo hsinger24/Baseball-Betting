@@ -277,6 +277,7 @@ def todays_bets(todays_games, todays_win_percentages, odds, capital, kelly):
     return todays_bets
 
 todays_bets = todays_bets(todays_games = todays_games, todays_win_percentages = todays_win_percentages, odds = odds, capital = capital, kelly = kelly)
+todays_bets.drop_duplicates(inplace = True)
 todays_bets.to_csv('past_bets/base/bets_' + today + '.csv')
 print(todays_bets)
 
@@ -386,5 +387,6 @@ def todays_bets_external(capital_athletic, capital_538, capital_combined, kelly)
     return data
 
 todays_bets_external = todays_bets_external(capital_athletic = capital_athletic, capital_538 = capital_538, capital_combined = capital_combined, kelly = kelly)
+todays_bets_external.drop_duplicates(subset = ['Away_Team', 'Home_Team'], inplace = True)
 todays_bets_external.to_csv('past_bets/external/bets_external_' + today + '.csv')
 print(todays_bets_external)
