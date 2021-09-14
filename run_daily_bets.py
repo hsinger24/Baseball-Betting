@@ -251,6 +251,10 @@ def todays_bets(todays_games, todays_win_percentages, odds, capital, kelly):
     for game in todays_games:
         home_team = team_map[game['home_team']['team_name']]
         away_team = team_map[game['away_team']['team_name']]
+        if todays_win_percentages.loc[todays_win_percentages.Team==home_team, 'SP_Adjustment'].values[0]==0:
+            continue
+        if todays_win_percentages.loc[todays_win_percentages.Team==away_team, 'SP_Adjustment'].values[0]==0:
+            continue
         home_prob_orig = todays_win_percentages.loc[todays_win_percentages.Team==home_team, 'Today_Win_Pct'].values[0]
         away_prob_orig = todays_win_percentages.loc[todays_win_percentages.Team==away_team, 'Today_Win_Pct'].values[0]
         home_prob = home_prob_orig*(1-away_prob_orig)
