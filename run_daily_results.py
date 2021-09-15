@@ -105,6 +105,10 @@ def calculate_yesterdays_bets_results(yesterday_string, yesterdays_capital):
     yesterdays_bets.reset_index(drop = True, inplace = True)
     for index,row in yesterdays_bets.iterrows():
         payoff = calculate_payoff(row)
+        if (row.Home_Team not in results_table['Winner'].values) & (row.Away_Team not in results_table['Winner'].values):
+            yesterdays_bets.loc[index, 'Home_Bet'] = 0
+            yesterdays_bets.loc[index, 'Away_Bet'] = 0
+            payoff = 0
         if row.Home_Bet>0:
             if row.Home_Team in results_table['Winner'].values:
                 yesterdays_bets.loc[index, 'Won'] = 1
@@ -216,6 +220,8 @@ def calculate_yesterdays_bets_results_external(yesterday_string, yesterdays_capi
     
     # Reading in yesterdays bets and creating tracker columns
     yesterdays_bets = pd.read_csv('past_bets/external/bets_external_' + yesterday_string + '.csv', index_col = 0)
+    yesterdays_bets['Home_Team'] = yesterdays_bets['Home_Team'].apply(lambda x: team_map[x])
+    yesterdays_bets['Away_Team'] = yesterdays_bets['Away_Team'].apply(lambda x: team_map[x])
     yesterdays_bets = yesterdays_bets[(yesterdays_bets.Bet_Athletic>0) | (yesterdays_bets.Bet_538>0) | (yesterdays_bets.Bet_Combined>0)]
     yesterdays_bets.reset_index(drop = True, inplace = True)
     yesterdays_bets['Won_Athletic'] = 0
@@ -225,11 +231,15 @@ def calculate_yesterdays_bets_results_external(yesterday_string, yesterdays_capi
     yesterdays_bets['Won_Combined'] = 0
     yesterdays_bets['Tracker_Combined'] = 0
     for index, row in yesterdays_bets.iterrows():
-        home_team = team_map[row.Home_Team]
-        away_team = team_map[row.Away_Team]
+        home_team = row.Home_Team
+        away_team = row.Away_Team
         payoff_athletic = calculate_payoff_external(row, Athletic = True)
         payoff_538 = calculate_payoff_external(row, Fivethirtyeight = True)
         payoff_combined = calculate_payoff_external(row, Combined = True)
+        if (home_team not in results_table['Winner'].values) & (away_team not in results_table['Winner'].values):
+            yesterdays_bets.loc[index, 'Won_Athletic'] = -1
+            yesterdays_bets.loc[index, 'Won_538'] = -1
+            yesterdays_bets.loc[index, 'Won_Combined'] = -1
         if row.Bet_Athletic>0:
             if (row.Home_KC_Athletic>0) & (home_team in results_table['Winner'].values):
                 yesterdays_bets.loc[index, 'Won_Athletic'] = 1

@@ -1,5 +1,6 @@
 import pandas as pd
 
-results_tracker_base = pd.read_csv('results_tracker/results_tracker_base.csv')
-results_tracker = results_tracker_base.iloc[:,7:]
-results_tracker.to_csv('results_tracker/results_tracker_base.csv')
+bets_today = pd.read_csv('past_bets/base/bets_20210915.csv', index_col = 0)
+bets_today.drop([7,13], axis = 0, inplace = True)
+bets_today.reset_index(inplace = True, drop = True)
+bets_today.to_csv('past_bets/base/bets_20210915.csv')
