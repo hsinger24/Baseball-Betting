@@ -1,7 +1,7 @@
 import pandas as pd
 import unidecode
 
-def sp_adjustment(games, starting_rotations, frac_season=0.0):
+def sp_adjustment(games, starting_rotations, pt, frac_season=0.0):
 
     names = pd.read_csv("pecota_data/names.csv", index_col=0)
     sp_adjust_list = []
@@ -66,8 +66,12 @@ def sp_adjustment(games, starting_rotations, frac_season=0.0):
                             try:
                                 home_pitch_war = (home_table.loc[home_table.Name==sp_home['name_alt_4'].values[0], 'WAR_proj'].values[0]*(1.0-frac_season)+home_table.loc[home_table.Name==sp_home['name_alt_4'].values[0], 'WAR'].values[0])*5.0
                             except:
-                                print('All names failed for', sp_home)
-                                home_pitch_war = 0
+                                try:
+                                    home_pitch_war = pt[pt['name'] == sp_home['name'].values[0]]['war_162'].iloc[0]
+                                    print('All names failed for', sp_home, 'Pecota WAR is:', home_pitch_war)
+                                except:
+                                    home_pitch_war = 0
+                                    print('All name failed for', sp_home, 'Do not bet on this game')
         if (frac_season>=0.25) & (frac_season < 0.5):
             home_table = home_table[home_table.GS>2] 
         if (frac_season>=0.5) & (frac_season < 0.75):
@@ -97,8 +101,12 @@ def sp_adjustment(games, starting_rotations, frac_season=0.0):
                             try:
                                 away_pitch_war = (away_table.loc[away_table.Name==sp_away['name_alt_4'].values[0], 'WAR_proj'].values[0]*(1.0-frac_season)+away_table.loc[away_table.Name==sp_away['name_alt_4'].values[0], 'WAR'].values[0])*5.0
                             except:
-                                print('All names failed for', sp_away)
-                                away_pitch_war = 0
+                                try:
+                                    away_pitch_war = pt[pt['name'] == sp_away['name'].values[0]]['war_162'].iloc[0]
+                                    print('All names failed for', sp_away, 'Pecota WAR is:', away_pitch_war)
+                                except:
+                                    away_pitch_war = 0
+                                    print('All name failed for', sp_away, 'Do not bet on this game')
         if (frac_season>=0.25) & (frac_season < 0.5):
             away_table = away_table[away_table.GS>2] 
         if (frac_season>=0.5) & (frac_season < 0.75):

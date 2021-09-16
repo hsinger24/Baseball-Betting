@@ -1,5 +1,7 @@
 1. Make SP adjustments
     1. Fix SP Adjustments so if name not found in starting rotations table, get their projected WAR from pecota
+        1. Believe this is fixed
+    2. Fix injured pitchers getting back in rotation
 2. Make active roster adjustments
     1. Fix so injured players only looks at projected WAR
 3. Fix aspects of final recommendations

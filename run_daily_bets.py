@@ -133,7 +133,7 @@ current_run_differential = _calculate_cl_with_differential()
 
 starting_rotations, failed_to_find_pitchers = retrieve_starting_rotations_WAR(pt, current_year_WAR)
 print(failed_to_find_pitchers)
-sp_adjustments = sp_adjustment(todays_games, starting_rotations, frac_season = frac_season)
+sp_adjustments = sp_adjustment(todays_games, starting_rotations, pt, frac_season = frac_season)
 print(sp_adjustments)
 overall_war_predictions_preseason = pd.read_csv('data/overall_war_predictions_preseason.csv')
 active_roster_war, failed_to_find_players = active_roster_war_table(active_rosters, overall_war_predictions_preseason, current_year_WAR, pt, current_year, frac_season)

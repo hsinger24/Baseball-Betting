@@ -106,9 +106,12 @@ def calculate_yesterdays_bets_results(yesterday_string, yesterdays_capital):
     for index,row in yesterdays_bets.iterrows():
         payoff = calculate_payoff(row)
         if (row.Home_Team not in results_table['Winner'].values) & (row.Away_Team not in results_table['Winner'].values):
-            yesterdays_bets.loc[index, 'Home_Bet'] = 0
-            yesterdays_bets.loc[index, 'Away_Bet'] = 0
-            payoff = 0
+            yesterdays_bets.loc[index, 'Won'] = -1
+            if index == 0:
+                yesterdays_bets.loc[index, 'Money_Tracker'] = yesterdays_capital
+            else:
+                yesterdays_bets.loc[index, 'Money_Tracker'] = yesterdays_bets.loc[(index-1), 'Money_Tracker']
+            continue
         if row.Home_Bet>0:
             if row.Home_Team in results_table['Winner'].values:
                 yesterdays_bets.loc[index, 'Won'] = 1
