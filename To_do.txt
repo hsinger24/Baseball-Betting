@@ -7,6 +7,9 @@
 3. Fix aspects of final recommendations
     1. Fix instance where there are no odds on yahoo for the game
         1. Right now we just skip through that game (todays_bets function) in run_daily_bets
+        2. Can also just wait until late enough in the day
     2. Create functionality where it doesn't bet on games with no listed SP (Think I did this)
-4. Go through and create comments for all code and functions (Just run dailys left)
+    3. Fix postponed games in external results
+4. Go through and create comments for all code and functions   
+    1. Everything in daily adjustments folder and run_daily files
 

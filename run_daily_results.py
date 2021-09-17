@@ -243,6 +243,15 @@ def calculate_yesterdays_bets_results_external(yesterday_string, yesterdays_capi
             yesterdays_bets.loc[index, 'Won_Athletic'] = -1
             yesterdays_bets.loc[index, 'Won_538'] = -1
             yesterdays_bets.loc[index, 'Won_Combined'] = -1
+            if index == 0:
+                yesterdays_bets.loc[index, 'Tracker_Athletic'] = yesterdays_capital_athletic
+                yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_capital_538
+                yesterdays_bets.loc[index, 'Tracker_Cthletic'] = yesterdays_capital_combined
+            else:
+                yesterdays_bets.loc[index, 'Tracker_Athletic'] = yesterdays_bets.loc[(index-1), 'Tracker_Athletic']
+                yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_bets.loc[(index-1), 'Tracker_538']
+                yesterdays_bets.loc[index, 'Tracker_Cthletic'] = yesterdays_bets.loc[(index-1), 'Tracker_Combined']
+            continue
         if row.Bet_Athletic>0:
             if (row.Home_KC_Athletic>0) & (home_team in results_table['Winner'].values):
                 yesterdays_bets.loc[index, 'Won_Athletic'] = 1
