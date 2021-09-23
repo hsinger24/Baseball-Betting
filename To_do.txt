@@ -1,9 +1,11 @@
 1. Make SP adjustments
-    1. Fix SP Adjustments so if name not found in starting rotations table, get their projected WAR from pecota
-        1. Believe this is fixed
-    2. Fix injured pitchers getting back in rotation
+    1. Fix injured pitchers getting back in rotation
+        1. Change WAR part to have an actual (in adjusted_war_today), projected and total. That way, if GS<threshold, can just set total = projected
+        2. Or, just get projected from pt table (already done at one point in the script)
 2. Make active roster adjustments
-    1. Fix so injured players only looks at projected WAR
+    1. Fix so injured players/called up players only looks at projected WAR
+        1. Started by getting GS from BP
+        2. Next step: adjusting WAR to skew more towards projected for these players
 3. Fix aspects of final recommendations
     1. Fix instance where there are no odds on yahoo for the game
         1. Right now we just skip through that game (todays_bets function) in run_daily_bets
@@ -13,3 +15,5 @@
 4. Go through and create comments for all code and functions   
     1. Everything in daily adjustments folder and run_daily files
 
+Remember to check
+    1. rotations so GS can be updated for players whose names don't match
