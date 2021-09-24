@@ -2,6 +2,17 @@ import pandas as pd
 import unidecode
 
 def calculate_sp_adjustment(games, starting_rotations, pt, frac_season=0.0):
+    """Calculates the starting pitcher adjustment for each team
+
+    Args:
+        games = output of retrieve_todays_game_info()
+        starting_rotations = output of retrieve_starting_rotations_war
+        pt = output of load_combined_pecota_table
+        frac_season = fraction of the season expressed as a decimal
+
+    Returns:
+        (list of dicts): a list of dicts, one dict for each team + roster
+    """
 
     # Getting starting pitcher names, and each teams' rotation
     names = pd.read_csv("pecota_data/names.csv", index_col=0)
@@ -185,6 +196,19 @@ def calculate_sp_adjustment(games, starting_rotations, pt, frac_season=0.0):
     return sp_adjust_list
 
 def calculate_active_roster_war_table(active_rosters, overall_war_predictions_preseason, curr_year_WAR_BP, pecota_table, current_year, frac_season = 0.0):
+    """Calculates the active roster adjustment for each team
+
+    Args:
+        active_rosters = output of retrieve_all_active_rosters
+        overall_war_predictions_preseason = pd.read_csv('data/overall_war_predictions_preseason.csv')
+        curr_year_WAR_BP = output of retrieve_current_year_WAR/load_current_year_WAR
+        pecota_table = output of load_combined_pecota_table
+        current_year = current_year
+        frac_season = fraction of the season expressed as a decimal
+
+    Returns:
+        (list of dicts): a list of dicts, one dict for each team + roster
+    """
 
     # Instantiating stuff
     names = pd.read_csv("pecota_data/names.csv", index_col=0)

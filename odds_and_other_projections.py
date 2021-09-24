@@ -16,59 +16,119 @@ def _calculate_odds(odds):
         return (100/(odds+100))*100
 
 def retrieve_odds():
+    # odds_team_mapping = {
+    # 'Cleveland Indians' : 'Indians',
+    # 'St. Louis Cardinals' : 'Cardinals',
+    # 'Minnesota Twins' : 'Twins',
+    # 'Detroit Tigers' : 'Tigers',
+    # 'Boston Red Sox' : 'Red Sox',
+    # 'Toronto Blue Jays' : 'Blue Jays',
+    # 'Seattle Mariners' : 'Mariners',
+    # 'Houston Astros' : 'Astros',
+    # 'San Diego Padres' : 'Padres',
+    # 'Oakland Athletics' : 'Athletics',
+    # 'Baltimore Orioles' : 'Orioles',
+    # 'Miami Marlins' : 'Marlins',
+    # 'Philadelphia Phillies' : 'Phillies',
+    # 'Washington Nationals' : 'Nationals',
+    # 'New York Mets' : 'Mets',
+    # 'Atlanta Braves' : 'Braves',
+    # 'Tampa Bay Rays' : 'Rays',
+    # 'New York Yankees' : 'Yankees',
+    # 'Texas Rangers' : 'Rangers',
+    # 'Arizona Diamondbacks' : 'Diamondbacks',
+    # 'Chicago Cubs' : 'Cubs',
+    # 'Cincinnati Reds' : 'Reds',
+    # 'Kansas City Royals' : 'Royals',
+    # 'Chicago White Sox' : 'White Sox',
+    # 'Los Angeles Angels' : 'Angels',
+    # 'Colorado Rockies' : 'Rockies',
+    # 'San Francisco Giants' : 'Giants',
+    # 'Los Angeles Dodgers' : 'Dodgers',
+    # 'Milwaukee Brewers' : 'Brewers',
+    # 'Pittsburgh Pirates' : 'Pirates'
+    # }
+    # regex_ml = r'[+-]\d+'
+    # regex_team = r'(\D+\w\D+)+'
+    # odds = pd.read_html('https://sports.yahoo.com/mlb/odds/')
+    # del odds[-1]
+    # odds_df = pd.DataFrame(columns = ['Home_Team', 'Away_Team', 'Home_Odds', 'Away_Odds'])
+    # for game in odds:
+    #     try:
+    #         ml_home = float(re.findall(regex_ml, game.iloc[1,1])[-1])
+    #     except:
+    #         ml_home = 'NaN'
+    #     try:
+    #         ml_away = float(re.findall(regex_ml, game.iloc[0,1])[-1])
+    #     except:
+    #         ml_away = 'NaN'
+    #     home_team = re.findall(regex_team, game.iloc[1,0])[0]
+    #     away_team = re.findall(regex_team, game.iloc[0,0])[0]
+    #     to_append = [home_team, away_team, ml_home, ml_away]
+    #     append = pd.Series(to_append, index = odds_df.columns)
+    #     odds_df = odds_df.append(append, ignore_index = True)
+    # odds_df['Home_Odds'] = odds_df.Home_Odds.apply(float)
+    # odds_df['Away_Odds'] = odds_df.Away_Odds.apply(float)
+    # odds_df['Home_Prob'] = odds_df.Home_Odds.apply(_calculate_odds)
+    # odds_df['Away_Prob'] = odds_df.Away_Odds.apply(_calculate_odds)
+    # odds_df['Home_Team'] = odds_df.Home_Team.apply(lambda x: odds_team_mapping[x])
+    # odds_df['Away_Team'] = odds_df.Away_Team.apply(lambda x: odds_team_mapping[x])
+    # return odds_df
+    tables = pd.read_html('https://www.actionnetwork.com/mlb/odds')
+    odds = tables[0]
     odds_team_mapping = {
-    'Cleveland Indians' : 'Indians',
-    'St. Louis Cardinals' : 'Cardinals',
-    'Minnesota Twins' : 'Twins',
-    'Detroit Tigers' : 'Tigers',
-    'Boston Red Sox' : 'Red Sox',
-    'Toronto Blue Jays' : 'Blue Jays',
-    'Seattle Mariners' : 'Mariners',
-    'Houston Astros' : 'Astros',
-    'San Diego Padres' : 'Padres',
-    'Oakland Athletics' : 'Athletics',
-    'Baltimore Orioles' : 'Orioles',
-    'Miami Marlins' : 'Marlins',
-    'Philadelphia Phillies' : 'Phillies',
-    'Washington Nationals' : 'Nationals',
-    'New York Mets' : 'Mets',
-    'Atlanta Braves' : 'Braves',
-    'Tampa Bay Rays' : 'Rays',
-    'New York Yankees' : 'Yankees',
-    'Texas Rangers' : 'Rangers',
-    'Arizona Diamondbacks' : 'Diamondbacks',
-    'Chicago Cubs' : 'Cubs',
-    'Cincinnati Reds' : 'Reds',
-    'Kansas City Royals' : 'Royals',
-    'Chicago White Sox' : 'White Sox',
-    'Los Angeles Angels' : 'Angels',
-    'Colorado Rockies' : 'Rockies',
-    'San Francisco Giants' : 'Giants',
-    'Los Angeles Dodgers' : 'Dodgers',
-    'Milwaukee Brewers' : 'Brewers',
-    'Pittsburgh Pirates' : 'Pirates'
+    'CHC' : 'Cubs',
+    'STL' : 'Cardinals',
+    'MIN' : 'Twins',
+    'DET' : 'Tigers',
+    'BOS' : 'Red Sox',
+    'TOR' : 'Blue Jays',
+    'SEA' : 'Mariners',
+    'HOU' : 'Astros',
+    'SD' : 'Padres',
+    'OAK' : 'Athletics',
+    'BAL' : 'Orioles',
+    'MIA' : 'Marlins',
+    'PHI' : 'Phillies',
+    'WSH' : 'Nationals',
+    'NYM' : 'Mets',
+    'ATL' : 'Braves',
+    'TB' : 'Rays',
+    'NYY' : 'Yankees',
+    'TEX' : 'Rangers',
+    'ARI' : 'Diamondbacks',
+    'CHC' : 'Cubs',
+    'CIN' : 'Reds',
+    'KC' : 'Royals',
+    'CWS' : 'White Sox',
+    'LAA' : 'Angels',
+    'COL' : 'Rockies',
+    'SF' : 'Giants',
+    'LAD' : 'Dodgers',
+    'MIL' : 'Brewers',
+    'PIT' : 'Pirates',
+    'CLE' : 'Indians'
     }
-    regex_ml = r'[+-]\d+'
-    regex_team = r'(\D+\w\D+)+'
-    odds = pd.read_html('https://sports.yahoo.com/mlb/odds/')
-    del odds[-1]
+    team_regex = r'[A-Z]{2,3}'
     odds_df = pd.DataFrame(columns = ['Home_Team', 'Away_Team', 'Home_Odds', 'Away_Odds'])
-    for game in odds:
+    for index, row in odds.iterrows():
+        teams = re.findall(team_regex, row.Scheduled)
+        away_team = teams[1]
+        home_team = teams[2]
+        ml_string = row['Unnamed: 2']
+        ml_away = ml_string[11:15]
+        ml_home = ml_string[-6:-2]
         try:
-            ml_home = float(re.findall(regex_ml, game.iloc[1,1])[-1])
+            ml_away = float(ml_away)
         except:
-            ml_home = 'NaN'
+            continue
         try:
-            ml_away = float(re.findall(regex_ml, game.iloc[0,1])[-1])
+            ml_home = float(ml_home)
         except:
-            ml_away = 'NaN'
-        home_team = re.findall(regex_team, game.iloc[1,0])[0]
-        away_team = re.findall(regex_team, game.iloc[0,0])[0]
+            continue
         to_append = [home_team, away_team, ml_home, ml_away]
         append = pd.Series(to_append, index = odds_df.columns)
         odds_df = odds_df.append(append, ignore_index = True)
-    odds_df['Home_Odds'] = odds_df.Home_Odds.apply(float)
-    odds_df['Away_Odds'] = odds_df.Away_Odds.apply(float)
     odds_df['Home_Prob'] = odds_df.Home_Odds.apply(_calculate_odds)
     odds_df['Away_Prob'] = odds_df.Away_Odds.apply(_calculate_odds)
     odds_df['Home_Team'] = odds_df.Home_Team.apply(lambda x: odds_team_mapping[x])
