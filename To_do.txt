@@ -1,17 +1,18 @@
 1. Make SP adjustments
-    1. Fix injured pitchers getting back in rotation
+    1. Fix injured pitchers getting back in rotation (Think I did this)
         1. Change WAR part to have an actual (in adjusted_war_today), projected and total. That way, if GS<threshold, can just set total = projected
         2. Or, just get projected from pt table (already done at one point in the script)
 2. Make active roster adjustments
     1. Fix so injured players/called up players only looks at projected WAR
-        1. Started by getting GS from BP
+        1. Something to consider: need to set threshold to differentiate injured players from players who don't play
         2. Next step: adjusting WAR to skew more towards projected for these players
 3. Fix aspects of final recommendations
     1. Fix instance where there are no odds on yahoo for the game
         1. Right now we just skip through that game (todays_bets function) in run_daily_bets
         2. Can also just wait until late enough in the day
     2. Create functionality where it doesn't bet on games with no listed SP (Think I did this)
-    3. Fix postponed games in external results
+        1. Automate this so never recommends a bet where there is a signal not to
+    3. Fix postponed games in external results (Think I did this)
 4. Go through and create comments for all code and functions   
     1. Everything in daily adjustments folder and run_daily files
 
