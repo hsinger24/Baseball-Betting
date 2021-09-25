@@ -199,15 +199,18 @@ def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
     all_players = pd.DataFrame()
     for key, value in table_dict.items():
         all_players = all_players.append(value)
-    grouped = all_players.groupby(by = 'Name')['WAR'].sum()
+    #grouped = all_players.groupby(by = 'Name')['WAR'].sum()
+    grouped = all_players.groupby(by = 'Name').agg({'WAR' : 'sum', 'GS_P' : 'sum', 'GS_H' : 'sum', 'Games_P' : 'sum'})
     grouped = pd.DataFrame(grouped)
     grouped.reset_index(inplace = True)
-    grouped.columns = ['Name', 'WAR']
+    #grouped.columns = ['Name', 'WAR']
+    grouped.columns = ['Name', 'WAR', 'GS_P', 'GS_H', 'Games_P']
     grouped['Name'] = grouped.Name.apply(unidecode.unidecode)
 
     # Adding GS and position
     drop_duplicated = all_players.drop_duplicates(subset = 'Name', keep = 'first')
-    drop_duplicated = drop_duplicated[['Name', 'GS_P', 'GS_H', 'Games_P', 'Position']]
+    #drop_duplicated = drop_duplicated[['Name', 'GS_P', 'GS_H', 'Games_P', 'Position']]
+    drop_duplicated = drop_duplicated[['Name', 'Position']]
     drop_duplicated['Name'] = drop_duplicated.Name.apply(unidecode.unidecode)
     final = pd.merge(grouped, drop_duplicated, on = 'Name', how = 'inner')
     final = final.drop_duplicates(subset = 'Name', keep = 'first')
