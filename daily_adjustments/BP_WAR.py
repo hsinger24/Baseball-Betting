@@ -139,8 +139,8 @@ def _retrieve_historical_player_war_tables(driver, year=None):
             player_table = pd.read_html(html)
             player_table = player_table[0]
             
-            player_table = player_table.iloc[:, [0,2,3,9,6]]
-            player_table.columns = ['Name', 'Team', 'WAR', 'GS_P', 'GS_H']
+            player_table = player_table.iloc[:, [0,2,3,9,6,8]]
+            player_table.columns = ['Name', 'Team', 'WAR', 'GS_P', 'GS_H', 'Games_P']
 
             if j==0:
                 player_table['Position'] = 'P'
@@ -148,6 +148,7 @@ def _retrieve_historical_player_war_tables(driver, year=None):
             else:
                 player_table['Position'] = 'H'
                 player_table['GS_P'] = 0
+                player_table['Games_P'] = 0
            
             player_table['Name'] = player_table.Name.apply(lambda x: re.findall(regex_name, x)[0])
             player_table['Name'] = player_table.Name.apply(lambda x: x.strip(' '))
@@ -206,7 +207,7 @@ def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
 
     # Adding GS and position
     drop_duplicated = all_players.drop_duplicates(subset = 'Name', keep = 'first')
-    drop_duplicated = drop_duplicated[['Name', 'GS_P', 'GS_H', 'Position']]
+    drop_duplicated = drop_duplicated[['Name', 'GS_P', 'GS_H', 'Games_P', 'Position']]
     drop_duplicated['Name'] = drop_duplicated.Name.apply(unidecode.unidecode)
     final = pd.merge(grouped, drop_duplicated, on = 'Name', how = 'inner')
     final = final.drop_duplicates(subset = 'Name', keep = 'first')

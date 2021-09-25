@@ -1,13 +1,21 @@
-1. Make SP adjustments
-2. Make active roster adjustments
+To do:
+
+1. Make active roster adjustments
     1. Consider getting WAR on a per game basis
+    2. Fix active roster adjustments for pitchers so it looks at games vs games started (Check)
+2. Evaluate cutoff for looking at current year war vs projected war
+    1. Maybe consider adding more bands
 3. Fix aspects of final recommendations
-    1. Fix instance where there are no odds on yahoo for the game (think I did this)
-    2. Create functionality where it doesn't bet on games with no listed SP (Think I did this)
+    2. Create functionality where it doesn't bet on games with no listed SP (Check)
         1. Automate this so never recommends a bet where there is a signal not to
-    3. Fix postponed games in external results (Think I did this)
+    3. Fix postponed games in external results (Check)
 4. Go through and create comments for all code and functions   
     1. Everything in daily adjustments folder and run_daily files
 
-Remember to check
-    1. rotations so GS can be updated for players whose names don't match
+Remember to check:
+
+1. rotations so GS can be updated for players whose names don't match
+
+Issues:
+
+1. Games played are off for traded players 

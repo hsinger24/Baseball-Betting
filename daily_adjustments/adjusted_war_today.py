@@ -234,7 +234,7 @@ def calculate_active_roster_war_table(active_rosters, overall_war_predictions_pr
                 current_year_war = curr_year_WAR_BP[curr_year_WAR_BP.Name == player['name'].values[0]].iloc[0,1]
                 if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name'].values[0], 'Position'].values[0] == 'P':
                     position = 'P'
-                    gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name'].values[0]].iloc[0,2]
+                    gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name'].values[0]].iloc[0,4]
                 if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name'].values[0], 'Position'].values[0] == 'H':
                     position = 'H'
                     gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name'].values[0]].iloc[0,3]
@@ -243,7 +243,7 @@ def calculate_active_roster_war_table(active_rosters, overall_war_predictions_pr
                     current_year_war = curr_year_WAR_BP[curr_year_WAR_BP.Name == player['name_wo_a'].values[0]].iloc[0,1]
                     if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_wo_a'].values[0], 'Position'].values[0] == 'P':
                         position = 'P'
-                        gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_wo_a'].values[0]].iloc[0,2]
+                        gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_wo_a'].values[0]].iloc[0,4]
                     if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_wo_a'].values[0], 'Position'].values[0] == 'H':
                         position = 'H'
                         gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_wo_a'].values[0]].iloc[0,3]
@@ -252,7 +252,7 @@ def calculate_active_roster_war_table(active_rosters, overall_war_predictions_pr
                         current_year_war = curr_year_WAR_BP[curr_year_WAR_BP.Name == player['name_alt_1'].values[0]].iloc[0,1]
                         if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_alt_1'].values[0], 'Position'].values[0] == 'P':
                             position = 'P'
-                            gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_1'].values[0]].iloc[0,2]
+                            gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_1'].values[0]].iloc[0,4]
                         if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_alt_1'].values[0], 'Position'].values[0] == 'H':
                             position = 'H'
                             gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_1'].values[0]].iloc[0,3]
@@ -261,7 +261,7 @@ def calculate_active_roster_war_table(active_rosters, overall_war_predictions_pr
                             current_year_war = curr_year_WAR_BP[curr_year_WAR_BP.Name == player['name_alt_2'].values[0]].iloc[0,1]
                             if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_alt_2'].values[0], 'Position'].values[0] == 'P':
                                 position = 'P'
-                                gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_2'].values[0]].iloc[0,2]
+                                gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_2'].values[0]].iloc[0,4]
                             if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_alt_2'].values[0], 'Position'].values[0] == 'H':
                                 position = 'H'
                                 gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_2'].values[0]].iloc[0,3]
@@ -270,7 +270,7 @@ def calculate_active_roster_war_table(active_rosters, overall_war_predictions_pr
                                 current_year_war = curr_year_WAR_BP[curr_year_WAR_BP.Name == player['name_alt_3'].values[0]].iloc[0,1]
                                 if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_alt_3'].values[0], 'Position'].values[0] == 'P':
                                     position = 'P'
-                                    gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_3'].values[0]].iloc[0,2]
+                                    gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_3'].values[0]].iloc[0,4]
                                 if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_alt_3'].values[0], 'Position'].values[0] == 'H':
                                     position = 'H'
                                     gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_3'].values[0]].iloc[0,3]
@@ -279,7 +279,7 @@ def calculate_active_roster_war_table(active_rosters, overall_war_predictions_pr
                                     current_year_war = curr_year_WAR_BP[curr_year_WAR_BP.Name == player['name_alt_4'].values[0]].iloc[0,1]
                                     if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_alt_4'].values[0], 'Position'].values[0] == 'P':
                                         position = 'P'
-                                        gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_4'].values[0]].iloc[0,2]
+                                        gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_4'].values[0]].iloc[0,4]
                                     if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_alt_4'].values[0], 'Position'].values[0] == 'H':
                                         position = 'H'
                                         gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_4'].values[0]].iloc[0,3]
@@ -292,21 +292,21 @@ def calculate_active_roster_war_table(active_rosters, overall_war_predictions_pr
             if position is not None:
                 try:
                     if position == 'H':
-                        if (frac_season>=0.25) & (frac_season<0.5) & (gs<10):
+                        if (frac_season>=0.25) & (frac_season<0.5) & (gs<20):
                             current_year_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
-                        if (frac_season>=0.50) & (frac_season<0.75) & (gs<20):
+                        if (frac_season>=0.50) & (frac_season<0.75) & (gs<40):
                             current_year_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
-                        if (frac_season>=0.75) & (gs<30):
+                        if (frac_season>=0.75) & (gs<70):
                             current_year_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
                 except:
                     current_year_war = 0
                 try:
                     if position == 'P':
-                        if (frac_season>=0.25) & (frac_season<0.5) & (gs<2):
+                        if (frac_season>=0.25) & (frac_season<0.5) & (gs<3):
                             current_year_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
-                        if (frac_season>=0.50) & (frac_season<0.75) & (gs<3):
+                        if (frac_season>=0.50) & (frac_season<0.75) & (gs<6):
                             current_year_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
-                        if (frac_season>=0.75) & (gs<4):
+                        if (frac_season>=0.75) & (gs<10):
                             current_year_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
                 except:
                     current_year_war = 0
