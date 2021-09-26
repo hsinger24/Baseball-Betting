@@ -55,10 +55,12 @@ team_map = {
 
 frac_season = float(input('Hank, please input the fraction of the season as a decimal: '))
 current_year = 2020
-capital = float(input('Hank, please input your current capital for the base model: '))
-capital_athletic = float(input('Hank, please input your current capital for the Athletic model: '))
-capital_538 = float(input('Hank, please input your current capital for the 538 model: '))
-capital_combined = float(input('Hank, please input your current capital for the combined model: '))
+results = pd.read_csv('results_tracker/results_tracker_base.csv')
+results_external = pd.read_csv('results_tracker/results_tracker_external.csv')
+capital = float(results.loc[len(results)-1, 'Money_Tracker'])
+capital_athletic = float(results_external.loc[len(results_external)-1, 'Tracker_Athletic'])
+capital_538 = float(results_external.loc[len(results_external)-1, 'Tracker_538'])
+capital_combined = float(results_external.loc[len(results_external)-1, 'Tracker_Combined'])
 kelly = 10
 today = str(dt.date.today()).replace('-', '')
 

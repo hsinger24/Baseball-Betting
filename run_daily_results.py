@@ -38,10 +38,12 @@ today = dt.date.today()
 yesterday = today - dt.timedelta(days=1)
 yesterday_string = str(yesterday)
 yesterday_string = yesterday_string.replace('-', '')
-yesterdays_capital = float(input("Hank, please input yesterday's capital for the base model: "))
-yesterdays_capital_athletic = float(input("Hank, please input yesterday's capital for the Athletic model: "))
-yesterdays_capital_538 = float(input("Hank, please input yesterday's capital for the 538 model: "))
-yesterdays_capital_combined = float(input("Hank, please input yesterday's capital for the combined model: "))
+results = pd.read_csv('results_tracker/results_tracker_base.csv')
+results_external = pd.read_csv('results_tracker/results_tracker_external.csv')
+yesterdays_capital = float(results.loc[len(results)-1, 'Money_Tracker'])
+yesterdays_capital_athletic = float(results_external.loc[len(results_external)-1, 'Tracker_Athletic'])
+yesterdays_capital_538 = float(results_external.loc[len(results_external)-1, 'Tracker_538'])
+yesterdays_capital_combined = float(results_external.loc[len(results_external)-1, 'Tracker_Combined'])
 
 ########## RUN DAILY TO CALCULATE YESTERDAYS RESULTS AND UPDATE TRACKER FOR BASE MODEL ##########
 

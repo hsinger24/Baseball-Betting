@@ -1,15 +1,12 @@
 To do:
 
-1. Make active roster adjustments
-    1. Consider getting WAR on a per game basis
-    2. Fix active roster adjustments for pitchers so it looks at games vs games started (Check)
-2. Evaluate cutoff for looking at current year war vs projected war
-    1. Maybe consider adding more bands
-3. Fix aspects of final recommendations
-    2. Create functionality where it doesn't bet on games with no listed SP (Check)
-        1. Automate this so never recommends a bet where there is a signal not to
-    3. Fix postponed games in external results (Check)
-4. Go through and create comments for all code and functions   
+1. Check new method of roster adjustments 
+    1. Consider new method for percent season for pitchers
+2. Fix aspects of final recommendations
+    1. Fix postponed games in external results (Check)
+    2. WHERE TO INCORPORATE ACTIVE ROSTER ADJUSTMENT?
+    3. Automate capital for a given day (Check)
+3. Go through and create comments for all code and functions   
     1. Everything in daily adjustments folder and run_daily files
 
 Remember to check:
@@ -18,4 +15,4 @@ Remember to check:
 
 Issues:
 
-1. Games played are off for traded players 
+
