@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
+from webdriver_manager.chrome import ChromeDriverManager
 import time
 import pandas as pd
 import re
@@ -50,7 +51,7 @@ def _get_driver_location():
     
     return dct
 
-def _retrieve_historical_player_war_tables(driver, year=None, get_gs = False):
+def _retrieve_historical_player_war_tables(driver, year=None):
     # create dict to store team's player tables
     table_dict = {}
     regex_name = r'(\D+\s\D+)+'
@@ -137,12 +138,18 @@ def _retrieve_historical_player_war_tables(driver, year=None, get_gs = False):
             html = driver.page_source
             player_table = pd.read_html(html)
             player_table = player_table[0]
-            if not get_gs:
-                player_table = player_table.iloc[:, [0,2,3]]
-                player_table.columns = ['Name', 'Team', 'WAR']
+            
+            player_table = player_table.iloc[:, [0,2,3,9,6,8]]
+            player_table.columns = ['Name', 'Team', 'WAR', 'GS_P', 'GS_H', 'Games_P']
+
+            if j==0:
+                player_table['Position'] = 'P'
+                player_table['GS_H'] = 0
             else:
-                player_table = player_table.iloc[:, [0,2,3, 8]]
-                player_table.columns = ['Name', 'Team', 'WAR', 'GS']
+                player_table['Position'] = 'H'
+                player_table['GS_P'] = 0
+                player_table['Games_P'] = 0
+           
             player_table['Name'] = player_table.Name.apply(lambda x: re.findall(regex_name, x)[0])
             player_table['Name'] = player_table.Name.apply(lambda x: x.strip(' '))
 
@@ -165,7 +172,7 @@ def _retrieve_historical_player_war_tables(driver, year=None, get_gs = False):
         
     return table_dict
 
-def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv", get_gs = False):
+def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv"):
     """Retrieves the current year WAR of all players who have played in the MLB this season from 
     baseball prospectus
 
@@ -175,32 +182,45 @@ def retrieve_current_year_WAR(file_path = "data/curr_war_table.csv", get_gs = Fa
     Returns:
         pandas.DataFrame: The current year war table
     """
-    driver_dict = _get_driver_location()
-    driver = None
-    if driver_dict['driver_type'] == 'Chrome':
-        driver = webdriver.Chrome(driver_dict['driver_loc'])
-    elif driver_dict['driver_type'] == 'Firefox':
-        driver = webdriver.Firefox(driver_dict['driver_loc'])
-    else:
-        print("Error")
-        return
+    # driver_dict = _get_driver_location()
+    # driver = None
+    # if driver_dict['driver_type'] == 'Chrome':
+    #     driver = webdriver.Chrome(driver_dict['driver_loc'])
+    # elif driver_dict['driver_type'] == 'Firefox':
+    #     driver = webdriver.Firefox(driver_dict['driver_loc'])
+    # else:
+    #     print("Error")
+    #     return
+    driver = webdriver.Chrome(ChromeDriverManager().install())
 
+    # Creates big df with all players, grouped by Name to get total WAR for each player
     table_dict = _retrieve_historical_player_war_tables(driver)
     driver.quit()
     all_players = pd.DataFrame()
     for key, value in table_dict.items():
         all_players = all_players.append(value)
-    grouped = all_players.groupby(by = 'Name')['WAR'].sum()
+    #grouped = all_players.groupby(by = 'Name')['WAR'].sum()
+    grouped = all_players.groupby(by = 'Name').agg({'WAR' : 'sum', 'GS_P' : 'sum', 'GS_H' : 'sum', 'Games_P' : 'sum'})
     grouped = pd.DataFrame(grouped)
     grouped.reset_index(inplace = True)
-    grouped.columns = ['Name', 'WAR']
+    #grouped.columns = ['Name', 'WAR']
+    grouped.columns = ['Name', 'WAR', 'GS_P', 'GS_H', 'Games_P']
     grouped['Name'] = grouped.Name.apply(unidecode.unidecode)
 
+    # Adding GS and position
+    drop_duplicated = all_players.drop_duplicates(subset = 'Name', keep = 'first')
+    #drop_duplicated = drop_duplicated[['Name', 'GS_P', 'GS_H', 'Games_P', 'Position']]
+    drop_duplicated = drop_duplicated[['Name', 'Position']]
+    drop_duplicated['Name'] = drop_duplicated.Name.apply(unidecode.unidecode)
+    final = pd.merge(grouped, drop_duplicated, on = 'Name', how = 'inner')
+    final = final.drop_duplicates(subset = 'Name', keep = 'first')
+
+    # Saving data to specified location
     if file_path is not None:
         with open("data/curr_war_table.csv", 'w') as f:
-            grouped.to_csv(f)
+            final.to_csv(f)
 
-    return grouped
+    return final
 
 def load_current_year_WAR(file_path = "data/curr_war_table.csv"):
     """Loads the current year war Table from a given file
@@ -215,15 +235,27 @@ def load_current_year_WAR(file_path = "data/curr_war_table.csv"):
     return pd.read_csv(file_path, index_col = 0)
 
 def retrieve_previous_year_war_table(previous_year, file_path="data/historical_war_table.csv"):
-    driver_dict = _get_driver_location()
-    driver = None
-    if driver_dict['driver_type'] == 'Chrome':
-        driver = webdriver.Chrome(driver_dict['driver_loc'])
-    elif driver_dict['driver_type'] == 'Firefox':
-        driver = webdriver.Firefox(driver_dict['driver_loc'])
-    else:
-        print("Error")
-        return
+    """Retrieves the previous year WAR for all players from Baseball Prospectus
+
+    Args:
+        - previous_year: year of interest
+        - file_path (str, optional): path to save file. Defaults to "data/historical_war_table.csv".
+
+    Returns:
+        pandas.DataFrame: The current year war table
+    """
+    # driver_dict = _get_driver_location()
+    # driver = None
+    # if driver_dict['driver_type'] == 'Chrome':
+    #     driver = webdriver.Chrome(driver_dict['driver_loc'])
+    # elif driver_dict['driver_type'] == 'Firefox':
+    #     driver = webdriver.Firefox(driver_dict['driver_loc'])
+    # else:
+    #     print("Error")
+    #     return
+    driver = webdriver.Chrome(ChromeDriverManager().install())
+
+    # Returns WAR for each team from the previous year
     table_dict = _retrieve_historical_player_war_tables(driver, year = previous_year)
     driver.quit()
     big_boi_df = pd.DataFrame()
@@ -235,6 +267,7 @@ def retrieve_previous_year_war_table(previous_year, file_path="data/historical_w
     grouped.columns = ['Team', 'WAR']
     grouped['Team'] = grouped.Team.apply(lambda x: team_map[x])
 
+    # Saves file to specified location
     if file_path is not None:
         with open(file_path, "w") as f:
             grouped.to_csv(f)

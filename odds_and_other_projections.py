@@ -7,6 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
 
 def _calculate_odds(odds):
     if odds<0:
@@ -14,60 +15,120 @@ def _calculate_odds(odds):
     if odds>0:
         return (100/(odds+100))*100
 
-def _retrieve_odds():
+def retrieve_odds():
+    # odds_team_mapping = {
+    # 'Cleveland Indians' : 'Indians',
+    # 'St. Louis Cardinals' : 'Cardinals',
+    # 'Minnesota Twins' : 'Twins',
+    # 'Detroit Tigers' : 'Tigers',
+    # 'Boston Red Sox' : 'Red Sox',
+    # 'Toronto Blue Jays' : 'Blue Jays',
+    # 'Seattle Mariners' : 'Mariners',
+    # 'Houston Astros' : 'Astros',
+    # 'San Diego Padres' : 'Padres',
+    # 'Oakland Athletics' : 'Athletics',
+    # 'Baltimore Orioles' : 'Orioles',
+    # 'Miami Marlins' : 'Marlins',
+    # 'Philadelphia Phillies' : 'Phillies',
+    # 'Washington Nationals' : 'Nationals',
+    # 'New York Mets' : 'Mets',
+    # 'Atlanta Braves' : 'Braves',
+    # 'Tampa Bay Rays' : 'Rays',
+    # 'New York Yankees' : 'Yankees',
+    # 'Texas Rangers' : 'Rangers',
+    # 'Arizona Diamondbacks' : 'Diamondbacks',
+    # 'Chicago Cubs' : 'Cubs',
+    # 'Cincinnati Reds' : 'Reds',
+    # 'Kansas City Royals' : 'Royals',
+    # 'Chicago White Sox' : 'White Sox',
+    # 'Los Angeles Angels' : 'Angels',
+    # 'Colorado Rockies' : 'Rockies',
+    # 'San Francisco Giants' : 'Giants',
+    # 'Los Angeles Dodgers' : 'Dodgers',
+    # 'Milwaukee Brewers' : 'Brewers',
+    # 'Pittsburgh Pirates' : 'Pirates'
+    # }
+    # regex_ml = r'[+-]\d+'
+    # regex_team = r'(\D+\w\D+)+'
+    # odds = pd.read_html('https://sports.yahoo.com/mlb/odds/')
+    # del odds[-1]
+    # odds_df = pd.DataFrame(columns = ['Home_Team', 'Away_Team', 'Home_Odds', 'Away_Odds'])
+    # for game in odds:
+    #     try:
+    #         ml_home = float(re.findall(regex_ml, game.iloc[1,1])[-1])
+    #     except:
+    #         ml_home = 'NaN'
+    #     try:
+    #         ml_away = float(re.findall(regex_ml, game.iloc[0,1])[-1])
+    #     except:
+    #         ml_away = 'NaN'
+    #     home_team = re.findall(regex_team, game.iloc[1,0])[0]
+    #     away_team = re.findall(regex_team, game.iloc[0,0])[0]
+    #     to_append = [home_team, away_team, ml_home, ml_away]
+    #     append = pd.Series(to_append, index = odds_df.columns)
+    #     odds_df = odds_df.append(append, ignore_index = True)
+    # odds_df['Home_Odds'] = odds_df.Home_Odds.apply(float)
+    # odds_df['Away_Odds'] = odds_df.Away_Odds.apply(float)
+    # odds_df['Home_Prob'] = odds_df.Home_Odds.apply(_calculate_odds)
+    # odds_df['Away_Prob'] = odds_df.Away_Odds.apply(_calculate_odds)
+    # odds_df['Home_Team'] = odds_df.Home_Team.apply(lambda x: odds_team_mapping[x])
+    # odds_df['Away_Team'] = odds_df.Away_Team.apply(lambda x: odds_team_mapping[x])
+    # return odds_df
+    tables = pd.read_html('https://www.actionnetwork.com/mlb/odds')
+    odds = tables[0]
     odds_team_mapping = {
-    'Cleveland Indians' : 'Indians',
-    'St. Louis Cardinals' : 'Cardinals',
-    'Minnesota Twins' : 'Twins',
-    'Detroit Tigers' : 'Tigers',
-    'Boston Red Sox' : 'Red Sox',
-    'Toronto Blue Jays' : 'Blue Jays',
-    'Seattle Mariners' : 'Mariners',
-    'Houston Astros' : 'Astros',
-    'San Diego Padres' : 'Padres',
-    'Oakland Athletics' : 'Athletics',
-    'Baltimore Orioles' : 'Orioles',
-    'Miami Marlins' : 'Marlins',
-    'Philadelphia Phillies' : 'Phillies',
-    'Washington Nationals' : 'Nationals',
-    'New York Mets' : 'Mets',
-    'Atlanta Braves' : 'Braves',
-    'Tampa Bay Rays' : 'Rays',
-    'New York Yankees' : 'Yankees',
-    'Texas Rangers' : 'Rangers',
-    'Arizona Diamondbacks' : 'Diamondbacks',
-    'Chicago Cubs' : 'Cubs',
-    'Cincinnati Reds' : 'Reds',
-    'Kansas City Royals' : 'Royals',
-    'Chicago White Sox' : 'White Sox',
-    'Los Angeles Angels' : 'Angels',
-    'Colorado Rockies' : 'Rockies',
-    'San Francisco Giants' : 'Giants',
-    'Los Angeles Dodgers' : 'Dodgers',
-    'Milwaukee Brewers' : 'Brewers',
-    'Pittsburgh Pirates' : 'Pirates'
+    'CHC' : 'Cubs',
+    'STL' : 'Cardinals',
+    'MIN' : 'Twins',
+    'DET' : 'Tigers',
+    'BOS' : 'Red Sox',
+    'TOR' : 'Blue Jays',
+    'SEA' : 'Mariners',
+    'HOU' : 'Astros',
+    'SD' : 'Padres',
+    'OAK' : 'Athletics',
+    'BAL' : 'Orioles',
+    'MIA' : 'Marlins',
+    'PHI' : 'Phillies',
+    'WSH' : 'Nationals',
+    'NYM' : 'Mets',
+    'ATL' : 'Braves',
+    'TB' : 'Rays',
+    'NYY' : 'Yankees',
+    'TEX' : 'Rangers',
+    'ARI' : 'Diamondbacks',
+    'CHC' : 'Cubs',
+    'CIN' : 'Reds',
+    'KC' : 'Royals',
+    'CWS' : 'White Sox',
+    'LAA' : 'Angels',
+    'COL' : 'Rockies',
+    'SF' : 'Giants',
+    'LAD' : 'Dodgers',
+    'MIL' : 'Brewers',
+    'PIT' : 'Pirates',
+    'CLE' : 'Indians'
     }
-    regex_ml = r'[+-]\d+'
-    regex_team = r'(\D+\w\D+)+'
-    odds = pd.read_html('https://sports.yahoo.com/mlb/odds/')
-    del odds[-1]
+    team_regex = r'[A-Z]{2,3}'
     odds_df = pd.DataFrame(columns = ['Home_Team', 'Away_Team', 'Home_Odds', 'Away_Odds'])
-    for game in odds:
+    for index, row in odds.iterrows():
+        teams = re.findall(team_regex, row.Scheduled)
+        away_team = teams[1]
+        home_team = teams[2]
+        ml_string = row['Unnamed: 2']
+        ml_away = ml_string[11:15]
+        ml_home = ml_string[-6:-2]
         try:
-            ml_home = float(re.findall(regex_ml, game.iloc[1,1])[-1])
+            ml_away = float(ml_away)
         except:
-            ml_home = 'NaN'
+            continue
         try:
-            ml_away = float(re.findall(regex_ml, game.iloc[0,1])[-1])
+            ml_home = float(ml_home)
         except:
-            ml_away = 'NaN'
-        home_team = re.findall(regex_team, game.iloc[1,0])[0]
-        away_team = re.findall(regex_team, game.iloc[0,0])[0]
+            continue
         to_append = [home_team, away_team, ml_home, ml_away]
         append = pd.Series(to_append, index = odds_df.columns)
         odds_df = odds_df.append(append, ignore_index = True)
-    odds_df['Home_Odds'] = odds_df.Home_Odds.apply(float)
-    odds_df['Away_Odds'] = odds_df.Away_Odds.apply(float)
     odds_df['Home_Prob'] = odds_df.Home_Odds.apply(_calculate_odds)
     odds_df['Away_Prob'] = odds_df.Away_Odds.apply(_calculate_odds)
     odds_df['Home_Team'] = odds_df.Home_Team.apply(lambda x: odds_team_mapping[x])
@@ -123,7 +184,7 @@ def _retrieve_538():
     final_538['Home_Team'] = final_538['Home_Team'].apply(lambda x: fivethirtyeight_team_mapping[x])
     final_538['Date'] = final_538.Date.apply(lambda x: re.findall(regex,x))
     final_538['Date'] = final_538.Date.apply(lambda x: x[0])
-    final_538['Date'] = '0' + final_538.Date
+    final_538['Date'] = pd.to_datetime(final_538.Date, format = '%m/%d')
     return final_538
 
 def _retrieve_athletic():
@@ -166,8 +227,25 @@ def _retrieve_athletic():
     options.add_argument("--start-maximized")
     options.add_argument('--disable-web-security')
     options.add_argument('--allow-running-insecure-content')
-    browser = webdriver.Chrome(executable_path = "../chromedriver", options = options)
+    browser = webdriver.Chrome(ChromeDriverManager().install())
     browser.get(url)
+    log_in = browser.find_element_by_xpath("//*[@id='navbar-top']/div/div/div/div[3]/div/a[1]")
+    log_in.click()
+    time.sleep(0.25)
+    log_in_email = browser.find_element_by_xpath("//*[@id='email-login-button']")
+    log_in_email.click()
+    time.sleep(0.25)
+    email = browser.find_element_by_xpath("//*[@id='email-login-form']/div[2]/input")
+    email.click()
+    time.sleep(0.25)
+    email.send_keys('singerfam1@gmail.com')
+    password = browser.find_element_by_xpath("//*[@id='email-login-form']/div[3]/input")
+    password.click()
+    time.sleep(0.25)
+    password.send_keys('Tredwell01!')
+    log_in = browser.find_element_by_xpath("//*[@id='email-login-form']/button")
+    log_in.click()
+    time.sleep(0.5)
     html = browser.page_source.encode('utf-8')
     soup = BeautifulSoup(html, 'lxml')
     tables = pd.read_html(html)
@@ -189,6 +267,7 @@ def _retrieve_athletic():
     final_athletic = final_athletic[['DATE_x','Home_Team_x', 'Away_Team_x', 'THE BAT XWIN%_x', 'THE BAT XWIN%_y']]
     final_athletic.columns = ['Date','Away_Team', 'Home_Team', 'Away_Prob', 'Home_Prob']
     browser.quit()
+    final_athletic['Date'] = pd.to_datetime(final_athletic.Date, format = "%m/%d")
     return final_athletic
 
 def retrieve_external_data(file_path = 'data/external_data.csv'):
@@ -202,17 +281,39 @@ def retrieve_external_data(file_path = 'data/external_data.csv'):
     merged = pd.merge(_retrieve_athletic(), _retrieve_538(), on = ['Home_Team', 'Away_Team', 'Date'], how = 'inner')
     merged.columns = ['Date', 'Away_Team', 'Home_Team','Away_Prob_Athletic', 'Home_Prob_Athletic', 'Away_Prob_538', 
                     'Home_Prob_538']
-    final = pd.merge(_retrieve_odds(), merged, on = ['Home_Team', 'Away_Team'], how = 'inner')
+    final = pd.merge(retrieve_odds(), merged, on = ['Home_Team', 'Away_Team'], how = 'inner')
     final.drop(['Home_Odds', 'Away_Odds'], axis = 1, inplace = True)
     final = final[['Date', 'Away_Team', 'Home_Team','Away_Prob_Athletic', 'Home_Prob_Athletic',
                 'Away_Prob_538', 'Home_Prob_538', 'Away_Prob', 'Home_Prob']]
     final.columns = ['Date', 'Away_Team', 'Home_Team','Away_Prob_Athletic', 'Home_Prob_Athletic', 'Away_Prob_538', 
                     'Home_Prob_538', 'Away_Prob_Implied', 'Home_Prob_Implied']
+    final['Date'] = dt.date.today()
+    final.dropna(inplace = True)
+    odds = retrieve_odds()
+    merged = pd.merge(final, odds, on = ['Home_Team', 'Away_Team'], how = 'inner')
+    merged = merged[['Date', 'Away_Team', 'Home_Team', 'Away_Prob_Athletic', 'Home_Prob_Athletic', 'Away_Prob_538', 
+    'Home_Prob_538', 'Home_Odds', 'Away_Odds', 'Home_Prob', 'Away_Prob']]
+    merged.columns = ['Date', 'Away_Team', 'Home_Team','Away_Prob_Athletic', 'Home_Prob_Athletic', 'Away_Prob_538', 
+                        'Home_Prob_538', 'Home_ML', 'Away_ML', 'Home_Prob_Implied', 'Away_Prob_Implied']
+    merged['Away_Prob_Athletic'] = merged.Away_Prob_Athletic.str.strip('%')
+    merged['Away_Prob_Athletic'] = merged.Away_Prob_Athletic.astype(float)
+    merged['Away_Prob_Athletic'] = merged.Away_Prob_Athletic/100
+    merged['Home_Prob_Athletic'] = merged.Home_Prob_Athletic.str.strip('%')
+    merged['Home_Prob_Athletic'] = merged.Home_Prob_Athletic.astype(float)
+    merged['Home_Prob_Athletic'] = merged.Home_Prob_Athletic/100
+    merged['Away_Prob_538'] = merged.Away_Prob_538.str.strip('%')
+    merged['Away_Prob_538'] = merged.Away_Prob_538.astype(float)
+    merged['Away_Prob_538'] = merged.Away_Prob_538/100
+    merged['Home_Prob_538'] = merged.Home_Prob_538.str.strip('%')
+    merged['Home_Prob_538'] = merged.Home_Prob_538.astype(float)
+    merged['Home_Prob_538'] = merged.Home_Prob_538/100
+    merged['Away_Prob_Implied'] = merged.Away_Prob_Implied/100
+    merged['Home_Prob_Implied'] = merged.Home_Prob_Implied/100
     if file_path is not None:
         with open(file_path, "w") as f:
-            final.to_csv(f)
+            merged.to_csv(f)
 
-    return final
+    return merged
 
 def load_external_data(file_path = 'data/external_data.csv'):
     """Loads external data table from a given file

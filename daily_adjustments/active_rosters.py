@@ -96,7 +96,6 @@ teams = [
     }
 ]
 
-
 def _retrieve_team_active_roster(team_id):
     '''
     Gets the ~25 man active roster for a specific MLB team. Should not be used outside this file
@@ -125,6 +124,8 @@ def retrieve_all_active_rosters(file_name="data/active_rosters.json"):
     Returns: 
         - A array of dictionaries where each element holds the team name and roster
     '''
+
+    # Iterating through teams list to create team name and active roster for each team, stored as dictionary
     active_rosters = []
     for team in teams:
         active_rosters.append({
@@ -132,6 +133,7 @@ def retrieve_all_active_rosters(file_name="data/active_rosters.json"):
             'team_roster': _retrieve_team_active_roster(team['team_id'])
         })
 
+    # Saves results to a json file in the data folder by default
     if file_name is not None:
         with open(file_name, "w") as f:
             f.write(json.dumps(active_rosters, indent=2))

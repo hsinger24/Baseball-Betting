@@ -82,6 +82,17 @@ def calculate_final_preseason_war_change(pecota_projected_war_table, previous_ye
     return final_WAR_table
 
 def calculate_win_percentage_predictions(cluster_luck_table, final_preseason_war_projections, file_name=False):
+    """A function that produces a DataFrame with each team's projected win percentage for the upcoming year
+
+    Args:
+        cluster_luck_table: The result of merge_cluster_luck_tables()
+        final_preseason_war_projections: 
+        file_name: Place to save the file. Defaults to none
+
+    Returns:
+        DF with final preseason win % projections
+    """
+    
     current_year = dt.date.today().year
     # merge tables
     table = pd.merge(cluster_luck_table, final_preseason_war_projections, on='Team')

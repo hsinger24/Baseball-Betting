@@ -1,10 +1,18 @@
-1. Make SP adjustments
-    1. Fix SP adjustment function so we don't call BP function a second time
-        1. Solution: once a day get the big boi player data, including name, team, WARP, GS and H/P. Save the df in the data folder and load in when necesary
-2. Make active roster adjustments
-3. Create final configuration
-    1. Things we need to do once vs. daily
-    2. What our daily output will look like
-    3. Need to save results in some way where we have data on performance
-    4. How to incorporate the other models we've scraped?
+To do:
+
+1. Check new method of roster adjustments 
+    1. Consider new method for percent season for pitchers
+2. Fix aspects of final recommendations
+    1. Fix postponed games in external results (Check)
+    2. WHERE TO INCORPORATE ACTIVE ROSTER ADJUSTMENT?
+        1. Might need to wait until next year... good chance issue lies b/c of timing of preseason projections
+3. Go through and create comments for all code and functions   
+    1. Everything in daily adjustments folder and run_daily files
+
+Remember to check:
+
+1. rotations so GS can be updated for players whose names don't match
+
+Issues:
+
 
