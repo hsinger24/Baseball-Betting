@@ -5,7 +5,7 @@ To do:
 2. Fix aspects of final recommendations
     1. Fix postponed games in external results (Check)
     2. WHERE TO INCORPORATE ACTIVE ROSTER ADJUSTMENT?
-    3. Automate capital for a given day (Check)
+        1. Might need to wait until next year... good chance issue lies b/c of timing of preseason projections
 3. Go through and create comments for all code and functions   
     1. Everything in daily adjustments folder and run_daily files
 

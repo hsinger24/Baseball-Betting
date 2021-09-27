@@ -217,7 +217,7 @@ def calculate_active_roster_war_table(active_rosters, overall_war_predictions_pr
     
     # Iteration through for each team
     for team_dict in active_rosters:
-        team_table = pd.DataFrame(columns = ['Name', 'WAR', 'WAR_Proj'])
+        team_table = pd.DataFrame(columns = ['Name', 'WAR'])
         team = team_dict['team_name']
         roster = team_dict['team_roster']
         
@@ -234,86 +234,81 @@ def calculate_active_roster_war_table(active_rosters, overall_war_predictions_pr
                 current_year_war = curr_year_WAR_BP[curr_year_WAR_BP.Name == player['name'].values[0]].iloc[0,1]
                 if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name'].values[0], 'Position'].values[0] == 'P':
                     position = 'P'
-                    gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name'].values[0]].iloc[0,4]
+                    gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name'].values[0]].iloc[0,2]
+                    games = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name'].values[0]].iloc[0,4]
+                    season_pct = frac_season
                 if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name'].values[0], 'Position'].values[0] == 'H':
                     position = 'H'
                     gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name'].values[0]].iloc[0,3]
+                    season_pct = gs/162.0
             except:
                 try:
                     current_year_war = curr_year_WAR_BP[curr_year_WAR_BP.Name == player['name_wo_a'].values[0]].iloc[0,1]
                     if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_wo_a'].values[0], 'Position'].values[0] == 'P':
                         position = 'P'
-                        gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_wo_a'].values[0]].iloc[0,4]
+                        gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_wo_a'].values[0]].iloc[0,2]
+                        games = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_wo_a'].values[0]].iloc[0,4]
+                        season_pct = frac_season
                     if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_wo_a'].values[0], 'Position'].values[0] == 'H':
                         position = 'H'
                         gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_wo_a'].values[0]].iloc[0,3]
+                        season_pct = gs/162.0
                 except:
                     try:
                         current_year_war = curr_year_WAR_BP[curr_year_WAR_BP.Name == player['name_alt_1'].values[0]].iloc[0,1]
                         if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_alt_1'].values[0], 'Position'].values[0] == 'P':
                             position = 'P'
-                            gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_1'].values[0]].iloc[0,4]
+                            gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_1'].values[0]].iloc[0,2]
+                            games = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_1'].values[0]].iloc[0,4]
+                            season_pct = frac_season
                         if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_alt_1'].values[0], 'Position'].values[0] == 'H':
                             position = 'H'
                             gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_1'].values[0]].iloc[0,3]
+                            season_pct = gs/162.0
                     except:
                         try:
                             current_year_war = curr_year_WAR_BP[curr_year_WAR_BP.Name == player['name_alt_2'].values[0]].iloc[0,1]
                             if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_alt_2'].values[0], 'Position'].values[0] == 'P':
                                 position = 'P'
-                                gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_2'].values[0]].iloc[0,4]
+                                gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_2'].values[0]].iloc[0,2]
+                                games = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_2'].values[0]].iloc[0,4]
+                                season_pct = frac_season
                             if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_alt_2'].values[0], 'Position'].values[0] == 'H':
                                 position = 'H'
                                 gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_2'].values[0]].iloc[0,3]
+                                season_pct = gs/162.0
                         except:
                             try:
                                 current_year_war = curr_year_WAR_BP[curr_year_WAR_BP.Name == player['name_alt_3'].values[0]].iloc[0,1]
                                 if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_alt_3'].values[0], 'Position'].values[0] == 'P':
                                     position = 'P'
-                                    gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_3'].values[0]].iloc[0,4]
+                                    gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_3'].values[0]].iloc[0,2]
+                                    games = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_3'].values[0]].iloc[0,4]
+                                    season_pct = frac_season
                                 if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_alt_3'].values[0], 'Position'].values[0] == 'H':
                                     position = 'H'
                                     gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_3'].values[0]].iloc[0,3]
+                                    season_pct = gs/162.0
                             except:
                                 try:
                                     current_year_war = curr_year_WAR_BP[curr_year_WAR_BP.Name == player['name_alt_4'].values[0]].iloc[0,1]
                                     if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_alt_4'].values[0], 'Position'].values[0] == 'P':
                                         position = 'P'
-                                        gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_4'].values[0]].iloc[0,4]
+                                        gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_4'].values[0]].iloc[0,2]
+                                        games = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_4'].values[0]].iloc[0,4]
+                                        season_pct = frac_season
                                     if curr_year_WAR_BP.loc[curr_year_WAR_BP.Name == player['name_alt_4'].values[0], 'Position'].values[0] == 'H':
                                         position = 'H'
                                         gs = curr_year_WAR_BP[curr_year_WAR_BP.Name==player['name_alt_4'].values[0]].iloc[0,3]
+                                        season_pct = gs/162.0
                                 except:
                                     failed_to_find_players.append(player_name + 'BP')
                                     current_year_war = 0
                                     gs = 0
+                                    games = 0
+                                    season_pct = frac_season
 
-            # Adjusting WAR for injured players/players recently called up
-            if position is not None:
-                try:
-                    if position == 'H':
-                        if (frac_season>=0.25) & (frac_season<0.5) & (gs<20):
-                            current_year_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
-                        if (frac_season>=0.50) & (frac_season<0.75) & (gs<40):
-                            current_year_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
-                        if (frac_season>=0.75) & (gs<70):
-                            current_year_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
-                except:
-                    current_year_war = 0
-                try:
-                    if position == 'P':
-                        if (frac_season>=0.25) & (frac_season<0.5) & (gs<3):
-                            current_year_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
-                        if (frac_season>=0.50) & (frac_season<0.75) & (gs<6):
-                            current_year_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
-                        if (frac_season>=0.75) & (gs<10):
-                            current_year_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
-                except:
-                    current_year_war = 0
-            if position is None:
-                current_year_war = 0
-            
-            # Getting projected WAR for player
+            # Getting projected WAR for each player
             try:
                 projected_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
             except:
@@ -335,17 +330,64 @@ def calculate_active_roster_war_table(active_rosters, overall_war_predictions_pr
                                     failed_to_find_players.append(player_name + 'Pecota')
                                     projected_war = 0
             
+             # Adjusting WAR for injured players/players recently called up
+            if position is not None:
+            #     try:
+            #         if position == 'H':
+            #             if (frac_season>=0.25) & (frac_season<0.5) & (gs<20):
+            #                 current_year_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
+            #             if (frac_season>=0.50) & (frac_season<0.75) & (gs<40):
+            #                 current_year_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
+            #             if (frac_season>=0.75) & (gs<70):
+            #                 current_year_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
+            #     except:
+            #         current_year_war = 0
+                try:
+                    if position == 'P':
+                        # if (frac_season>=0.25) & (frac_season<0.5) & (gs<3):
+                        #     current_year_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
+                        # if (frac_season>=0.50) & (frac_season<0.75) & (gs<6):
+                        #     current_year_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
+                        # if (frac_season>=0.75) & (gs<10):
+                        #     current_year_war = pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0]
+                        if (float(gs)/float(games)) > 0.5:
+                            if float(games)/frac_season < 0.125:
+                                current_year_war = (pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0])*season_pct
+                        else:
+                            if float(games)/frac_season < 0.2:
+                                current_year_war = (pecota_table[pecota_table['name'] == player['name'].values[0]]['war_162'].iloc[0])*season_pct
+                except:
+                    current_year_war = 0
+            if position is None:
+                current_year_war = 0
+            
+            # Getting current year WAR for each player
+            if position is not None:
+                if position == 'H':
+                    if frac_season >= 0.25:
+                        WAR = (1.0 - season_pct)*projected_war + current_year_war
+                    else:
+                        WAR = projected_war
+                if position == 'P':
+                    if frac_season>=0.25:
+                        WAR = (1.0-season_pct)*projected_war + current_year_war
+                    else:
+                        WAR = projected_war
+            if position is None:
+                WAR = 0
+
             # Appending player's data
-            player_series = pd.Series([player_name, current_year_war, projected_war], index = team_table.columns)
+            #player_series = pd.Series([player_name, current_year_war, projected_war], index = team_table.columns)
+            player_series = pd.Series([player_name, WAR], index = team_table.columns)
             team_table = team_table.append(player_series, ignore_index = True)
-        
         # Finding team's total WAR based on fraction of season
-        active_roster_total_war_current = team_table.WAR.sum()
-        active_roster_total_war_proj = team_table.WAR_Proj.sum()
-        if frac_season>0.25:
-            active_roster_war = active_roster_total_war_proj*(1.0-frac_season) + active_roster_total_war_current
-        else:
-            active_roster_war = active_roster_total_war_proj
+        # active_roster_total_war_current = team_table.WAR.sum()
+        # active_roster_total_war_proj = team_table.WAR_Proj.sum()
+        # if frac_season>0.25:
+        #     active_roster_war = active_roster_total_war_proj*(1.0-frac_season) + active_roster_total_war_current
+        # else:
+        #     active_roster_war = active_roster_total_war_proj
+        active_roster_war = team_table.WAR.sum()
         preseason_war_proj = overall_war_predictions_preseason.loc[overall_war_predictions_preseason.Team==team, str(current_year)].values[0]
         team_series = pd.Series([team, active_roster_war, preseason_war_proj], index = active_roster_war_table.columns)
         active_roster_war_table = active_roster_war_table.append(team_series, ignore_index = True)
