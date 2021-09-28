@@ -2,6 +2,11 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import requests
 import datetime as dt
+import email, smtplib, ssl
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 from war_functions.pecota_tables import *
 
@@ -18,9 +23,8 @@ from daily_adjustments.adjusted_war_today import *
 from odds_and_other_projections import *
 
 ######### DELETING BETS ##########
-bets_today = pd.read_csv('past_bets/base/bets_20210926.csv', index_col = 0)
-bets_today.drop([4,10], axis = 0, inplace = True)
+bets_today = pd.read_csv('past_bets/base/bets_20210928.csv', index_col = 0)
+bets_today.drop([1,10], axis = 0, inplace = True)
 bets_today.reset_index(inplace = True, drop = True)
-bets_today.to_csv('past_bets/base/bets_20210926.csv')
-
+bets_today.to_csv('past_bets/base/bets_20210928.csv')
 

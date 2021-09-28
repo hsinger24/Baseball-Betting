@@ -1,6 +1,7 @@
 ########## IMPORTS AND NECESSARY PARAMETERS ##########
 import pandas as pd
 import datetime as dt
+import smtplib, ssl
 team_map = {
     'Giants' : 'San Francisco Giants',
     'Astros' : 'Houston Astros',
@@ -134,9 +135,8 @@ def calculate_yesterdays_bets_results(yesterday_string, yesterdays_capital):
     return yesterdays_bets
 
 yesterdays_bets = calculate_yesterdays_bets_results(yesterday_string = yesterday_string, yesterdays_capital = yesterdays_capital)
-results_tracker_base = pd.read_csv('results_tracker/results_tracker_base.csv')
-results_tracker_base = results_tracker_base.append(yesterdays_bets)
-results_tracker_base.to_csv('results_tracker/results_tracker_base.csv')
+results = results.append(yesterdays_bets)
+results.to_csv('results_tracker/results_tracker_base.csv')
 
 ########## RUN DAILY TO CALCULATE YESTERDAYS RESULTS AND UPDATE TRACKER FOR EXTERNAL MODELS ##########
 
@@ -317,6 +317,26 @@ def calculate_yesterdays_bets_results_external(yesterday_string, yesterdays_capi
 yesterdays_bets = calculate_yesterdays_bets_results_external(yesterday_string = yesterday_string, 
     yesterdays_capital_athletic = yesterdays_capital_athletic, yesterdays_capital_538 = yesterdays_capital_538,
     yesterdays_capital_combined =  yesterdays_capital_combined)
-results_tracker_external = pd.read_csv('results_tracker/results_tracker_external.csv')
-results_tracker_external = results_tracker_external.append(yesterdays_bets)
-results_tracker_external.to_csv('results_tracker/results_tracker_external.csv')
+results_external = results_external.append(yesterdays_bets)
+results_external.to_csv('results_tracker/results_tracker_external.csv')
+
+
+########## SENDING EMAIL CONFIRMING RESULTS RAN ##########
+
+def send_results_email():
+    password = 'Hphs2174059'
+    port = 465
+    context = ssl.create_default_context()
+    smtp_server = "smtp.gmail.com"
+    sender_email = "hsingerautomated@gmail.com"  # Enter your address
+    receiver_email = "henrysinger24@gmail.com"  # Enter receiver address
+    message = """\
+    Subject: Hi there
+
+    Your results were calculated for yesterday's bets."""
+    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message)
+    return
+
+send_results_email()
