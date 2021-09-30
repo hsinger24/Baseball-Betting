@@ -2,6 +2,7 @@ To do:
 
 1. Check new method of roster adjustments 
     1. Consider new method for percent season for pitchers
+    2. Check .0001 thing
 2. Fix aspects of final recommendations
     1. Fix postponed games in external results (Check)
     2. WHERE TO INCORPORATE ACTIVE ROSTER ADJUSTMENT?
