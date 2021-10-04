@@ -23,8 +23,8 @@ from daily_adjustments.adjusted_war_today import *
 from odds_and_other_projections import *
 
 ######### DELETING BETS ##########
-bets_today = pd.read_csv('past_bets/base/bets_20211001.csv', index_col = 0)
-bets_today.drop([2,3,8,10], axis = 0, inplace = True)
+bets_today = pd.read_csv('past_bets/base/bets_20211003.csv', index_col = 0)
+bets_today.drop([1,7,12], axis = 0, inplace = True)
 bets_today.reset_index(inplace = True, drop = True)
-bets_today.to_csv('past_bets/base/bets_20211001.csv')
+bets_today.to_csv('past_bets/base/bets_20211003.csv')
 
