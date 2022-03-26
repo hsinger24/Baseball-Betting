@@ -16,6 +16,7 @@ team_map = {
     'LAD': 'Dodgers',
     'SD': 'Padres',
     'CWS': 'White Sox',
+    'CHW': 'White Sox',
     'MIN': 'Twins',
     'CLE': 'Indians',
     'OAK': 'Athletics',
@@ -39,6 +40,7 @@ team_map = {
     'BOS': 'Red Sox',
     'ARI': 'Diamondbacks',
     'WSH': 'Nationals',
+    'WAS': 'Nationals',
     'COL': 'Rockies',
     'MIA': 'Marlins',
     'PIT': 'Pirates',
@@ -162,7 +164,7 @@ def _retrieve_historical_player_war_tables(driver, year=None):
                 table_dict[team_name] = pd.DataFrame(columns = player_table.columns)
                 table_dict[team_name] = player_table
 
-            print(team_name)
+            # print(team_name)
 
             # Unclick the team
             team_filter.click()
@@ -269,8 +271,7 @@ def retrieve_previous_year_war_table(previous_year, file_path="data/historical_w
 
     # Saves file to specified location
     if file_path is not None:
-        with open(file_path, "w") as f:
-            grouped.to_csv(f)
+        grouped.to_csv(file_path)
 
     return grouped
 
