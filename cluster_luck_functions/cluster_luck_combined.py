@@ -41,8 +41,7 @@ def merge_cluster_luck_tables(hitting_table, pitching_table, file_name=None):
 
     # Write data to specific file location
     if file_name is not None:
-        with open(file_name, 'w') as f:
-            cluster_final.to_csv(f)
+        cluster_final.to_csv(file_name)
 
     return cluster_final
 
