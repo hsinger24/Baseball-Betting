@@ -106,8 +106,7 @@ def retrieve_historical_pitching_tables(years, file_name="data/historical_cluste
 
     # Saving file to CSV in data folder (by default)
     if file_name is not None:
-        with open(file_name, 'w') as f:
-            pitching_data.to_csv(f)
+        pitching_data.to_csv(file_name)
     
     
     return pitching_data
@@ -145,7 +144,7 @@ def calculate_and_save_pitching_linear_regression(previous_three_years_table, fi
 
     return linear_regression
 
-def calculate_predicted_cluster_luck_run_adjustment_pitching(linear_regression, pitching_data, file_name=None, gp=162):
+def calculate_predicted_cluster_luck_run_adjustment_pitching(linear_regression, pitching_data, gp=162):
     '''
     Calculate CL adjustment
     Params:
@@ -165,10 +164,5 @@ def calculate_predicted_cluster_luck_run_adjustment_pitching(linear_regression, 
     pitching_data['R'] = pitching_data.RPG*gp
     pitching_data['run_adjust'] = (
         (pitching_data['predict'] - pitching_data['HPR']) / pitching_data['HPR'])*pitching_data['R']
-
-    # Saving results to data folder
-    if file_name is not None:
-        with open(file_name, 'w') as f:
-            pitching_data.to_csv(f)
 
     return pitching_data
