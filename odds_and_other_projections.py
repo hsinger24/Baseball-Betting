@@ -140,7 +140,7 @@ def _retrieve_538():
     'SEAMariners' : 'Mariners'
     }
     regex = r'\d+/\d+'
-    tables = pd.read_html('https://projects.fivethirtyeight.com/2021-mlb-predictions/games/')
+    tables = pd.read_html(f'https://projects.fivethirtyeight.com/{dt.date.today().year}-mlb-predictions/games/')
     fivethirtyeight = tables[0][['Date', 'Team', 'Win prob.Chance of winning']]
     fivethirtyeight.columns = ['Date', 'Team', 'Win Probability']
     fivethirtyeight.head()

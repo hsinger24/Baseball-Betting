@@ -35,6 +35,7 @@ team_map = {
     'Diamondbacks': 'Arizona Diamondbacks',
     'D-backs' : 'Arizona Diamondbacks'
 }
+
 today = dt.date.today()
 yesterday = today - dt.timedelta(days=1)
 yesterday_string = str(yesterday)
