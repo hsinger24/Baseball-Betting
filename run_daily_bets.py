@@ -44,7 +44,7 @@ team_map = {
     'Cardinals': 'St. Louis Cardinals',
     'Tigers': 'Detroit Tigers',
     'Cubs': 'Chicago Cubs',
-    'Indians': 'Cleveland Indians',
+    'Indians': 'Cleveland Guardians',
     'Nationals': 'Washington Nationals',
     'Rockies': 'Colorado Rockies',
     'Marlins': 'Miami Marlins',
@@ -56,10 +56,11 @@ team_map = {
     'Diamondbacks': 'Arizona Diamondbacks',
     'D-backs' : 'Arizona Diamondbacks'
 }
+
 ########## SETTING NECESSARY PARAMETERS ##########
 
 frac_season = float(input('Hank, please input the fraction of the season as a decimal: '))
-current_year = 2020
+current_year = dt.date.today().year
 results = pd.read_csv('results_tracker/results_tracker_base.csv')
 results_external = pd.read_csv('results_tracker/results_tracker_external.csv')
 capital = float(results.loc[len(results)-1, 'Money_Tracker'])
@@ -103,7 +104,7 @@ def _calculate_current_run_differential():
     return merged
 
 def _retrieve_current_cluster_luck_hitting():
-    current_year_hitting = retrieve_historical_hitting_tables(2021, file_name = None)
+    current_year_hitting = retrieve_historical_hitting_tables(current_year, file_name = None)
     hitting_reg = load_linear_regression("data/hitting_regression.pickle")
     cluster_luck_hitting = calculate_predicted_cluster_luck_run_adjustment_hitting(hitting_reg, current_year_hitting)
     cluster_luck_hitting = cluster_luck_hitting[['Team', 'GP', 'run_adjust']]
@@ -134,7 +135,6 @@ def _calculate_cl_with_differential():
     return merged
 
 current_run_differential = _calculate_cl_with_differential()
-#print(current_run_differential)
 
 ########## MAKING WAR ADJUSTMENTS FOR ACTIVE ROSTER AND STARTING ROTATION ##########
 
@@ -145,7 +145,6 @@ print(sp_adjustments)
 overall_war_predictions_preseason = pd.read_csv('data/overall_war_predictions_preseason.csv')
 active_roster_war, failed_to_find_players = calculate_active_roster_war_table(active_rosters, overall_war_predictions_preseason, current_year_WAR, pt, current_year, frac_season)
 print(failed_to_find_players)
-print(active_roster_war)
 
 ########## COMBINING ALL INPUTS TO GET TODAY'S WIN PERCENTAGE FOR EACH TEAM ##########
 

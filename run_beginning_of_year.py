@@ -12,8 +12,7 @@ from war_functions.pecota_tables import *
 from war_functions.preseason_war_projections import *
 from war_functions.preseason_win_percentage import *
 
-#current_year = dt.date.today()
-current_year = 2020
+current_year = dt.date.today().year
 
 # ########## ACTIVE ROSTER BEGINNING OF YEAR ##########
 

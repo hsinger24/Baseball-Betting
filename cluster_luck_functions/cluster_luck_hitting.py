@@ -1,8 +1,6 @@
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 import pickle
-from typing import Union
-
 
 _team_map = {
     'New York Mets' : 'Mets',
@@ -28,6 +26,7 @@ _team_map = {
     'Tampa Bay Rays': 'Rays',
     'St. Louis Cardinals': 'Cardinals',
     'Cleveland Indians': 'Indians',
+    'Cleveland Guardians' : 'Guardians',
     'Seattle Mariners': 'Mariners',
     'Oakland Athletics': 'Athletics',
     'Milwaukee Brewers': 'Brewers',

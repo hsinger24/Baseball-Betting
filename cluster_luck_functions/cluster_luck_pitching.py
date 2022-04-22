@@ -3,7 +3,7 @@ from sklearn.linear_model import LinearRegression
 import datetime as dt
 import pickle
 
-_team_map = {
+_team_map_old = {
     'LA Dodgers' : 'Dodgers',
     'Minnesota': 'Twins',
     'Cincinnati': 'Reds',
@@ -36,6 +36,38 @@ _team_map = {
     'Boston': 'Red Sox'
 }
 
+_team_map_new = {
+    'LA Dodgers' : 'Dodgers',
+    'Minnesota': 'Twins',
+    'Cincinnati': 'Reds',
+    'Chi Sox' : 'White Sox',
+    'Milwaukee' : 'Brewers',
+    'Cleveland' : 'Guardians',
+    'St. Louis' : 'Cardinals',
+    'San Diego': 'Padres',
+    'Chi Cubs': 'Cubs',
+    'Tampa Bay': 'Rays',
+    'Atlanta': 'Braves',
+    'Houston': 'Astros',
+    'Oakland': 'Athletics',
+    'SF Giants': 'Giants',
+    'Kansas City': 'Royals',
+    'Pittsburgh': 'Pirates',
+    'Texas': 'Rangers',
+    'NY Yankees': 'Yankees',
+    'Baltimore': 'Orioles',
+    'Seattle': 'Mariners',
+    'LA Angels': 'Angels',
+    'Toronto': 'Blue Jays',
+    'NY Mets': 'Mets',
+    'Miami': 'Marlins',
+    'Arizona': 'Diamondbacks',
+    'Detroit': 'Tigers',
+    'Washington': 'Nationals',
+    'Philadelphia': 'Phillies',
+    'Colorado': 'Rockies',
+    'Boston': 'Red Sox'
+}
 
 def _table_maker(link_list, year):
     '''
@@ -83,7 +115,10 @@ def _retrieve_single_year_pitching_table(year):
     pitching_data = pitching_data.append(_table_maker(links, year))
 
     # Changing team name to be consistent
-    pitching_data.Team = pitching_data.Team.apply(lambda x: _team_map[x])
+    if year < 2022:
+        pitching_data.Team = pitching_data.Team.apply(lambda x: _team_map_old[x])
+    else:
+        pitching_data.Team = pitching_data.Team.apply(lambda x: _team_map_new[x])
     return pitching_data
 
 def retrieve_historical_pitching_tables(years, file_name="data/historical_clusterluck_team_pitching.csv"):

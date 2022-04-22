@@ -16,9 +16,9 @@ def _calculate_odds(odds):
         return (100/(odds+100))*100
 
 def retrieve_odds():
-    tables = pd.read_html('https://www.actionnetwork.com/mlb/odds')
-    odds = tables[0]
-    odds_team_mapping = {
+    
+    # Team map
+    team_map = {
     'CHC' : 'Cubs',
     'STL' : 'Cardinals',
     'MIN' : 'Twins',
@@ -51,15 +51,45 @@ def retrieve_odds():
     'PIT' : 'Pirates',
     'CLE' : 'Indians'
     }
-    team_regex = r'[A-Z]{2,3}'
+
+    # Getting odds table and formatting
+    tables = pd.read_html('https://www.actionnetwork.com/mlb/odds')
+    odds = tables[0]
+    odds = odds.iloc[::2]
+    odds.reset_index(drop = True, inplace = True)
+
+    # Iterating through to get home/away and odds
     odds_df = pd.DataFrame(columns = ['Home_Team', 'Away_Team', 'Home_Odds', 'Away_Odds'])
     for index, row in odds.iterrows():
-        teams = re.findall(team_regex, row.Scheduled)
-        away_team = teams[1]
-        home_team = teams[2]
-        ml_string = row['Unnamed: 4']
-        ml_away = ml_string[11:15]
-        ml_home = ml_string[-6:-2]
+        # Retreiving home and away teams
+        teams = {}
+        for key in team_map.keys():
+            if row.Scheduled.find(key) != -1:
+                teams[row.Scheduled.find(key)] = key
+        keys = []
+        for key in teams.keys():
+            keys.append(key)
+        if keys[0] > keys[1]:
+            home_team = teams[keys[0]]
+            away_team = teams[keys[1]]
+        else:
+            home_team = teams[keys[1]]
+            away_team = teams[keys[0]]
+        # Retreiving odds
+        ml_string = row['Unnamed: 6']
+        if len(ml_string) == 8:
+            ml_away = ml_string[:4]
+            ml_home = ml_string[-4:]
+        if len(ml_string) == 9:
+            if (ml_string[4] == '+') | (ml_string[4]=='-'):
+                ml_away = ml_string[:4]
+                ml_home = ml_string[-5:]
+            else:
+                ml_away = ml_string[:5]
+                ml_home = ml_string[-4:]
+        if len(ml_string) == 10:
+                ml_away = ml_string[:5]
+                ml_home = ml_string[-5:]
         try:
             ml_away = float(ml_away)
         except:
@@ -68,13 +98,12 @@ def retrieve_odds():
             ml_home = float(ml_home)
         except:
             continue
-        to_append = [home_team, away_team, ml_home, ml_away]
-        append = pd.Series(to_append, index = odds_df.columns)
-        odds_df = odds_df.append(append, ignore_index = True)
+        series = pd.Series([home_team, away_team, ml_home, ml_away], index = odds_df.columns)
+        odds_df = odds_df.append(series, ignore_index = True)
     odds_df['Home_Prob'] = odds_df.Home_Odds.apply(_calculate_odds)
     odds_df['Away_Prob'] = odds_df.Away_Odds.apply(_calculate_odds)
-    odds_df['Home_Team'] = odds_df.Home_Team.apply(lambda x: odds_team_mapping[x])
-    odds_df['Away_Team'] = odds_df.Away_Team.apply(lambda x: odds_team_mapping[x])
+    odds_df['Home_Team'] = odds_df.Home_Team.apply(lambda x: team_map[x])
+    odds_df['Away_Team'] = odds_df.Away_Team.apply(lambda x: team_map[x])
     return odds_df
 
 def _retrieve_538():

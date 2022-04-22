@@ -16,9 +16,9 @@ def _load_pecota_hitting_table(file_name='pecota_data/pecota_hitting.csv'):
     hitting_table['war_162'] = (162/hitting_table['g'])*hitting_table['warp']
 
     # Changing players who have infinte WAR for 162 games
-    for i in range(len(hitting_table.warp)):
-        if hitting_table.loc[i, 'g'] == 0:
-            hitting_table.loc[i, 'war_162'] = hitting_table.loc[i, 'warp']
+    for index, row in hitting_table.iterrows():
+        if row.g == 0:
+            hitting_table.loc[index, 'war_162'] = hitting_table.loc[index, 'warp']
 
     # don't need games column anymore
     hitting_table.drop('g', axis=1)
