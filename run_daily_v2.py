@@ -23,7 +23,8 @@ from odds_and_other_projections import *
 frac_season = float(input('Hank, please input the fraction of the season as a decimal: '))
 current_year = dt.date.today().year
 today = str(dt.date.today()).replace('-', '')
-yesterday = today - dt.timedelta(days=1)
+today_date = dt.date.today()
+yesterday = today_date - dt.timedelta(days=1)
 yesterday_string = str(yesterday)
 yesterday_string = yesterday_string.replace('-', '')
 kelly = 10
@@ -48,7 +49,8 @@ team_map = {
     'Cardinals': 'St. Louis Cardinals',
     'Tigers': 'Detroit Tigers',
     'Cubs': 'Chicago Cubs',
-    'Indians': 'Cleveland Guardians',
+    'Indians': 'Cleveland Indians',
+    'Guardians' : 'Cleveland Guardians',
     'Nationals': 'Washington Nationals',
     'Rockies': 'Colorado Rockies',
     'Marlins': 'Miami Marlins',
