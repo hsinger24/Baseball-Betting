@@ -47,10 +47,10 @@ final_cluster_luck = merge_cluster_luck_tables(prev_year_hitting_adjustment, pre
 ########## WAR FUNCTIONS ##########
 
 pt = load_combined_pecota_table()
-#retrieve_previous_year_war_table(2019)
+retrieve_previous_year_war_table(2022)
 prev_year_war = load_previous_year_war_table()
 preseason_projections = calculate_preaseason_war_projections(rosters, pt)
 final_war_preseason = calculate_final_preseason_war_change(preseason_projections, prev_year_war, current_year = current_year, file_name = 'data/overall_war_predictions_preseason.csv')
-#final_preseason_win_percentage = calculate_preseason_win_percentage(final_cluster_luck, final_war_preseason, current_year, file_name = 'data/preseason_projections.csv')
+final_preseason_win_percentage = calculate_preseason_win_percentage(final_cluster_luck, final_war_preseason, current_year, file_name = 'data/preseason_projections.csv')
 
 

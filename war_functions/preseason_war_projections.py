@@ -23,9 +23,12 @@ def calculate_preaseason_war_projections(active_rosters, pecota_table, file_name
         team_data_frame = pd.DataFrame(columns=pecota_table.columns)
         # For every player in the roster
         for player in team['team_roster']:
-            # Get their row from the PECOTA
-            player_row = pecota_table[pecota_table.mlbid == int(player[1])]
 
+            try:
+            # Get their row from the PECOTA
+                player_row = pecota_table[pecota_table.mlbid == int(player[1])]
+            except:
+                print(player)
             # TODO Shohei can start as both a hitter or pitcher
 
             # Handles duplicate players assuming they are a batter
