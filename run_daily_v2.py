@@ -94,6 +94,7 @@ def _retrieve_current_cluster_luck_hitting():
     cluster_luck_hitting = calculate_predicted_cluster_luck_run_adjustment_hitting(hitting_reg, current_year_hitting)
     cluster_luck_hitting = cluster_luck_hitting[['Team', 'GP', 'run_adjust']]
     cluster_luck_hitting.columns = ['Team', 'Games', 'Offensive_Adjustment']
+    cluster_luck_hitting['Offensive_Adjustment'] = cluster_luck_hitting.Offensive_Adjustment * (162.0/cluster_luck_hitting.Games)
     return cluster_luck_hitting
 
 def _retrieve_current_cluster_luck_pitching():

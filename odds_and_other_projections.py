@@ -49,7 +49,7 @@ def retrieve_odds():
     'LAD' : 'Dodgers',
     'MIL' : 'Brewers',
     'PIT' : 'Pirates',
-    'CLE' : 'Indians'
+    'CLE' : 'Guardians'
     }
 
     # Getting odds table and formatting
