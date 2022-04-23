@@ -75,7 +75,7 @@ def _retrieve_current_runs_scored():
     return runs_scored_table
 
 def _retrieve_current_runs_allowed():
-    tables = pd.read_html('https://www.foxsports.com/mlb/team-stats?category=pitching&season=2021&seasonType=reg')
+    tables = pd.read_html(f'https://www.foxsports.com/mlb/team-stats?category=pitching&season={dt.date.today().year}&seasonType=reg')
     runs_allowed_table = tables[1]
     runs_allowed_table = runs_allowed_table.iloc[:,[1,2,13]]
     runs_allowed_table.columns = ['Team', 'Games', 'Runs_Allowed']
@@ -97,7 +97,7 @@ def _retrieve_current_cluster_luck_hitting():
     return cluster_luck_hitting
 
 def _retrieve_current_cluster_luck_pitching():
-    current_year_pitching = retrieve_historical_pitching_tables(2021, file_name = None)
+    current_year_pitching = retrieve_historical_pitching_tables(current_year, file_name = None)
     pitching_reg = load_linear_regression('./data/pitching_regression.pickle')
     cluster_luck_pitching = calculate_predicted_cluster_luck_run_adjustment_pitching(pitching_reg, current_year_pitching)
     return cluster_luck_pitching

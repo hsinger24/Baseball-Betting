@@ -23,7 +23,7 @@ teams = [
         'team_name': 'Reds'
     }, {
         'team_id': '114',
-        'team_name': 'Indians'
+        'team_name': 'Guardians'
     }, {
         'team_id': '115',
         'team_name': 'Rockies'
