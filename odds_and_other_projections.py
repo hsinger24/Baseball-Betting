@@ -106,7 +106,7 @@ def retrieve_odds():
     odds_df['Away_Team'] = odds_df.Away_Team.apply(lambda x: team_map[x])
     return odds_df
 
-def _retrieve_538():
+def retrieve_538():
     fivethirtyeight_team_mapping = {
     'MIAMarlins' : 'Marlins',
     'WSHNationals' : 'Nationals',
@@ -118,6 +118,7 @@ def _retrieve_538():
     'BOSRed Sox' : 'Red Sox',
     'STLCardinals' : 'Cardinals',
     'CLEIndians' : 'Indians',
+    'CLEGuardians' : '538',
     'ATLBraves' : 'Braves',
     'NYMMets' : 'Mets',
     'NYYYankees' : 'Yankees',

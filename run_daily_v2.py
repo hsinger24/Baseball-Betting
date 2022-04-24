@@ -338,13 +338,90 @@ def calculate_yesterdays_bets_results(yesterday_string, yesterdays_capital):
     yesterdays_bets['Date'] = today
     return yesterdays_bets
 
+def calculate_bets_external(capital_538):
+
+    # Getting odds and 538 data in one place
+    data = retrieve_538()
+    odds = retrieve_odds()
+    merged = pd.merge(data, odds, on = 'Home_Team')
+    merged = merged[['Date', 'Away_Team_x', 'Home_Team', 'Away_Prob_x', 'Home_Prob_x', 'Home_Odds', 'Away_Odds',
+        'Home_Prob_y', 'Away_Prob_y']]
+    merged.columns = ['Date', 'Away_Team', 'Home_Team', 'Away_Prob_538', 'Home_Prob_538', 'Home_Odds', 'Away_Odds',
+        'Home_Prob_Odds', 'Away_Prob_Odds']
+
+    # Formatting data
+    merged['Home_Prob_538'] = merged.Home_Prob_538.str.strip('%')
+    merged['Away_Prob_538'] = merged.Away_Prob_538.str.strip('%')
+    merged['Home_Prob_538'] = merged.Home_Prob_538.astype('float') / 100.0
+    merged['Away_Prob_538'] = merged.Away_Prob_538.astype('float') / 100.0
+    merged['Home_Prob_Odds'] = merged.Home_Prob_Odds / 100.0
+    merged['Away_Prob_Odds'] = merged.Away_Prob_Odds / 100.0
+    current_day = dt.date.today().day
+    merged['Date_Day'] = merged.Date.dt.day
+    merged = merged[merged.Date_Day == current_day]
+    merged.drop_duplicates(inplace = True, subset = ['Home_Team', 'Away_Team'])
+    merged.drop(['Date_Day'], axis = 1, inplace = True)
+
+    # Defining KC calculator function
+    def kc(row, kelly, Home):
+        if Home:
+            diff = row.Home_Prob_538 - row.Home_Prob_Odds
+            if diff<0:
+                return 0
+            else:
+                p = row.Home_Prob_538
+                q = 1-p
+                ml = row.Home_Odds
+                if ml>=0:
+                    b = (ml/100)
+                if ml<0:
+                    b = (100/abs(ml))
+                kc = ((p*b) - q) / b
+                if (kc > 0.5) & (kc<0.6):
+                    return kc/(kelly+2)
+                if (kc > 0.6) & (kc<0.7):
+                    return kc/(kelly+4)
+                if kc > 0.7:
+                    return kc/(kelly+7)
+                else:
+                    return kc/kelly
+        if not Home:
+            diff = row.Away_Prob_538 - row.Away_Prob_Odds
+            if diff<0:
+                return 0
+            else:
+                p = row.Away_Prob_538
+                q = 1-p
+                ml = row.Away_Odds
+                if ml>=0:
+                    b = (ml/100)
+                if ml<0:
+                    b = (100/abs(ml))
+                kc = ((p*b) - q) / b
+                if (kc > 0.5) & (kc<0.6):
+                    return kc/(kelly+2)
+                if (kc > 0.6) & (kc<0.7):
+                    return kc/(kelly+4)
+                if kc > 0.7:
+                    return kc/(kelly+7)
+                else:
+                    return kc/kelly
+        
+    # Creating bets
+    merged['Home_KC_538'] = merged.apply(kc, axis = 1, kelly = 10, Home = True)
+    merged['Away_KC_538'] = merged.apply(kc, axis = 1, kelly = 10, Home = False)
+    merged['Bet_538'] = merged.apply(lambda x: capital_538 * x.Home_KC_538 if x.Home_KC_538>0
+            else capital_538 * x.Away_KC_538, axis = 1)
+
+    return merged
+
 ##########RUN##########
 
 # Run parameters
 first_run = False
-calculate_external = False
+first_run_external = True
 
-# Results calculation
+# Results calculation base
 if not first_run:
     results = pd.read_csv('results_tracker/results_tracker_base.csv')
     yesterdays_capital = float(results.loc[len(results)-1, 'Money_Tracker'])
@@ -355,6 +432,12 @@ if not first_run:
     capital = float(results.loc[len(results)-1, 'Money_Tracker'])
 else:
     capital = 100000
+
+# Results calculation external
+if not first_run_external:
+    pass
+else:
+    capital_538 = 100000
 
 # Bets calculation
 
@@ -380,3 +463,8 @@ todays_bets = todays_bets(todays_games = todays_games, todays_win_percentages = 
 todays_bets.drop_duplicates(inplace = True)
 todays_bets.to_csv('past_bets/base/bets_' + today + '.csv')
 print(todays_bets)
+
+# Bets calculation_external
+
+todays_bets_external = calculate_bets_external(capital_538)
+todays_bets.to_csv('past_bets/external/bets_' + today + '.csv')
