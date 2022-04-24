@@ -341,7 +341,7 @@ def calculate_yesterdays_bets_results(yesterday_string, yesterdays_capital):
 ##########RUN##########
 
 # Run parameters
-first_run = True
+first_run = False
 calculate_external = False
 
 # Results calculation
@@ -350,6 +350,7 @@ if not first_run:
     yesterdays_capital = float(results.loc[len(results)-1, 'Money_Tracker'])
     yesterdays_bets = calculate_yesterdays_bets_results(yesterday_string = yesterday_string, yesterdays_capital = yesterdays_capital)
     results = results.append(yesterdays_bets)
+    results.to_csv('results_tracker/results_tracker_base.csv')
     results.to_csv('results_tracker/results_tracker_base.csv')
     capital = float(results.loc[len(results)-1, 'Money_Tracker'])
 else:
@@ -369,10 +370,10 @@ current_run_differential = _calculate_cl_with_differential()
 starting_rotations, failed_to_find_pitchers = retrieve_starting_rotations_WAR(pt, current_year_WAR)
 print(failed_to_find_pitchers)
 sp_adjustments = calculate_sp_adjustment(todays_games, starting_rotations, pt, frac_season = frac_season)
-overall_war_predictions_preseason = pd.read_csv('data/overall_war_predictions_preseason.csv')
+overall_war_predictions_preseason = pd.read_csv('data/overall_war_predictions_preseason.csv', index_col = 0)
 active_roster_war, failed_to_find_players = calculate_active_roster_war_table(active_rosters, overall_war_predictions_preseason, current_year_WAR, pt, current_year, frac_season)
 print(failed_to_find_players)
-preseason_projections = pd.read_csv('data/preseason_projections.csv')
+preseason_projections = pd.read_csv('data/preseason_projections.csv', index_col = 0)
 todays_win_percentages = todays_win_percentages(preseason_projections, current_run_differential, sp_adjustments, active_roster_war, frac_season)
 # Calculating today's bets
 todays_bets = todays_bets(todays_games = todays_games, todays_win_percentages = todays_win_percentages, odds = odds, capital = capital, kelly = kelly)
