@@ -423,11 +423,11 @@ first_run_external = True
 
 # Results calculation base
 if not first_run:
-    results = pd.read_csv('results_tracker/results_tracker_base.csv')
+    results = pd.read_csv('results_tracker/results_tracker_base.csv', index_col = 0)
     yesterdays_capital = float(results.loc[len(results)-1, 'Money_Tracker'])
     yesterdays_bets = calculate_yesterdays_bets_results(yesterday_string = yesterday_string, yesterdays_capital = yesterdays_capital)
     results = results.append(yesterdays_bets)
-    results.to_csv('results_tracker/results_tracker_base.csv')
+    results.reset_index(drop = True, inplace = True)
     results.to_csv('results_tracker/results_tracker_base.csv')
     capital = float(results.loc[len(results)-1, 'Money_Tracker'])
 else:
@@ -462,7 +462,7 @@ todays_win_percentages = todays_win_percentages(preseason_projections, current_r
 todays_bets = todays_bets(todays_games = todays_games, todays_win_percentages = todays_win_percentages, odds = odds, capital = capital, kelly = kelly)
 todays_bets.drop_duplicates(inplace = True)
 todays_bets.to_csv('past_bets/base/bets_' + today + '.csv')
-print(todays_bets)
+print(sp_adjustments)
 
 # Bets calculation_external
 
