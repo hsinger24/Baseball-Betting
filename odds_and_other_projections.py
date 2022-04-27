@@ -1,12 +1,15 @@
 import pandas as pd
 import datetime as dt
 import re
+import time
 from bs4 import BeautifulSoup
-from urllib.request import Request, urlopen
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-import time
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import Select
 from webdriver_manager.chrome import ChromeDriverManager
 
 def _calculate_odds(odds):
@@ -17,7 +20,7 @@ def _calculate_odds(odds):
 
 def retrieve_odds():
     
-    # Team map
+     # Team map
     team_map = {
     'CHC' : 'Cubs',
     'STL' : 'Cardinals',
@@ -52,8 +55,18 @@ def retrieve_odds():
     'CLE' : 'Guardians'
     }
 
+    # Instantiating webdriver
+    driver = webdriver.Chrome(ChromeDriverManager().install())
+    driver.get('https://www.actionnetwork.com/mlb/odds')
+
+    # Navigating to ML
+    ml_button = driver.find_element_by_xpath("//*[@id='__next']/div/main/div/div[2]/div/div[1]/div[2]/select")
+    select = Select(ml_button)
+    select.select_by_visible_text('Moneyline')
+
     # Getting odds table and formatting
-    tables = pd.read_html('https://www.actionnetwork.com/mlb/odds')
+    html = driver.page_source
+    tables = pd.read_html(html)
     odds = tables[0]
     odds = odds.iloc[::2]
     odds.reset_index(drop = True, inplace = True)
@@ -76,7 +89,7 @@ def retrieve_odds():
             home_team = teams[keys[1]]
             away_team = teams[keys[0]]
         # Retreiving odds
-        ml_string = row['Unnamed: 6']
+        ml_string = row['Unnamed: 5']
         if len(ml_string) == 8:
             ml_away = ml_string[:4]
             ml_home = ml_string[-4:]
@@ -104,6 +117,7 @@ def retrieve_odds():
     odds_df['Away_Prob'] = odds_df.Away_Odds.apply(_calculate_odds)
     odds_df['Home_Team'] = odds_df.Home_Team.apply(lambda x: team_map[x])
     odds_df['Away_Team'] = odds_df.Away_Team.apply(lambda x: team_map[x])
+
     return odds_df
 
 def retrieve_538():

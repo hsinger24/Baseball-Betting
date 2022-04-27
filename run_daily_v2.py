@@ -415,29 +415,146 @@ def calculate_bets_external(capital_538):
 
     return merged
 
+def calculate_yesterdays_bet_results_external(yesterday_string, yesterdays_capital_538):
+    
+    # Function to calculate potential payoffs
+    def calculate_payoff_external(row):
+        if row.Bet_538<=0:
+            payoff = 0
+        else:
+            if row.Home_KC_538>0:
+                if row.Home_Odds>0:
+                    payoff = (row.Home_Odds/100)*row.Bet_538
+                if row.Home_Odds<0:
+                    payoff = row.Bet_538/((abs(row.Home_Odds)/100))
+            if row.Away_KC_538>0:
+                if row.Away_Odds>0:
+                    payoff = (row.Away_Odds/100)*row.Bet_538
+                if row.Away_Odds<0:
+                    payoff = row.Bet_538/((abs(row.Away_Odds)/100))
+        return payoff
+
+    # Getting yesterday's results from CBS
+    link = 'https://www.cbssports.com/mlb/scoreboard/' + yesterday_string + '/'
+    tables = pd.read_html(link)
+    results_table = pd.DataFrame(columns = ['Home_Team', 'Away_Team', 'Winner'])
+    for table in tables:
+        if list(table.columns) == ['Unnamed: 0', 'R', 'H', 'E']:
+            # Getting team names
+            team_away_list = table.iloc[0,0].split(' ')
+            del team_away_list[-2:]
+            if len(team_away_list) == 2:
+                team_away = team_away_list[0] + ' ' + team_away_list[1]
+            else:
+                team_away = team_away_list[0]
+            team_home_list = table.iloc[1,0].split(' ')
+            del team_home_list[-2:]
+            if len(team_home_list) == 2:
+                team_home = team_home_list[0] + ' ' + team_home_list[1]
+            else:
+                team_home = team_home_list[0]
+            # Getting score and determining winner
+            runs_away = table.iloc[0,1]
+            runs_home = table.iloc[1,1]
+            if runs_away>runs_home:
+                winner = team_away
+            else:
+                winner = team_home
+            # Appending to results table
+            series = pd.Series([team_home, team_away, winner], index = results_table.columns)
+            results_table = results_table.append(series, ignore_index = True)        
+        else:
+            continue
+    for column in list(results_table.columns):
+        results_table[column] = results_table[column].apply(lambda x: team_map[x])
+
+    # Reading in yesterdays bets and creating tracker columns
+    yesterdays_bets = pd.read_csv('past_bets/external/bets_' + yesterday_string + '.csv', index_col = 0)
+    yesterdays_bets = yesterdays_bets[(yesterdays_bets.Home_Team != '538') & (yesterdays_bets.Away_Team != '538')]
+    yesterdays_bets['Home_Team'] = yesterdays_bets['Home_Team'].apply(lambda x: team_map[x])
+    yesterdays_bets['Away_Team'] = yesterdays_bets['Away_Team'].apply(lambda x: team_map[x])
+    yesterdays_bets = yesterdays_bets[yesterdays_bets.Bet_538>0]
+    yesterdays_bets.reset_index(drop = True, inplace = True)
+    yesterdays_bets['Won_538'] = 0
+    yesterdays_bets['Tracker_538'] = 0
+    for index, row in yesterdays_bets.iterrows():
+        home_team = row.Home_Team
+        away_team = row.Away_Team
+        payoff_538 = calculate_payoff_external(row, Fivethirtyeight = True)
+        if row.Bet_538>0:
+            if (row.Home_KC_538>0) & (home_team in results_table['Winner'].values):
+                yesterdays_bets.loc[index, 'Won_538'] = 1
+            elif (row.Away_KC_538>0) & (away_team in results_table['Winner'].values):
+                yesterdays_bets.loc[index, 'Won_538'] = 1
+            else:
+                yesterdays_bets.loc[index, 'Won_538'] = 0
+        else:
+            yesterdays_bets.loc[index, 'Won_538'] = -1
+        if yesterdays_bets.loc[index, 'Won_538'] == 1:
+            if index == 0:
+                yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_capital_538 + payoff_538
+            else:
+                yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_bets.loc[(index-1), 'Tracker_538'] + payoff_538
+        else:
+            if index == 0:
+                yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_capital_538 - row.Bet_538
+            else:
+                yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_bets.loc[(index-1), 'Tracker_538'] - row.Bet_538
+            
+    return yesterdays_bets
+
 ##########RUN##########
 
 # Run parameters
 first_run = False
-first_run_external = True
+first_run_external = False
+calculate_results = False
+calculate_results_external = False
 
-# Results calculation base
-if not first_run:
-    results = pd.read_csv('results_tracker/results_tracker_base.csv', index_col = 0)
-    yesterdays_capital = float(results.loc[len(results)-1, 'Money_Tracker'])
-    yesterdays_bets = calculate_yesterdays_bets_results(yesterday_string = yesterday_string, yesterdays_capital = yesterdays_capital)
-    results = results.append(yesterdays_bets)
-    results.reset_index(drop = True, inplace = True)
-    results.to_csv('results_tracker/results_tracker_base.csv')
-    capital = float(results.loc[len(results)-1, 'Money_Tracker'])
+# Results calculation
+if calculate_results:
+    # Results calculation base
+    if not first_run:
+        results = pd.read_csv('results_tracker/results_tracker_base.csv', index_col = 0)
+        results.reset_index(drop = True, inplace = True)
+        yesterdays_capital = float(results.loc[len(results)-1, 'Money_Tracker'])
+        yesterdays_bets = calculate_yesterdays_bets_results(yesterday_string = yesterday_string, yesterdays_capital = yesterdays_capital)
+        results = results.append(yesterdays_bets)
+        results.reset_index(drop = True, inplace = True)
+        results.to_csv('results_tracker/results_tracker_base.csv')
+        capital = float(results.loc[len(results)-1, 'Money_Tracker'])
+    else:
+        capital = 100000
 else:
-    capital = 100000
-
+    try:
+        results = pd.read_csv('results_tracker/results_tracker_base.csv', index_col = 0)
+        capital = float(results.loc[len(results)-1, 'Money_Tracker'])
+    except:
+        capital = 100000
 # Results calculation external
-if not first_run_external:
-    pass
+if calculate_results_external:
+    if not first_run_external:
+        yesterdays_capital_538 = 100000
+        yesterdays_bets = calculate_yesterdays_bet_results_external(yesterday_string, yesterdays_capital_538)
+        yesterdays_bets.reset_index(drop = True, inplace = True)
+        yesterdays_bets.to_csv('results_tracker/results_tracker_external.csv')
+        capital_538 = float(yesterdays_bets.loc[len(yesterdays_bets)-1, 'Tracker_538'])
+
+        # results = pd.read_csv('results_tracker/results_tracker_external.csv', index_col = 0)
+        # yesterdays_capital_538 = float(results.loc[len(results)-1, 'Tracker_538'])
+        # yesterdays_bets = calculate_yesterdays_bets_results_external(yesterday_string, yesterdays_capital_538)
+        # results = results.append(yesterdays_bets)
+        # results.reset_index(drop = True, inplace = True)
+        # results.to_csv('results_tracker/results_tracker_external.csv')
+        # capital_538 = capital = float(results.loc[len(results)-1, 'Tracker_538'])
+    else:
+        capital_538 = 100000
 else:
-    capital_538 = 100000
+    try:
+        results = pd.read_csv('results_tracker/results_tracker_external.csv', index_col = 0)
+        capital_538 = float(results.loc[len(results)-1, 'Tracker_538'])
+    except:
+        capital_538 = 100000
 
 # Bets calculation
 
@@ -467,4 +584,4 @@ print(sp_adjustments)
 # Bets calculation_external
 
 todays_bets_external = calculate_bets_external(capital_538)
-todays_bets.to_csv('past_bets/external/bets_' + today + '.csv')
+todays_bets_external.to_csv('past_bets/external/bets_' + today + '.csv')
