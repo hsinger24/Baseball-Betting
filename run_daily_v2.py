@@ -480,7 +480,7 @@ def calculate_yesterdays_bet_results_external(yesterday_string, yesterdays_capit
     for index, row in yesterdays_bets.iterrows():
         home_team = row.Home_Team
         away_team = row.Away_Team
-        payoff_538 = calculate_payoff_external(row, Fivethirtyeight = True)
+        payoff_538 = calculate_payoff_external(row)
         if row.Bet_538>0:
             if (row.Home_KC_538>0) & (home_team in results_table['Winner'].values):
                 yesterdays_bets.loc[index, 'Won_538'] = 1
@@ -508,8 +508,8 @@ def calculate_yesterdays_bet_results_external(yesterday_string, yesterdays_capit
 # Run parameters
 first_run = False
 first_run_external = False
-calculate_results = False
-calculate_results_external = False
+calculate_results = True
+calculate_results_external = True
 
 # Results calculation
 if calculate_results:
@@ -534,19 +534,13 @@ else:
 # Results calculation external
 if calculate_results_external:
     if not first_run_external:
-        yesterdays_capital_538 = 100000
+        results = pd.read_csv('results_tracker/results_tracker_external.csv', index_col = 0)
+        yesterdays_capital_538 = float(results.loc[len(results)-1, 'Tracker_538'])
         yesterdays_bets = calculate_yesterdays_bet_results_external(yesterday_string, yesterdays_capital_538)
-        yesterdays_bets.reset_index(drop = True, inplace = True)
-        yesterdays_bets.to_csv('results_tracker/results_tracker_external.csv')
-        capital_538 = float(yesterdays_bets.loc[len(yesterdays_bets)-1, 'Tracker_538'])
-
-        # results = pd.read_csv('results_tracker/results_tracker_external.csv', index_col = 0)
-        # yesterdays_capital_538 = float(results.loc[len(results)-1, 'Tracker_538'])
-        # yesterdays_bets = calculate_yesterdays_bets_results_external(yesterday_string, yesterdays_capital_538)
-        # results = results.append(yesterdays_bets)
-        # results.reset_index(drop = True, inplace = True)
-        # results.to_csv('results_tracker/results_tracker_external.csv')
-        # capital_538 = capital = float(results.loc[len(results)-1, 'Tracker_538'])
+        results = results.append(yesterdays_bets)
+        results.reset_index(drop = True, inplace = True)
+        results.to_csv('results_tracker/results_tracker_external.csv')
+        capital_538 = capital = float(results.loc[len(results)-1, 'Tracker_538'])
     else:
         capital_538 = 100000
 else:
