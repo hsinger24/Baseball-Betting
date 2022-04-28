@@ -20,7 +20,6 @@ from daily_adjustments.adjusted_war_today import *
 from odds_and_other_projections import *
 
 # Parameters
-frac_season = float(input('Hank, please input the fraction of the season as a decimal: '))
 current_year = dt.date.today().year
 today = str(dt.date.today()).replace('-', '')
 today_date = dt.date.today()
@@ -119,6 +118,12 @@ def _calculate_cl_with_differential():
     run_diff = _calculate_current_run_differential()
     merged = pd.merge(run_diff, cl, on = 'Team')
     return merged
+
+def _calculate_frac_season():
+    df = _retrieve_current_cluster_luck_hitting()
+    df['Frac_Season'] = df.GP/162.0
+    frac_season = df.Frac_Season.mean()
+    return frac_season
 
 def todays_win_percentages(preseason_projections, current_run_differential, sp_adjustments, active_roster_war, frac_season):
     
@@ -553,6 +558,7 @@ else:
 # Bets calculation
 
 # Getting necessary inputs
+frac_season = _calculate_frac_season()
 active_rosters = retrieve_all_active_rosters(file_name = None)
 todays_games = retrieve_todays_games_info()
 retrieve_current_year_WAR()
