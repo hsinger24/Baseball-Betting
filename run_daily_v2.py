@@ -121,7 +121,7 @@ def _calculate_cl_with_differential():
 
 def _calculate_frac_season():
     df = _retrieve_current_cluster_luck_hitting()
-    df['Frac_Season'] = df.GP/162.0
+    df['Frac_Season'] = df.Games/162.0
     frac_season = df.Frac_Season.mean()
     return frac_season
 
