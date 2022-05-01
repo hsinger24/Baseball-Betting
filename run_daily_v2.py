@@ -417,6 +417,10 @@ def calculate_bets_external(capital_538):
     merged['Away_KC_538'] = merged.apply(kc, axis = 1, kelly = 10, Home = False)
     merged['Bet_538'] = merged.apply(lambda x: capital_538 * x.Home_KC_538 if x.Home_KC_538>0
             else capital_538 * x.Away_KC_538, axis = 1)
+    
+    # Changing 538 to Guardians
+    merged['Home_Team'] = merged.Home_Team.apply(lambda x: 'Guardians' if x == '538' else x)
+    merged['Away_Team'] = merged.Away_Team.apply(lambda x: 'Guardians' if x == '538' else x)
 
     return merged
 
