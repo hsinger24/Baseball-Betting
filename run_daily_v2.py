@@ -508,20 +508,37 @@ def calculate_yesterdays_bet_results_external(yesterday_string, yesterdays_capit
         home_team = row.Home_Team
         away_team = row.Away_Team
         payoff_538 = calculate_payoff_external(row)
+        # Signifying win, loss, or other
         if row.Bet_538>0:
+            # Normal bets
             if (row.Home_KC_538>0) & (home_team in results_table['Winner'].values):
                 yesterdays_bets.loc[index, 'Won_538'] = 1
             elif (row.Away_KC_538>0) & (away_team in results_table['Winner'].values):
                 yesterdays_bets.loc[index, 'Won_538'] = 1
             else:
                 yesterdays_bets.loc[index, 'Won_538'] = 0
+            # Postponed games
+            if (home_team not in results_table['Winner'].values) & (away_team not in results_table['Winner'].values):
+                yesterdays_bets.loc[index, 'Won_538'] = -1
+            # Double headers
+            if (home_team in results_table['Winner'].values) & (away_team in results_table['Winner'].values):
+                yesterdays_bets.loc[index, 'Won_538'] = -1
+            elif (list(results_table['Winner'].values).count(home_team) > 1) | (list(results_table['Winner'].values).count(away_team) > 1):
+                yesterdays_bets.loc[index, 'Won_538'] = -1
+        # Games that weren't bet on
         else:
             yesterdays_bets.loc[index, 'Won_538'] = -1
+        # Updating tracker
         if yesterdays_bets.loc[index, 'Won_538'] == 1:
             if index == 0:
                 yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_capital_538 + payoff_538
             else:
                 yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_bets.loc[(index-1), 'Tracker_538'] + payoff_538
+        elif yesterdays_bets.loc[index, 'Won_538'] == -1:
+            if index == 0:
+                yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_capital_538
+            else:
+                yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_bets.loc[(index-1), 'Tracker_538']
         else:
             if index == 0:
                 yesterdays_bets.loc[index, 'Tracker_538'] = yesterdays_capital_538 - row.Bet_538
