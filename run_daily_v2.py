@@ -578,19 +578,13 @@ else:
 # Results calculation external
 if calculate_results_external:
     if not first_run_external:
-        yesterdays_capital_538 = 100000
+        results = pd.read_csv('results_tracker/results_tracker_external.csv', index_col = 0)
+        yesterdays_capital_538 = float(results.loc[len(results)-1, 'Tracker_538'])
         yesterdays_bets = calculate_yesterdays_bet_results_external(yesterday_string, yesterdays_capital_538)
-        yesterdays_bets.reset_index(drop = True, inplace = True)
-        yesterdays_bets.to_csv('results_tracker/results_tracker_external.csv')
-        capital_538 = capital = float(yesterdays_bets.loc[len(yesterdays_bets)-1, 'Tracker_538'])
-
-        # results = pd.read_csv('results_tracker/results_tracker_external.csv', index_col = 0)
-        # yesterdays_capital_538 = float(results.loc[len(results)-1, 'Tracker_538'])
-        # yesterdays_bets = calculate_yesterdays_bet_results_external(yesterday_string, yesterdays_capital_538)
-        # results = results.append(yesterdays_bets)
-        # results.reset_index(drop = True, inplace = True)
-        # results.to_csv('results_tracker/results_tracker_external.csv')
-        # capital_538 = capital = float(results.loc[len(results)-1, 'Tracker_538'])
+        results = results.append(yesterdays_bets)
+        results.reset_index(drop = True, inplace = True)
+        results.to_csv('results_tracker/results_tracker_external.csv')
+        capital_538 = capital = float(results.loc[len(results)-1, 'Tracker_538'])
     else:
         capital_538 = 100000
 else:
