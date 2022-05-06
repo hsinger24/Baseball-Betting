@@ -93,16 +93,18 @@ def retrieve_odds():
         if len(ml_string) == 8:
             ml_away = ml_string[:4]
             ml_home = ml_string[-4:]
-        if len(ml_string) == 9:
+        elif len(ml_string) == 9:
             if (ml_string[4] == '+') | (ml_string[4]=='-'):
                 ml_away = ml_string[:4]
                 ml_home = ml_string[-5:]
             else:
                 ml_away = ml_string[:5]
                 ml_home = ml_string[-4:]
-        if len(ml_string) == 10:
+        elif len(ml_string) == 10:
                 ml_away = ml_string[:5]
                 ml_home = ml_string[-5:]
+        else:
+            continue
         try:
             ml_away = float(ml_away)
         except:
