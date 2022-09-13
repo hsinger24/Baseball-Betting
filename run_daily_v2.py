@@ -276,22 +276,18 @@ def calculate_yesterdays_bets_results(yesterday_string, yesterdays_capital):
     link = 'https://www.cbssports.com/mlb/scoreboard/' + yesterday_string + '/'
     tables = pd.read_html(link)
     results_table = pd.DataFrame(columns = ['Home_Team', 'Away_Team', 'Winner'])
+    team_regex = r'\D*'
     for table in tables:
         if list(table.columns) == ['Unnamed: 0', 'R', 'H', 'E']:
 
             # Getting team names
-            team_away_list = table.iloc[0,0].split(' ')
-            del team_away_list[-2:]
-            if len(team_away_list) == 2:
-                team_away = team_away_list[0] + ' ' + team_away_list[1]
-            else:
-                team_away = team_away_list[0]
-            team_home_list = table.iloc[1,0].split(' ')
-            del team_home_list[-2:]
-            if len(team_home_list) == 2:
-                team_home = team_home_list[0] + ' ' + team_home_list[1]
-            else:
-                team_home = team_home_list[0]
+            team_away_string = table.iloc[0,0]
+            team_away_list = re.findall(team_regex, team_away_string)
+            team_away = team_away_list[0]
+            
+            team_home_string = table.iloc[1,0]
+            team_home_list = re.findall(team_regex, team_home_string)
+            team_home = team_home_list[0]
             
             # Getting score and determining winner
             runs_away = table.iloc[0,1]
@@ -300,7 +296,7 @@ def calculate_yesterdays_bets_results(yesterday_string, yesterdays_capital):
                 winner = team_away
             else:
                 winner = team_home
-
+            
             # Appending to results table
             series = pd.Series([team_home, team_away, winner], index = results_table.columns)
             results_table = results_table.append(series, ignore_index = True)        
@@ -461,25 +457,23 @@ def calculate_yesterdays_bet_results_external(yesterday_string, yesterdays_capit
                     payoff = row.Bet_538/((abs(row.Away_Odds)/100))
         return payoff
 
-    # Getting yesterday's results from CBS
+    # Getting yesterdays results from CBS
     link = 'https://www.cbssports.com/mlb/scoreboard/' + yesterday_string + '/'
     tables = pd.read_html(link)
     results_table = pd.DataFrame(columns = ['Home_Team', 'Away_Team', 'Winner'])
+    team_regex = r'\D*'
     for table in tables:
         if list(table.columns) == ['Unnamed: 0', 'R', 'H', 'E']:
+
             # Getting team names
-            team_away_list = table.iloc[0,0].split(' ')
-            del team_away_list[-2:]
-            if len(team_away_list) == 2:
-                team_away = team_away_list[0] + ' ' + team_away_list[1]
-            else:
-                team_away = team_away_list[0]
-            team_home_list = table.iloc[1,0].split(' ')
-            del team_home_list[-2:]
-            if len(team_home_list) == 2:
-                team_home = team_home_list[0] + ' ' + team_home_list[1]
-            else:
-                team_home = team_home_list[0]
+            team_away_string = table.iloc[0,0]
+            team_away_list = re.findall(team_regex, team_away_string)
+            team_away = team_away_list[0]
+            
+            team_home_string = table.iloc[1,0]
+            team_home_list = re.findall(team_regex, team_home_string)
+            team_home = team_home_list[0]
+            
             # Getting score and determining winner
             runs_away = table.iloc[0,1]
             runs_home = table.iloc[1,1]
@@ -487,6 +481,7 @@ def calculate_yesterdays_bet_results_external(yesterday_string, yesterdays_capit
                 winner = team_away
             else:
                 winner = team_home
+            
             # Appending to results table
             series = pd.Series([team_home, team_away, winner], index = results_table.columns)
             results_table = results_table.append(series, ignore_index = True)        
@@ -494,6 +489,8 @@ def calculate_yesterdays_bet_results_external(yesterday_string, yesterdays_capit
             continue
     for column in list(results_table.columns):
         results_table[column] = results_table[column].apply(lambda x: team_map[x])
+
+
 
     # Reading in yesterdays bets and creating tracker columns
     yesterdays_bets = pd.read_csv('past_bets/external/bets_' + yesterday_string + '.csv', index_col = 0)
@@ -552,8 +549,8 @@ def calculate_yesterdays_bet_results_external(yesterday_string, yesterdays_capit
 # Run parameters
 first_run = False
 first_run_external = False
-calculate_results = False
-calculate_results_external = False
+calculate_results = True
+calculate_results_external = True
 
 # Results calculation
 if calculate_results:
