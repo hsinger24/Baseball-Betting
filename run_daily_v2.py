@@ -67,8 +67,9 @@ team_map = {
 
 def _retrieve_current_runs_scored():
     tables = pd.read_html('https://www.espn.com/mlb/stats/team')
-    runs_scored_table = pd.merge(tables[0], tables[1], left_on = tables[0].index, right_on = tables[1].index)
-    runs_scored_table.drop('key_0', axis = 1, inplace = True)
+    tables[1].reset_index(inplace = True)
+    tables[1]['index'] = tables[1].index + 1
+    runs_scored_table = pd.merge(tables[0], tables[1], left_on = 'RK', right_on = 'index')
     runs_scored_table = runs_scored_table[['Team', 'GP', 'R']]
     runs_scored_table['Runs_162'] = runs_scored_table.R * (162.0/runs_scored_table.GP)
     return runs_scored_table

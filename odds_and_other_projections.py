@@ -165,8 +165,8 @@ def retrieve_538():
     evens.reset_index(drop = True, inplace = True)
     odds = fivethirtyeight.iloc[1::2]
     odds.reset_index(drop = True, inplace = True)
-    final_538 = pd.merge(evens, odds, left_on = evens.index, right_on = odds.index)
-    final_538.drop(['key_0', 'Date_y'], axis = 1, inplace = True)
+    final_538 = pd.merge(evens, odds, left_index = True, right_index = True)
+    final_538.drop(['Date_y'], axis = 1, inplace = True)
     final_538.columns = ['Date', 'Away_Team', 'Away_Prob', 'Home_Team', 'Home_Prob']
     final_538['Away_Team'] = final_538['Away_Team'].apply(lambda x: fivethirtyeight_team_mapping[x])
     final_538['Home_Team'] = final_538['Home_Team'].apply(lambda x: fivethirtyeight_team_mapping[x])
