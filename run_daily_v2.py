@@ -1,6 +1,7 @@
 ##########IMPORTS AND PARAMETERS##########
 
 
+
 # Imports
 import pandas as pd
 import email, smtplib, ssl
@@ -62,7 +63,10 @@ team_map = {
     'D-backs' : 'Arizona Diamondbacks'
 }
 
+
+
 ##########FUNCTIONS##########
+
 
 
 def _retrieve_current_runs_scored():
@@ -545,7 +549,11 @@ def calculate_yesterdays_bet_results_external(yesterday_string, yesterdays_capit
             
     return yesterdays_bets
 
-##########RUN##########
+
+
+##########SCRIPT##########
+
+
 
 # Run parameters
 first_run = False
