@@ -39,6 +39,7 @@ team_map = {
     'DET': 'Tigers',
     'BOS': 'Red Sox',
     'ARI': 'Diamondbacks',
+    'AZ' : 'Diamondbacks',
     'WSH': 'Nationals',
     'WAS': 'Nationals',
     'COL': 'Rockies',
@@ -65,7 +66,7 @@ def _retrieve_historical_player_war_tables(driver, year=None):
             driver.get("https://www.baseballprospectus.com/leaderboards/pitching/")
     
         # list of filters
-        filters = driver.find_elements_by_class_name("filter-btn")
+        filters = driver.find_elements(By.CLASS_NAME, "filter-btn__text")
 
         # get the current year
         year_filter = filters[0]
@@ -77,31 +78,31 @@ def _retrieve_historical_player_war_tables(driver, year=None):
 
             # set the year to the given year
             year_filter.click()
-            year_slider = driver.find_element_by_name("currentSliderValue")
+            year_slider = driver.find_element(By.NAME, "currentSliderValue")
             year_slider.clear()
             year_slider.send_keys(year)
 
             # get the save button, click it and wait for it to be stale
-            save_btn = driver.find_elements_by_class_name("modal__btn--save")[0]
+            save_btn = driver.find_elements(By.CLASS_NAME, "modal__btn--save")[0]
             save_btn.click()
             WebDriverWait(driver, 30).until(EC.staleness_of(save_btn))
 
         # Set PA/IP to 0    
         plate_apearance_innings_pitched_filter = filters[4]
         plate_apearance_innings_pitched_filter.click()
-        pa_slider = driver.find_element_by_name("currentSliderValue")
+        pa_slider = driver.find_element(By.NAME, "currentSliderValue")
         pa_slider.clear()
         pa_slider.send_keys(0)
 
         # save selection
-        save_btn = driver.find_elements_by_class_name("modal__btn--save")[0]
+        save_btn = driver.find_elements(By.CLASS_NAME, "modal__btn--save")[0]
         save_btn.click()
         WebDriverWait(driver, 30).until(EC.staleness_of(save_btn))
 
         # unclick the default all selection
         team_filter = filters[3]
         team_filter.click()
-        teams = driver.find_elements_by_class_name("multi-select__box")
+        teams = driver.find_elements(By.CLASS_NAME, "multi-select__box")
         all_btn = teams[0]
         all_btn.click()
 
@@ -112,11 +113,11 @@ def _retrieve_historical_player_war_tables(driver, year=None):
         # For every team
         for i in range(1, 31):
             # click the correct team
-            team_btn = driver.find_elements_by_class_name("multi-select__box")[i]
+            team_btn = driver.find_elements(By.CLASS_NAME, "multi-select__box")[i]
             team_btn.click()
 
             # click save
-            save_btn = driver.find_elements_by_class_name("modal__btn--save")
+            save_btn = driver.find_elements(By.CLASS_NAME, "modal__btn--save")
             save_btn = save_btn[0]
             save_btn.click()
 
@@ -128,10 +129,10 @@ def _retrieve_historical_player_war_tables(driver, year=None):
             # click load till you can't click no mo
 
             # get the load button
-            load_more_button = driver.find_elements_by_class_name("load-more__btn")[0]
+            load_more_button = driver.find_elements(By.CLASS_NAME, "load-more__btn")[0]
             # click load while it is not disabled, but if it's inactive then also don't click it
-            while len(driver.find_elements_by_class_name("load-more__btn--disabled")) == 0:
-                if len(driver.find_elements_by_class_name("load-more__btn--inactive")) > 0:
+            while len(driver.find_elements(By.CLASS_NAME, "load-more__btn--disabled")) == 0:
+                if len(driver.find_elements(By.CLASS_NAME, "load-more__btn--inactive")) > 0:
                     continue
                 load_more_button.click()
 
@@ -168,7 +169,7 @@ def _retrieve_historical_player_war_tables(driver, year=None):
 
             # Unclick the team
             team_filter.click()
-            team_btn = driver.find_elements_by_class_name("multi-select__box")[i]
+            team_btn = driver.find_elements(By.CLASS_NAME, "multi-select__box")[i]
             team_btn.click()
         
         

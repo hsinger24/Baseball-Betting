@@ -257,9 +257,11 @@ def todays_bets(todays_games, todays_win_percentages, odds, capital, kelly):
         away_kc = kelly_criterion_away()
         home_bet = capital * home_kc
         away_bet = capital * away_kc
-        series = pd.Series([home_team, away_team, home_prob, away_prob, home_ml, away_ml, home_ml_prob, away_ml_prob,
-        home_diff, away_diff, home_kc, away_kc, home_bet, away_bet], index = todays_bets.columns)
-        todays_bets = todays_bets.append(series, ignore_index = True)
+        new_data = [home_team, away_team, home_prob, away_prob, home_ml, away_ml, home_ml_prob, away_ml_prob,
+        home_diff, away_diff, home_kc, away_kc, home_bet, away_bet]
+        new_df = pd.DataFrame([new_data])
+        new_df.columns = todays_bets.columns
+        todays_bets = pd.concat([todays_bets, new_df], ignore_index = True)
     return todays_bets
 
 def calculate_payoff(row):
@@ -303,8 +305,10 @@ def calculate_yesterdays_bets_results(yesterday_string, yesterdays_capital):
                 winner = team_home
             
             # Appending to results table
-            series = pd.Series([team_home, team_away, winner], index = results_table.columns)
-            results_table = results_table.append(series, ignore_index = True)        
+            new_data = [team_home, team_away, winner]
+            new_df = pd.DataFrame([new_data])
+            new_df.columns = results_table.columns
+            results_table = pd.concat([results_table, new_df], ignore_index = True)        
         else:
             continue
     for column in list(results_table.columns):
@@ -488,8 +492,10 @@ def calculate_yesterdays_bet_results_external(yesterday_string, yesterdays_capit
                 winner = team_home
             
             # Appending to results table
-            series = pd.Series([team_home, team_away, winner], index = results_table.columns)
-            results_table = results_table.append(series, ignore_index = True)        
+            new_data = [team_home, team_away, winner]
+            new_df = pd.DataFrame([new_data])
+            new_df.columns = results_table.columns
+            results_table = pd.concat([results_table, new_df], ignore_index = True)       
         else:
             continue
     for column in list(results_table.columns):
@@ -569,7 +575,7 @@ if calculate_results:
         results.reset_index(drop = True, inplace = True)
         yesterdays_capital = float(results.loc[len(results)-1, 'Money_Tracker'])
         yesterdays_bets = calculate_yesterdays_bets_results(yesterday_string = yesterday_string, yesterdays_capital = yesterdays_capital)
-        results = results.append(yesterdays_bets)
+        results = pd.concat([results, yesterdays_bets], ignore_index = True)
         results.reset_index(drop = True, inplace = True)
         results.to_csv('results_tracker/results_tracker_base.csv')
         capital = float(results.loc[len(results)-1, 'Money_Tracker'])
@@ -587,7 +593,7 @@ if calculate_results_external:
         results = pd.read_csv('results_tracker/results_tracker_external.csv', index_col = 0)
         yesterdays_capital_538 = float(results.loc[len(results)-1, 'Tracker_538'])
         yesterdays_bets = calculate_yesterdays_bet_results_external(yesterday_string, yesterdays_capital_538)
-        results = results.append(yesterdays_bets)
+        results = pd.concat([results, yesterdays_bets], ignore_index = True)
         results.reset_index(drop = True, inplace = True)
         results.to_csv('results_tracker/results_tracker_external.csv')
         capital_538 = capital = float(results.loc[len(results)-1, 'Tracker_538'])

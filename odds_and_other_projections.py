@@ -60,7 +60,7 @@ def retrieve_odds():
     driver.get('https://www.actionnetwork.com/mlb/odds')
 
     # Navigating to ML
-    ml_button = driver.find_element_by_xpath("//*[@id='__next']/div/main/div/div[2]/div/div[1]/div[2]/select")
+    ml_button = driver.find_element(By.XPATH, "//*[@id='__next']/div/main/div/div[2]/div/div[1]/div[2]/select")
     select = Select(ml_button)
     select.select_by_visible_text('Moneyline')
 
@@ -113,8 +113,12 @@ def retrieve_odds():
             ml_home = float(ml_home)
         except:
             continue
-        series = pd.Series([home_team, away_team, ml_home, ml_away], index = odds_df.columns)
-        odds_df = odds_df.append(series, ignore_index = True)
+        # series = pd.Series([home_team, away_team, ml_home, ml_away], index = odds_df.columns)
+        # odds_df = odds_df.append(series, ignore_index = True)
+        new_data = [home_team, away_team, ml_home, ml_away]
+        new_df = pd.DataFrame([new_data])
+        new_df.columns = odds_df.columns
+        odds_df = pd.concat([odds_df, new_df], ignore_index = True)
     odds_df['Home_Prob'] = odds_df.Home_Odds.apply(_calculate_odds)
     odds_df['Away_Prob'] = odds_df.Away_Odds.apply(_calculate_odds)
     odds_df['Home_Team'] = odds_df.Home_Team.apply(lambda x: team_map[x])
