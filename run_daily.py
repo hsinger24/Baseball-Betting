@@ -70,12 +70,11 @@ team_map = {
 
 
 def _retrieve_current_runs_scored():
-    tables = pd.read_html('https://www.espn.com/mlb/stats/team')
-    tables[1].reset_index(inplace = True)
-    tables[1]['index'] = tables[1].index + 1
-    runs_scored_table = pd.merge(tables[0], tables[1], left_on = 'RK', right_on = 'index')
-    runs_scored_table = runs_scored_table[['Team', 'GP', 'R']]
+    tables = pd.read_html('https://www.foxsports.com/mlb/team-stats')
+    runs_scored_table = tables[1].iloc[:, [1,2,6]]
+    runs_scored_table.columns = ['Team', 'GP', 'R']
     runs_scored_table['Runs_162'] = runs_scored_table.R * (162.0/runs_scored_table.GP)
+    runs_scored_table['Team'] = runs_scored_table.Team.apply(lambda x: team_map[x])
     return runs_scored_table
 
 def _retrieve_current_runs_allowed():
@@ -564,8 +563,8 @@ def calculate_yesterdays_bet_results_external(yesterday_string, yesterdays_capit
 # Run parameters
 first_run = False
 first_run_external = False
-calculate_results = True
-calculate_results_external = True
+calculate_results = False
+calculate_results_external = False
 
 # Results calculation
 if calculate_results:

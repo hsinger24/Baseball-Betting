@@ -36,6 +36,39 @@ _team_map = {
     'Cincinnati Reds': 'Reds'
 }
 
+_team_map_v2 = {
+    'LA Dodgers' : 'Dodgers',
+    'Minnesota': 'Twins',
+    'Cincinnati': 'Reds',
+    'Chi Sox' : 'White Sox',
+    'Milwaukee' : 'Brewers',
+    'Cleveland' : 'Guardians',
+    'St. Louis' : 'Cardinals',
+    'San Diego': 'Padres',
+    'Chi Cubs': 'Cubs',
+    'Tampa Bay': 'Rays',
+    'Atlanta': 'Braves',
+    'Houston': 'Astros',
+    'Oakland': 'Athletics',
+    'SF Giants': 'Giants',
+    'Kansas City': 'Royals',
+    'Pittsburgh': 'Pirates',
+    'Texas': 'Rangers',
+    'NY Yankees': 'Yankees',
+    'Baltimore': 'Orioles',
+    'Seattle': 'Mariners',
+    'LA Angels': 'Angels',
+    'Toronto': 'Blue Jays',
+    'NY Mets': 'Mets',
+    'Miami': 'Marlins',
+    'Arizona': 'Diamondbacks',
+    'Detroit': 'Tigers',
+    'Washington': 'Nationals',
+    'Philadelphia': 'Phillies',
+    'Colorado': 'Rockies',
+    'Boston': 'Red Sox'
+}
+
 def _retrieve_single_year_hitting_table(year: int) -> pd.DataFrame:
     """Retrieves a table from espn for a team's single year cluster luck table with
     cluster luck regressors. This function should not be used outside this file
@@ -46,7 +79,7 @@ def _retrieve_single_year_hitting_table(year: int) -> pd.DataFrame:
     Returns:
         pd.DataFrame: DataFrame containing a teams single year stats to be used for cluster lucks
     """
-    # Link to espn
+   # Link to espn
     link = 'https://www.espn.com/mlb/stats/team/_/stat/batting/season/%s/seasontype/2' % year
 
     # will hold combination of all stats for teams for given year
@@ -59,8 +92,23 @@ def _retrieve_single_year_hitting_table(year: int) -> pd.DataFrame:
     combined_stats_table = pd.concat([stats_table_html[0], stats_table_html[1]], axis=1)
     hitting_table = hitting_table.append(combined_stats_table)
 
+    # Getting team names via joining Team Ranking
+    obp_df = pd.read_html(f'https://www.teamrankings.com/mlb/stat/on-base-pct?date={year}-11')[0][['Team', '2023']]
+    obp_df.columns = ['Team', 'OBP']
+    slg_df = pd.read_html(f'https://www.teamrankings.com/mlb/stat/slugging-pct?date={year}-11')[0][['Team', '2023']]
+    slg_df.columns = ['Team', 'SLG']
+    rankings_df = obp_df.merge(slg_df, on = 'Team')
+    for index, row in hitting_table.iterrows():
+        team = ' '
+        rankings_df['DIFF_SLG'] = rankings_df.SLG.apply(lambda x: x - row.SLG)
+        rankings_df['DIFF_OBP'] = rankings_df.OBP.apply(lambda x: x - row.OBP)
+        data_row = rankings_df[(rankings_df.DIFF_SLG < 0.002) & (rankings_df.DIFF_OBP < 0.002) & 
+                            (rankings_df.DIFF_SLG > -0.002) & (rankings_df.DIFF_OBP > -0.002)]
+        team = data_row[['Team']].values[0][0]
+        hitting_table.loc[index, 'Team'] = team
+        
     # Convert Team names to standard naming convention
-    hitting_table.Team = hitting_table.Team.apply(lambda x: _team_map[x])
+    hitting_table.Team = hitting_table.Team.apply(lambda x: _team_map_v2[x])
 
     return hitting_table
 
