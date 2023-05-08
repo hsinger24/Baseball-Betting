@@ -79,7 +79,7 @@ def _retrieve_single_year_hitting_table(year: int) -> pd.DataFrame:
     Returns:
         pd.DataFrame: DataFrame containing a teams single year stats to be used for cluster lucks
     """
-   # Link to espn
+    # Link to espn
     link = 'https://www.espn.com/mlb/stats/team/_/stat/batting/season/%s/seasontype/2' % year
 
     # will hold combination of all stats for teams for given year
@@ -97,15 +97,27 @@ def _retrieve_single_year_hitting_table(year: int) -> pd.DataFrame:
     obp_df.columns = ['Team', 'OBP']
     slg_df = pd.read_html(f'https://www.teamrankings.com/mlb/stat/slugging-pct?date={year}-11')[0][['Team', '2023']]
     slg_df.columns = ['Team', 'SLG']
+    avg_df = pd.read_html(f'https://www.teamrankings.com/mlb/stat/batting-average?date={year}-11')[0][['Team', '2023']]
+    avg_df.columns = ['Team', 'AVG']
     rankings_df = obp_df.merge(slg_df, on = 'Team')
+    rankings_df = rankings_df.merge(avg_df, on = 'Team')
     for index, row in hitting_table.iterrows():
         team = ' '
         rankings_df['DIFF_SLG'] = rankings_df.SLG.apply(lambda x: x - row.SLG)
         rankings_df['DIFF_OBP'] = rankings_df.OBP.apply(lambda x: x - row.OBP)
-        data_row = rankings_df[(rankings_df.DIFF_SLG < 0.002) & (rankings_df.DIFF_OBP < 0.002) & 
-                            (rankings_df.DIFF_SLG > -0.002) & (rankings_df.DIFF_OBP > -0.002)]
-        team = data_row[['Team']].values[0][0]
-        hitting_table.loc[index, 'Team'] = team
+        rankings_df['DIFF_AVG'] = rankings_df.AVG.apply(lambda x: x - row.AVG)
+        try:
+            data_row = rankings_df[(rankings_df.DIFF_SLG < 0.001) & (rankings_df.DIFF_OBP < 0.001) & 
+                                (rankings_df.DIFF_SLG > -0.001) & (rankings_df.DIFF_OBP > -0.001) &
+                                (rankings_df.DIFF_AVG > -0.001) & (rankings_df.DIFF_AVG > -0.001)]
+            team = data_row[['Team']].values[0][0]
+            hitting_table.loc[index, 'Team'] = team
+        except:
+            data_row = rankings_df[(rankings_df.DIFF_SLG < 0.002) & (rankings_df.DIFF_OBP < 0.002) & 
+                                (rankings_df.DIFF_SLG > -0.002) & (rankings_df.DIFF_OBP > -0.002) &
+                                (rankings_df.DIFF_AVG > -0.002) & (rankings_df.DIFF_AVG > -0.002)]
+            team = data_row[['Team']].values[0][0]
+            hitting_table.loc[index, 'Team'] = team
         
     # Convert Team names to standard naming convention
     hitting_table.Team = hitting_table.Team.apply(lambda x: _team_map_v2[x])
