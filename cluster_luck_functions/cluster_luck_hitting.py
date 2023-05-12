@@ -109,13 +109,13 @@ def _retrieve_single_year_hitting_table(year: int) -> pd.DataFrame:
         try:
             data_row = rankings_df[(rankings_df.DIFF_SLG < 0.001) & (rankings_df.DIFF_OBP < 0.001) & 
                                 (rankings_df.DIFF_SLG > -0.001) & (rankings_df.DIFF_OBP > -0.001) &
-                                (rankings_df.DIFF_AVG > -0.001) & (rankings_df.DIFF_AVG > -0.001)]
+                                (rankings_df.DIFF_AVG < 0.001) & (rankings_df.DIFF_AVG > -0.001)]
             team = data_row[['Team']].values[0][0]
             hitting_table.loc[index, 'Team'] = team
         except:
             data_row = rankings_df[(rankings_df.DIFF_SLG < 0.002) & (rankings_df.DIFF_OBP < 0.002) & 
                                 (rankings_df.DIFF_SLG > -0.002) & (rankings_df.DIFF_OBP > -0.002) &
-                                (rankings_df.DIFF_AVG > -0.002) & (rankings_df.DIFF_AVG > -0.002)]
+                                (rankings_df.DIFF_AVG < 0.002) & (rankings_df.DIFF_AVG > -0.002)]
             team = data_row[['Team']].values[0][0]
             hitting_table.loc[index, 'Team'] = team
         
