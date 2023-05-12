@@ -83,7 +83,7 @@ def _retrieve_historical_player_war_tables(driver, year=None):
             year_slider.send_keys(year)
 
             # get the save button, click it and wait for it to be stale
-            save_btn = driver.find_elements(By.CLASS_NAME, "modal__btn--save")[0]
+            save_btn = driver.find_elements(By.CLASS_NAME, "modal__btn--save")[1]
             save_btn.click()
             WebDriverWait(driver, 30).until(EC.staleness_of(save_btn))
 
@@ -95,7 +95,7 @@ def _retrieve_historical_player_war_tables(driver, year=None):
         pa_slider.send_keys(0)
 
         # save selection
-        save_btn = driver.find_elements(By.CLASS_NAME, "modal__btn--save")[0]
+        save_btn = driver.find_elements(By.CLASS_NAME, "modal__btn--save")[1]
         save_btn.click()
         WebDriverWait(driver, 30).until(EC.staleness_of(save_btn))
 
@@ -118,7 +118,7 @@ def _retrieve_historical_player_war_tables(driver, year=None):
 
             # click save
             save_btn = driver.find_elements(By.CLASS_NAME, "modal__btn--save")
-            save_btn = save_btn[0]
+            save_btn = save_btn[1]
             save_btn.click()
 
             # wait for save button staleness
