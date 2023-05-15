@@ -99,23 +99,29 @@ def _retrieve_single_year_hitting_table(year: int) -> pd.DataFrame:
     slg_df.columns = ['Team', 'SLG']
     avg_df = pd.read_html(f'https://www.teamrankings.com/mlb/stat/batting-average?date={year}-11')[0][['Team', '2023']]
     avg_df.columns = ['Team', 'AVG']
+    doubles_df = pd.read_html(f'https://www.teamrankings.com/mlb/stat/doubles-per-game?date={year}-11')[0][['Team', '2023']]
+    doubles_df.columns = ['Team', 'DPG']
     rankings_df = obp_df.merge(slg_df, on = 'Team')
     rankings_df = rankings_df.merge(avg_df, on = 'Team')
+    rankings_df = rankings_df.merge(doubles_df, on = 'Team')
     for index, row in hitting_table.iterrows():
         team = ' '
         rankings_df['DIFF_SLG'] = rankings_df.SLG.apply(lambda x: x - row.SLG)
         rankings_df['DIFF_OBP'] = rankings_df.OBP.apply(lambda x: x - row.OBP)
         rankings_df['DIFF_AVG'] = rankings_df.AVG.apply(lambda x: x - row.AVG)
+        rankings_df['DIFF_DPG'] = rankings_df.DPG.apply(lambda x: x - (row['2B']/row['GP']))
         try:
-            data_row = rankings_df[(rankings_df.DIFF_SLG < 0.001) & (rankings_df.DIFF_OBP < 0.001) & 
-                                (rankings_df.DIFF_SLG > -0.001) & (rankings_df.DIFF_OBP > -0.001) &
-                                (rankings_df.DIFF_AVG < 0.001) & (rankings_df.DIFF_AVG > -0.001)]
+            data_row = rankings_df[(rankings_df.DIFF_SLG < 0.001) & (rankings_df.DIFF_SLG > -0.001) & 
+                                (rankings_df.DIFF_OBP < 0.001) & (rankings_df.DIFF_OBP > -0.001) &
+                                (rankings_df.DIFF_AVG < 0.001) & (rankings_df.DIFF_AVG > -0.001) &
+                                (rankings_df.DIFF_DPG < 0.005) & (rankings_df.DIFF_DPG > -0.005)]
             team = data_row[['Team']].values[0][0]
             hitting_table.loc[index, 'Team'] = team
         except:
-            data_row = rankings_df[(rankings_df.DIFF_SLG < 0.002) & (rankings_df.DIFF_OBP < 0.002) & 
-                                (rankings_df.DIFF_SLG > -0.002) & (rankings_df.DIFF_OBP > -0.002) &
-                                (rankings_df.DIFF_AVG < 0.002) & (rankings_df.DIFF_AVG > -0.002)]
+            data_row = rankings_df[(rankings_df.DIFF_SLG < 0.002) & (rankings_df.DIFF_SLG > -0.002) & 
+                                (rankings_df.DIFF_OBP < 0.002) & (rankings_df.DIFF_OBP > -0.002) &
+                                (rankings_df.DIFF_AVG < 0.002) & (rankings_df.DIFF_AVG > -0.002) &
+                                (rankings_df.DIFF_DPG < 0.01) & (rankings_df.DIFF_DPG > -0.01)]
             team = data_row[['Team']].values[0][0]
             hitting_table.loc[index, 'Team'] = team
         
