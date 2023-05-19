@@ -89,7 +89,7 @@ def retrieve_odds():
             home_team = teams[keys[1]]
             away_team = teams[keys[0]]
         # Retreiving odds
-        ml_string = row['Unnamed: 5']
+        ml_string = row['Unnamed: 6']
         if len(ml_string) == 8:
             ml_away = ml_string[:4]
             ml_home = ml_string[-4:]
@@ -113,8 +113,6 @@ def retrieve_odds():
             ml_home = float(ml_home)
         except:
             continue
-        # series = pd.Series([home_team, away_team, ml_home, ml_away], index = odds_df.columns)
-        # odds_df = odds_df.append(series, ignore_index = True)
         new_data = [home_team, away_team, ml_home, ml_away]
         new_df = pd.DataFrame([new_data])
         new_df.columns = odds_df.columns
