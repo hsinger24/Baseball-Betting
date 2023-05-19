@@ -563,8 +563,8 @@ def calculate_yesterdays_bet_results_external(yesterday_string, yesterdays_capit
 # Run parameters
 first_run = False
 first_run_external = False
-calculate_results = False
-calculate_results_external = False
+calculate_results = True
+calculate_results_external = True
 
 # Results calculation
 if calculate_results:

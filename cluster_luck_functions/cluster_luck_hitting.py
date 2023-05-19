@@ -118,13 +118,21 @@ def _retrieve_single_year_hitting_table(year: int) -> pd.DataFrame:
             team = data_row[['Team']].values[0][0]
             hitting_table.loc[index, 'Team'] = team
         except:
-            data_row = rankings_df[(rankings_df.DIFF_SLG < 0.002) & (rankings_df.DIFF_SLG > -0.002) & 
-                                (rankings_df.DIFF_OBP < 0.002) & (rankings_df.DIFF_OBP > -0.002) &
-                                (rankings_df.DIFF_AVG < 0.002) & (rankings_df.DIFF_AVG > -0.002) &
-                                (rankings_df.DIFF_DPG < 0.01) & (rankings_df.DIFF_DPG > -0.01)]
-            team = data_row[['Team']].values[0][0]
-            hitting_table.loc[index, 'Team'] = team
-        
+            try:
+                data_row = rankings_df[(rankings_df.DIFF_SLG < 0.002) & (rankings_df.DIFF_SLG > -0.002) & 
+                                    (rankings_df.DIFF_OBP < 0.002) & (rankings_df.DIFF_OBP > -0.002) &
+                                    (rankings_df.DIFF_AVG < 0.002) & (rankings_df.DIFF_AVG > -0.002) &
+                                    (rankings_df.DIFF_DPG < 0.01) & (rankings_df.DIFF_DPG > -0.01)]
+                team = data_row[['Team']].values[0][0]
+                hitting_table.loc[index, 'Team'] = team
+            except:
+                data_row = rankings_df[(rankings_df.DIFF_SLG < 0.002) & (rankings_df.DIFF_SLG > -0.002) & 
+                                    (rankings_df.DIFF_OBP < 0.002) & (rankings_df.DIFF_OBP > -0.002) &
+                                    (rankings_df.DIFF_AVG < 0.002) & (rankings_df.DIFF_AVG > -0.002) &
+                                    (rankings_df.DIFF_DPG < 0.025) & (rankings_df.DIFF_DPG > -0.025)]
+                team = data_row[['Team']].values[0][0]
+                hitting_table.loc[index, 'Team'] = team
+            
     # Convert Team names to standard naming convention
     hitting_table.Team = hitting_table.Team.apply(lambda x: _team_map_v2[x])
 
