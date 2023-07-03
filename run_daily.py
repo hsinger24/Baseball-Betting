@@ -564,7 +564,7 @@ def calculate_yesterdays_bet_results_external(yesterday_string, yesterdays_capit
 first_run = False
 first_run_external = False
 calculate_results = True
-calculate_results_external = True
+calculate_results_external = False
 
 # Results calculation
 if calculate_results:
@@ -633,5 +633,5 @@ print(sp_adjustments)
 
 # Bets calculation_external
 
-todays_bets_external = calculate_bets_external(capital_538)
-todays_bets_external.to_csv('past_bets/external/bets_' + today + '.csv')
+# todays_bets_external = calculate_bets_external(capital_538)
+# todays_bets_external.to_csv('past_bets/external/bets_' + today + '.csv')
